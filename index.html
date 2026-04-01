@@ -137,10 +137,10 @@
         </div>
 
         <div id="view-despesas" class="content-view">
-            <div class="header-title"><h2>Auditoria TCO (Ticket Log & VExpense)</h2></div>
+            <div class="header-title"><h2>Auditoria TCO (Cartão Combustível & Cartão Despesa)</h2></div>
             <div class="card">
                 <table id="tbl-tco">
-                    <thead><tr><th>Placa</th><th>Combustível</th><th>Oficina</th><th>VExpense</th><th>Total</th><th>Margem</th></tr></thead>
+                    <thead><tr><th>Placa</th><th>Combustível</th><th>Oficina</th><th>Cartão Despesa</th><th>Total</th><th>Margem</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -189,11 +189,11 @@
                 </div>
 
                 <div class="int-card">
-                    <span class="status-badge status-off" id="status-vexpense">Desconectado</span>
-                    <h3><i class="fas fa-receipt" style="color:#9b59b6"></i> VExpense</h3>
-                    <div class="form-group"><label>Endpoint da API</label><input type="text" id="vexpense-url" value="https://api.vexpense.com/v2" disabled></div>
-                    <div class="form-group"><label>Token de Acesso (Bearer)</label><input type="password" id="vexpense-token" placeholder="Cole seu token de integração gerado no painel"></div>
-                    <button class="btn btn-test" onclick="testarConexao('VExpense', 'vexpense-url')"><i class="fas fa-wifi"></i> Testar Conexão</button>
+                    <span class="status-badge status-off" id="status-Cartão Despesa">Desconectado</span>
+                    <h3><i class="fas fa-receipt" style="color:#9b59b6"></i> Cartão Despesa</h3>
+                    <div class="form-group"><label>Endpoint da API</label><input type="text" id="Cartão Despesa-url" value="https://api.Cartão Despesa.com/v2" disabled></div>
+                    <div class="form-group"><label>Token de Acesso (Bearer)</label><input type="password" id="Cartão Despesa-token" placeholder="Cole seu token de integração gerado no painel"></div>
+                    <button class="btn btn-test" onclick="testarConexao('Cartão Despesa', 'Cartão Despesa-url')"><i class="fas fa-wifi"></i> Testar Conexão</button>
                 </div>
             </div>
         </div>
@@ -269,7 +269,7 @@
         // --- INTEGRAÇÕES (API LOGIC) ---
         function testarConexao(sistema, inputId) {
             const url = document.getElementById(inputId).value;
-            if(!url && sistema !== 'VExpense') {
+            if(!url && sistema !== 'Cartão Despesa') {
                 return alert("Por favor, preencha o campo de URL/Host antes de testar.");
             }
 
@@ -351,7 +351,7 @@
             const m = document.getElementById('modal-roteiro');
             const c = document.getElementById('m-cont');
             m.style.display = 'flex';
-            c.innerHTML = `<i class="fas fa-sync fa-spin fa-2x" style="color:var(--sf-blue)"></i><p>Simulando rota otimizada e buscando dados VExpense/Winthor...</p>`;
+            c.innerHTML = `<i class="fas fa-sync fa-spin fa-2x" style="color:var(--sf-blue)"></i><p>Simulando rota otimizada e buscando dados Cartão Despesa/Winthor...</p>`;
             
             setTimeout(() => {
                 c.innerHTML = `<i class="fas fa-check-circle fa-2x" style="color:green"></i><p>Rota traçada com sucesso!</p>
