@@ -1,0 +1,371 @@
+]
+```html
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Control Hub | Inteligência Logística BR-163</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root { --sf-blue: #00a1e0; --sf-dark: #032d60; --bg: #f4f7f9; --success: #2e844a; --danger: #ea001e; --warning: #f88c00; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 240px; background: var(--sf-dark); color: white; display: flex; flex-direction: column; flex-shrink: 0; }
+        .logo { padding: 25px 20px; font-weight: bold; font-size: 1.1rem; border-bottom: 1px solid #0c3d75; background: #021d3d; letter-spacing: 1px; }
+        .nav-item { padding: 15px 20px; color: #adbbcc; text-decoration: none; display: flex; align-items: center; gap: 12px; cursor: pointer; border-left: 4px solid transparent; transition: 0.2s; font-size: 14px; }
+        .nav-item:hover, .nav-item.active { background: #0c3d75; color: white; border-left: 4px solid var(--sf-blue); }
+
+        /* Área de Conteúdo */
+        .main { flex: 1; overflow-y: auto; padding: 25px; position: relative; }
+        .content-view { display: none; }
+        .content-view.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Cabeçalhos e Botões */
+        .header-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .btn { background: var(--sf-blue); color: white; border: none; padding: 10px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+        .btn-add { background: var(--success); }
+        .btn-del { background: var(--danger); padding: 5px 10px; }
+
+        /* Cards e Layout */
+        .card { background: white; padding: 20px; border-radius: 8px; border: 1px solid #dce4ec; box-shadow: 0 2px 5px rgba(0,0,0,0.04); margin-bottom: 20px; }
+        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
+        .kpi-card { background: white; padding: 15px; border-radius: 8px; border-top: 4px solid var(--sf-blue); }
+        .kpi-card h2 { margin: 5px 0 0; color: var(--sf-dark); }
+
+        /* Tabelas Editáveis */
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+        th { text-align: left; padding: 12px; background: #f8f9fa; color: #555; text-transform: uppercase; font-size: 11px; }
+        td { padding: 8px 12px; border-top: 1px solid #f0f0f0; }
+        input[type="text"], input[type="number"] { width: 90%; padding: 6px; border: 1px solid #ddd; border-radius: 3px; font-size: 12px; }
+
+        /* Kanban */
+        .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .k-col { background: #e2e7ed; padding: 15px; border-radius: 8px; min-height: 450px; }
+        .k-items { min-height: 400px; padding-top: 10px; }
+        .k-card { background: white; padding: 12px; margin-bottom: 10px; border-radius: 4px; border-left: 4px solid var(--sf-blue); cursor: grab; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .k-card:active { cursor: grabbing; }
+
+        #map { height: 400px; width: 100%; border-radius: 8px; z-index: 1; }
+
+        /* Modal */
+        #modal-roteiro { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; text-align: center; width: 350px; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo"><i class="fas fa-satellite"></i> CONTROL HUB</div>
+        <div class="nav-item active" onclick="showView('view-torre', this)"><i class="fas fa-th-large"></i> Torre de Controle</div>
+        <div class="nav-item" onclick="showView('view-crm', this)"><i class="fas fa-handshake"></i> Pipeline CRM</div>
+        <div class="nav-item" onclick="showView('view-pedidos', this)"><i class="fas fa-boxes"></i> Pedidos (OMS)</div>
+        <div class="nav-item" onclick="showView('view-despesas', this)"><i class="fas fa-gas-pump"></i> Despesas (TCO)</div>
+        <div class="nav-item" onclick="showView('view-parametros', this)" style="margin-top: auto; border-top: 1px solid #0c3d75;"><i class="fas fa-cog"></i> Parâmetros</div>
+    </nav>
+
+    <div class="main">
+        <div id="view-torre" class="content-view active">
+            <div class="header-title"><h2>Visão Executiva: Escoamento BR-163</h2></div>
+            <div class="kpi-row">
+                <div class="kpi-card"><small>Receita Total</small><h2 id="kpi-receita">R$ 0</h2></div>
+                <div class="kpi-card" style="border-color: var(--danger)"><small>Custo Total</small><h2 id="kpi-custo">R$ 0</h2></div>
+                <div class="kpi-card" style="border-color: var(--success)"><small>Lucro Líquido</small><h2 id="kpi-lucro">R$ 0</h2></div>
+                <div class="kpi-card" style="border-color: var(--warning)"><small>Margem Global</small><h2 id="kpi-margem">0%</h2></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                <div class="card"><div id="map"></div></div>
+                <div class="card"><div class="card-title">Próximos Fechamentos</div><div id="resumo-crm"></div></div>
+            </div>
+        </div>
+
+        <div id="view-crm" class="content-view">
+            <div class="header-title">
+                <h2>Pipeline Comercial</h2>
+                <div style="display:flex; gap:10px">
+                    <input type="text" id="crm-new-cli" placeholder="Cliente">
+                    <input type="number" id="crm-new-val" placeholder="Valor (R$)">
+                    <button class="btn btn-add" onclick="addCRM()"><i class="fas fa-plus"></i> Add Negócio</button>
+                </div>
+            </div>
+            <div class="kanban">
+                <div class="k-col">
+                    <h3>Proposta</h3>
+                    <div id="proposta" class="k-items" ondrop="drop(event, 'proposta')" ondragover="allowDrop(event)"></div>
+                </div>
+                <div class="k-col">
+                    <h3>Negociação</h3>
+                    <div id="negociacao" class="k-items" ondrop="drop(event, 'negociacao')" ondragover="allowDrop(event)"></div>
+                </div>
+                <div class="k-col">
+                    <h3>Fechado</h3>
+                    <div id="fechado" class="k-items" ondrop="drop(event, 'fechado')" ondragover="allowDrop(event)"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-pedidos" class="content-view">
+            <div class="header-title">
+                <h2>Gestão de Pedidos (OMS)</h2>
+                <button class="btn" onclick="executarRoteirizador()"><i class="fas fa-route"></i> Roteirizar</button>
+            </div>
+            <div class="card">
+                <table id="tbl-pedidos">
+                    <thead><tr><th>ID</th><th>Origem</th><th>Cliente</th><th>Volume (t)</th><th>Destino</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="view-despesas" class="content-view">
+            <div class="header-title"><h2>Auditoria TCO (Ticket Log & VExpense)</h2></div>
+            <div class="card">
+                <table id="tbl-tco">
+                    <thead><tr><th>Placa</th><th>Combustível</th><th>Oficina</th><th>VExpense</th><th>Total</th><th>Margem</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="view-parametros" class="content-view">
+            <div class="header-title">
+                <h2>Configuração de Dados</h2>
+                <button class="btn" onclick="salvarTabelas()"><i class="fas fa-save"></i> Salvar Alterações</button>
+            </div>
+            
+            <div class="card">
+                <h3>Editar Pedidos e Coordenadas</h3>
+                <table id="edit-tbl-pedidos">
+                    <thead><tr><th>Pedido</th><th>Cliente</th><th>Cidade</th><th>Vol (t)</th><th>Lat</th><th>Lng</th><th>Ação</th></tr></thead>
+                    <tbody id="body-edit-pedidos"></tbody>
+                </table>
+                <button class="btn btn-sec" onclick="addRowPedido()" style="margin-top:10px"><i class="fas fa-plus"></i> Novo Pedido</button>
+            </div>
+
+            <div class="card">
+                <h3>Editar Custos da Frota (TCO)</h3>
+                <table id="edit-tbl-frota">
+                    <thead><tr><th>Placa</th><th>Combustível</th><th>Oficina</th><th>Receita (R$)</th><th>Ação</th></tr></thead>
+                    <tbody id="body-edit-frota"></tbody>
+                </table>
+                <button class="btn btn-sec" onclick="addRowFrota()" style="margin-top:10px"><i class="fas fa-plus"></i> Nova Placa</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-roteiro"><div class="modal-content" id="m-cont"></div></div>
+
+    <script>
+        // --- DADOS ---
+        let pedidos = JSON.parse(localStorage.getItem('oms_pedidos')) || [
+            {id: "1001", erp: "Winthor", cli: "Inpasa", vol: "35", city: "Sinop", lat: -11.85, lng: -55.51},
+            {id: "2005", erp: "SAP B1", cli: "3 Tentos", vol: "12", city: "Mutum", lat: -13.83, lng: -56.07}
+        ];
+        let frota = JSON.parse(localStorage.getItem('oms_frota')) || [
+            {placa: "ABC-1234", comb: 4200, ofic: 800, ext: 120, rev: 18000},
+            {placa: "KJH-4421", comb: 5100, ofic: 150, ext: 80, rev: 22000}
+        ];
+        let crm = JSON.parse(localStorage.getItem('oms_crm')) || [
+            {id: '1', cli: 'Inpasa', val: 120000, fase: 'negociacao'},
+            {id: '2', cli: '3 Tentos', val: 85000, fase: 'proposta'}
+        ];
+
+        // --- MAPA ---
+        const map = L.map('map').setView([-13.00, -56.00], 6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        let layers = L.layerGroup().addTo(map);
+
+        // --- CRM DRAG & DROP ---
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drop(ev, novaFase) {
+            ev.preventDefault();
+            const id = ev.dataTransfer.getData("text");
+            const item = crm.find(c => c.id === id);
+            if(item) {
+                item.fase = novaFase;
+                render();
+            }
+        }
+
+        function addCRM() {
+            const cli = document.getElementById('crm-new-cli').value;
+            const val = document.getElementById('crm-new-val').value;
+            if(!cli || !val) return alert("Preencha cliente e valor");
+            crm.push({id: 'crm-' + Date.now(), cli: cli, val: parseFloat(val), fase: 'proposta'});
+            document.getElementById('crm-new-cli').value = '';
+            document.getElementById('crm-new-val').value = '';
+            render();
+        }
+
+        // --- PARÂMETROS ---
+        function addRowPedido() {
+            const tbody = document.getElementById('body-edit-pedidos');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="p-id" value="NEW"></td>
+                <td><input type="text" class="p-cli" value=""></td>
+                <td><input type="text" class="p-city" value=""></td>
+                <td><input type="number" class="p-vol" value="0"></td>
+                <td><input type="number" class="p-lat" value="-12.0"></td>
+                <td><input type="number" class="p-lng" value="-55.0"></td>
+                <td><button class="btn btn-del" onclick="this.parentElement.parentElement.remove()">X</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function addRowFrota() {
+            const tbody = document.getElementById('body-edit-frota');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="f-placa" value=""></td>
+                <td><input type="number" class="f-comb" value="0"></td>
+                <td><input type="number" class="f-ofic" value="0"></td>
+                <td><input type="number" class="f-rev" value="0"></td>
+                <td><button class="btn btn-del" onclick="this.parentElement.parentElement.remove()">X</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function salvarTabelas() {
+            const novosPedidos = [];
+            document.querySelectorAll('#body-edit-pedidos tr').forEach(tr => {
+                novosPedidos.push({
+                    id: tr.querySelector('.p-id').value,
+                    cli: tr.querySelector('.p-cli').value,
+                    city: tr.querySelector('.p-city').value,
+                    vol: tr.querySelector('.p-vol').value,
+                    lat: parseFloat(tr.querySelector('.p-lat').value),
+                    lng: parseFloat(tr.querySelector('.p-lng').value),
+                    erp: "Manual"
+                });
+            });
+
+            const novaFrota = [];
+            document.querySelectorAll('#body-edit-frota tr').forEach(tr => {
+                novaFrota.push({
+                    placa: tr.querySelector('.f-placa').value,
+                    comb: parseFloat(tr.querySelector('.f-comb').value),
+                    ofic: parseFloat(tr.querySelector('.f-ofic').value),
+                    rev: parseFloat(tr.querySelector('.f-rev').value),
+                    ext: 0
+                });
+            });
+
+            pedidos = novosPedidos;
+            frota = novaFrota;
+            localStorage.setItem('oms_pedidos', JSON.stringify(pedidos));
+            localStorage.setItem('oms_frota', JSON.stringify(frota));
+            render();
+            alert("Dados salvos com sucesso!");
+        }
+
+        // --- ROTEIRIZADOR ---
+        function executarRoteirizador() {
+            const m = document.getElementById('modal-roteiro');
+            const c = document.getElementById('m-cont');
+            m.style.display = 'flex';
+            c.innerHTML = `<i class="fas fa-sync fa-spin fa-2x"></i><p>Simulando rota otimizada...</p>`;
+            
+            setTimeout(() => {
+                c.innerHTML = `<i class="fas fa-check-circle fa-2x" style="color:green"></i><p>Rota traçada com sucesso!</p>
+                               <button class="btn" onclick="document.getElementById('modal-roteiro').style.display='none'; showView('view-torre')">Ver Mapa</button>`;
+                const pontos = pedidos.map(p => [p.lat, p.lng]);
+                L.polyline(pontos, {color: 'var(--sf-blue)', weight: 5}).addTo(layers);
+                map.fitBounds(pontos);
+            }, 1200);
+        }
+
+        // --- RENDERIZAÇÃO GERAL ---
+        function render() {
+            // KPIs
+            let tRev = frota.reduce((a,b) => a + b.rev, 0);
+            let tCost = frota.reduce((a,b) => a + (b.comb + b.ofic + b.ext), 0);
+            document.getElementById('kpi-receita').innerText = `R$ ${tRev.toLocaleString()}`;
+            document.getElementById('kpi-custo').innerText = `R$ ${tCost.toLocaleString()}`;
+            document.getElementById('kpi-lucro').innerText = `R$ ${(tRev-tCost).toLocaleString()}`;
+            document.getElementById('kpi-margem').innerText = `${tRev > 0 ? (((tRev-tCost)/tRev)*100).toFixed(1) : 0}%`;
+
+            // Visualização Pedidos
+            document.querySelector('#tbl-pedidos tbody').innerHTML = pedidos.map(p => 
+                `<tr><td>#${p.id}</td><td>${p.erp}</td><td>${p.cli}</td><td>${p.vol} t</td><td>${p.city}</td></tr>`
+            ).join('');
+
+            // Visualização TCO
+            document.querySelector('#tbl-tco tbody').innerHTML = frota.map(f => 
+                `<tr><td>${f.placa}</td><td>R$ ${f.comb}</td><td>R$ ${f.ofic}</td><td>R$ ${f.ext}</td><td>R$ ${f.comb+f.ofic+f.ext}</td><td>${f.rev > 0 ? (((f.rev-(f.comb+f.ofic))/f.rev)*100).toFixed(1) : 0}%</td></tr>`
+            ).join('');
+
+            // Edição Pedidos (Parâmetros)
+            document.getElementById('body-edit-pedidos').innerHTML = pedidos.map(p => `<tr>
+                <td><input type="text" class="p-id" value="${p.id}"></td>
+                <td><input type="text" class="p-cli" value="${p.cli}"></td>
+                <td><input type="text" class="p-city" value="${p.city}"></td>
+                <td><input type="number" class="p-vol" value="${p.vol}"></td>
+                <td><input type="number" class="p-lat" value="${p.lat}"></td>
+                <td><input type="number" class="p-lng" value="${p.lng}"></td>
+                <td><button class="btn btn-del" onclick="this.parentElement.parentElement.remove()">X</button></td>
+            </tr>`).join('');
+
+            // Edição Frota (Parâmetros)
+            document.getElementById('body-edit-frota').innerHTML = frota.map(f => `<tr>
+                <td><input type="text" class="f-placa" value="${f.placa}"></td>
+                <td><input type="number" class="f-comb" value="${f.comb}"></td>
+                <td><input type="number" class="f-ofic" value="${f.ofic}"></td>
+                <td><input type="number" class="f-rev" value="${f.rev}"></td>
+                <td><button class="btn btn-del" onclick="this.parentElement.parentElement.remove()">X</button></td>
+            </tr>`).join('');
+
+            // Mapa
+            layers.clearLayers();
+            pedidos.forEach(p => {
+                if(p.lat && p.lng) L.marker([p.lat, p.lng]).addTo(layers).bindPopup(`<b>${p.cli}</b><br>${p.vol}t`);
+            });
+            
+            // CRM Kanban
+            const resCRM = document.getElementById('resumo-crm');
+            resCRM.innerHTML = '';
+            ['proposta', 'negociacao', 'fechado'].forEach(fase => {
+                const col = document.getElementById(fase);
+                col.innerHTML = '';
+                crm.filter(c => c.fase === fase).forEach(c => {
+                    col.innerHTML += `
+                        <div class="k-card" id="${c.id}" draggable="true" ondragstart="drag(event)">
+                            <b>${c.cli}</b><br>R$ ${c.val.toLocaleString()}
+                        </div>`;
+                    if(fase !== 'fechado') {
+                        resCRM.innerHTML += `<div style="padding:8px; border-bottom:1px solid #eee"><b>${c.cli}</b> - R$ ${c.val.toLocaleString()}</div>`;
+                    }
+                });
+            });
+            localStorage.setItem('oms_crm', JSON.stringify(crm));
+        }
+
+        // Navegação
+        function showView(id, el) {
+            document.querySelectorAll('.content-view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(el) {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+            }
+            if(id === 'view-torre') setTimeout(() => map.invalidateSize(), 200);
+        }
+
+        render();
+    </script>
+</body>
+</html>
+```
+
