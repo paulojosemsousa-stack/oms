@@ -1,0 +1,2730 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPOGPay — Super App do Ecossistema IPOG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #6B3FA0;
+            --primary-light: #8B5FBF;
+            --primary-dark: #4A1D7A;
+            --secondary: #D4A843;
+            --secondary-light: #F0D078;
+            --secondary-dark: #A67B20;
+            --bg-app: #F4F4F9;
+            --bg-card: #FFFFFF;
+            --bg-card-hover: #F0F0F5;
+            --bg-surface: #FFFFFF;
+            --text-primary: #1A1A2E;
+            --text-secondary: #5A5A6E;
+            --text-tertiary: #8A8A9E;
+            --border-color: #E0E0E8;
+            --shadow-card: 0 2px 12px rgba(0,0,0,0.06);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.10);
+            --radius: 16px;
+            --radius-lg: 24px;
+            --radius-sm: 10px;
+            --font: 'Inter', system-ui, sans-serif;
+            --transition: 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: var(--bg-app);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .app-wrapper {
+            width: 100%;
+            max-width: 430px;
+            height: 100vh;
+            max-height: 920px;
+            background: var(--bg-app);
+            border-radius: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        @media (min-width: 500px) { .app-wrapper { border-radius: 28px; height: 92vh; max-height: 900px; margin: 0 16px; } }
+        @media (min-width: 900px) { .app-wrapper { border-radius: 32px; height: 90vh; max-height: 880px; } }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        .header-brand { display: flex; align-items: center; gap: 10px; }
+        .header-logo {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 16px; color: #fff; letter-spacing: -1px;
+            overflow: hidden; flex-shrink: 0;
+        }
+        .header-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; }
+        .header-title { font-weight: 700; font-size: 18px; color: var(--text-primary); letter-spacing: -0.3px; }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .header-icon-btn {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 18px; transition: var(--transition);
+            color: var(--text-primary); position: relative;
+        }
+        .header-icon-btn:hover { background: var(--bg-card-hover); }
+        .header-icon-btn .badge-dot {
+            position: absolute; top: 6px; right: 6px;
+            width: 8px; height: 8px; background: #E74C3C;
+            border-radius: 50%; border: 2px solid var(--bg-surface);
+        }
+        .header-avatar {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: var(--primary); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 15px; color: #fff;
+            border: 2px solid var(--primary-light); transition: var(--transition);
+            overflow: hidden; flex: 0 0 38px; line-height: 1;
+        }
+        .header-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; }
+
+        .bottom-nav {
+            display: flex; align-items: center; justify-content: space-around;
+            background: var(--bg-surface); border-top: 1px solid var(--border-color);
+            padding: 4px 4px 12px; flex-shrink: 0; z-index: 10;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            cursor: pointer; padding: 4px 6px; border-radius: 12px;
+            transition: var(--transition); color: var(--text-tertiary);
+            font-size: 10px; font-weight: 500; position: relative;
+            min-width: 48px; -webkit-tap-highlight-color: transparent;
+        }
+        .nav-item .nav-icon { font-size: 22px; transition: var(--transition); }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active .nav-icon { transform: translateY(-2px); }
+        .nav-item.active::after {
+            content: ''; position: absolute; top: -4px;
+            width: 18px; height: 3px; background: var(--primary);
+            border-radius: 0 0 4px 4px;
+        }
+
+        .screen { display: none; flex-direction: column; padding: 16px 18px 20px; animation: fadeSlide 0.3s ease; }
+        .screen.active { display: flex; }
+        @keyframes fadeSlide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card {
+            background: var(--bg-card); border-radius: var(--radius);
+            padding: 16px 18px; border: 1px solid var(--border-color);
+            transition: var(--transition); cursor: pointer; box-shadow: var(--shadow-card);
+        }
+        .card:hover { border-color: var(--primary-light); box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 20px; border-radius: 30px; font-weight: 600; font-size: 14px;
+            cursor: pointer; border: none; transition: var(--transition);
+            font-family: var(--font); white-space: nowrap;
+        }
+        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(107,63,160,0.25); }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(107,63,160,0.35); }
+        .btn-secondary { background: var(--secondary); color: #1a1a14; box-shadow: 0 4px 12px rgba(212,168,67,0.25); }
+        .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212,168,67,0.35); }
+        .btn-outline { background: transparent; border: 1.5px solid var(--border-color); color: var(--text-primary); }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-sm { padding: 8px 14px; font-size: 12px; border-radius: 20px; }
+        .btn-success { background: #2ECC71; color: #fff; box-shadow: 0 4px 12px rgba(46,204,113,0.25); }
+
+        .field-input {
+            width: 100%; background: var(--bg-card);
+            border: 1.5px solid var(--border-color); border-radius: var(--radius-sm);
+            padding: 12px 14px; font-size: 14px; color: var(--text-primary);
+            font-family: var(--font); transition: var(--transition); margin-bottom: 12px;
+        }
+        .field-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(107,63,160,0.1); }
+        .field-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+
+        .metric-card { background: var(--bg-card); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border-color); text-align: center; box-shadow: var(--shadow-card); }
+        .metric-value { font-size: 26px; font-weight: 800; color: var(--text-primary); }
+        .metric-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+        .point-display { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 6px 14px; display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 13px; color: var(--text-secondary); box-shadow: var(--shadow-card); }
+        .point-display .point-value { font-size: 20px; font-weight: 800; color: var(--primary); background: rgba(107,63,160,0.08); padding: 2px 12px; border-radius: 6px; min-width: 70px; text-align: center; }
+
+        .voucher-card { background: var(--bg-card); border-radius: var(--radius); padding: 12px; border: 1px solid var(--border-color); text-align: center; transition: var(--transition); cursor: pointer; box-shadow: var(--shadow-card); }
+        .voucher-card:hover { border-color: var(--secondary); transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        .voucher-card .v-icon { font-size: 36px; display: block; margin-bottom: 4px; }
+        .voucher-card .v-name { font-weight: 600; font-size: 13px; color: var(--text-primary); }
+        .voucher-card .v-price { font-weight: 700; font-size: 14px; color: var(--secondary); margin-top: 4px; }
+
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+        .product-card { background: var(--bg-card); border-radius: var(--radius); padding: 12px; border: 1px solid var(--border-color); transition: var(--transition); cursor: pointer; text-align: center; box-shadow: var(--shadow-card); }
+        .product-card:hover { border-color: var(--primary-light); box-shadow: 0 4px 16px rgba(0,0,0,0.05); }
+        .product-card .prod-icon { font-size: 32px; display: block; margin: 0 auto 4px; }
+        .product-card .prod-name { font-size: 11px; font-weight: 600; color: var(--text-primary); line-height: 1.2; }
+        .product-card .prod-price { font-size: 14px; font-weight: 700; color: var(--secondary); margin-top: 4px; }
+
+        .linkedin-post { background: var(--bg-card); border-radius: var(--radius); padding: 14px; border: 1px solid var(--border-color); transition: var(--transition); cursor: pointer; box-shadow: var(--shadow-card); }
+        .linkedin-post:hover { border-color: var(--primary-light); }
+        .linkedin-post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .linkedin-post-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: #fff; flex-shrink: 0; }
+        .linkedin-post-name { font-weight: 700; color: var(--text-primary); font-size: 14px; }
+        .linkedin-post-title { font-size: 12px; color: var(--text-secondary); }
+        .linkedin-post-desc { font-size: 13px; color: var(--text-primary); margin: 6px 0; line-height: 1.4; }
+        .linkedin-post-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+        .linkedin-post-tags span { background: rgba(107,63,160,0.08); padding: 2px 10px; border-radius: 12px; font-size: 10px; color: var(--primary); }
+        .linkedin-post-actions { display: flex; gap: 16px; margin-top: 8px; font-size: 13px; color: var(--text-tertiary); }
+
+        .student-switch { cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border-bottom: 1px dashed var(--primary); }
+        .wallet-id-card { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+        .mini-bank-card { background: #101828; color: #fff; border-radius: 18px; padding: 16px; min-height: 126px; position: relative; overflow: hidden; box-shadow: var(--shadow-lg); }
+        .mini-bank-card::after { content: ''; position: absolute; width: 160px; height: 160px; right: -70px; bottom: -80px; border-radius: 50%; background: rgba(212,168,67,0.24); }
+        .mini-bank-label { font-size: 10px; opacity: 0.72; text-transform: uppercase; letter-spacing: 0.08em; }
+        .mini-bank-value { font-size: 19px; font-weight: 900; margin-top: 4px; letter-spacing: 0.08em; }
+        .network-hero { background: linear-gradient(135deg, #ffffff, #f7f4fb); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow-card); margin-bottom: 12px; }
+        .network-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+        .network-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 9px; text-align: center; }
+        .network-stat strong { display: block; color: var(--primary); font-size: 17px; }
+        .pro-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-card); margin-bottom: 12px; }
+        .pro-banner { height: 72px; background: linear-gradient(135deg, var(--primary), #0EA5A4); }
+        .pro-body { padding: 0 14px 14px; }
+        .pro-avatar { width: 72px; height: 72px; border-radius: 50%; border: 4px solid #fff; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; margin-top: -36px; box-shadow: var(--shadow-card); overflow: hidden; }
+        .pro-avatar img, .linkedin-post-avatar img, .profile-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-photo { width: 92px; height: 92px; border-radius: 50%; border: 4px solid var(--secondary); background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 900; margin: 0 auto; overflow: hidden; }
+        .pro-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+        .pro-actions .btn { padding: 9px 6px; font-size: 11px; border-radius: 18px; }
+        .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .tag-pill { background: rgba(107,63,160,0.08); color: var(--primary); border: 1px solid rgba(107,63,160,0.13); border-radius: 999px; font-size: 10.5px; font-weight: 700; padding: 4px 8px; }
+        .status-pill { background: rgba(46,204,113,0.1); color: #168A4B; border: 1px solid rgba(46,204,113,0.25); border-radius: 999px; font-size: 10.5px; font-weight: 800; padding: 4px 8px; }
+        .statement-amount.credit { color: #168A4B; }
+        .statement-amount.debit { color: #D92D20; }
+        .statement-amount.points { color: #C77800; }
+        .student-list-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-color); cursor: pointer; }
+        .student-list-item:last-child { border-bottom: none; }
+        .radio-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border-color); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .radio-dot.active { border-color: var(--primary); }
+        .radio-dot.active::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+        .qr-pix { width: 96px; height: 96px; background: repeating-linear-gradient(90deg, #111 0 6px, #fff 6px 12px), repeating-linear-gradient(0deg, transparent 0 7px, rgba(255,255,255,0.6) 7px 13px); background-blend-mode: difference; border: 6px solid #fff; box-shadow: 0 0 0 1px var(--border-color); border-radius: 10px; margin: 0 auto; }
+
+        .estab-card { background: var(--bg-card); border-radius: var(--radius); padding: 14px; border: 1px solid var(--border-color); transition: var(--transition); cursor: pointer; box-shadow: var(--shadow-card); }
+        .estab-card:hover { border-color: var(--primary-light); }
+        .estab-card .estab-icon { font-size: 40px; }
+        .estab-card .estab-name { font-weight: 700; color: var(--text-primary); font-size: 16px; }
+        .estab-card .estab-address { font-size: 12px; color: var(--text-secondary); }
+        .estab-menu-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+        .estab-menu-item:last-child { border-bottom: none; }
+        .estab-menu-item .item-name { font-weight: 600; color: var(--text-primary); font-size: 13px; }
+        .estab-menu-item .item-price { color: var(--secondary); font-weight: 700; }
+        .estab-menu-item .item-desc { font-size: 11px; color: var(--text-tertiary); }
+
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--bg-card); color: var(--text-primary); padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 600; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); }
+        .toast.show { opacity: 1; }
+
+        .quick-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 50; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .quick-modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .quick-modal { background: var(--bg-surface); border-radius: 24px 24px 0 0; padding: 24px; width: 100%; max-width: 430px; max-height: 70vh; overflow-y: auto; border-top: 1px solid var(--border-color); }
+        
+        /* NOVO: Estilos da Tela Cheia de Sucesso estilo Fintech (Nubank/Inter) */
+        .fintech-success-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--primary);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .fintech-success-screen.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .success-icon-anim {
+            font-size: 80px;
+            animation: scaleUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+        }
+
+        @keyframes scaleUp {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-details-card {
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
+            width: 90%;
+            max-width: 380px;
+            margin-top: 32px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+            transform: translateY(30px);
+            opacity: 0;
+            animation: slideUpFade 0.5s ease 0.2s forwards;
+        }
+
+        @keyframes slideUpFade {
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .config-section { background: var(--bg-card); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border-color); margin-bottom: 12px; }
+        .config-section .config-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+        .config-section label { font-weight: 600; font-size: 13px; min-width: 100px; }
+        .config-section input[type="color"] { width: 40px; height: 40px; border: none; border-radius: 8px; cursor: pointer; background: none; }
+        .config-section input[type="file"] { font-size: 12px; }
+        .logo-preview { width: 60px; height: 60px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff; }
+        .logo-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        @media (min-width: 900px) {
+            body { align-items: stretch; justify-content: flex-start; }
+            .layout { max-width: 1400px; margin: 0 auto; display: flex; width: 100%; min-height: 100vh; }
+            .sidebar { display: flex; flex-direction: column; width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border-color); padding: 20px 16px; gap: 16px; height: 100vh; position: sticky; top: 0; }
+            .sidebar-user { background: var(--bg-card); border-radius: var(--radius); padding: 12px; border: 1px solid var(--border-color); display:flex; align-items:center; gap:10px; min-height:64px; overflow:hidden; }
+            .sidebar-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-secondary); font-weight: 600; transition: var(--transition); border-left: 3px solid transparent; }
+            .sidebar-item:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+            .sidebar-item.active { background: rgba(107,63,160,0.08); color: var(--primary); border-left-color: var(--primary); }
+            .app-wrapper { max-width: none; height: 100vh; max-height: none; border-radius: 0; box-shadow: none; flex: 1; }
+            .bottom-nav { display: none; }
+            .screen { padding: 24px 32px 32px; max-width: 1100px; }
+            .app-header { padding: 16px 32px; }
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+        .login-box { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 32px 28px; box-shadow: var(--shadow-lg); }
+        .role-option { background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: var(--radius); padding: 12px; text-align: center; cursor: pointer; transition: var(--transition); }
+        .role-option:hover { border-color: var(--primary-light); background: rgba(107,63,160,0.04); }
+        .role-option.selected { border-color: var(--primary) !important; background: rgba(107,63,160,0.06) !important; }
+        .demo-chip { font-size: 11px; font-weight: 600; color: var(--text-secondary); background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 6px 12px; cursor: pointer; transition: var(--transition); }
+        .demo-chip:hover { border-color: var(--primary); color: var(--primary); }
+        .login-brand-logo { width: 260px; max-width: 92%; height: 86px; object-fit: contain; display: block; margin: 0 auto 4px; }
+        .login-marketing-banner { display: block; width: 100%; border: 1px solid var(--border-color); border-radius: 18px; overflow: hidden; background: #4b0b1c; box-shadow: var(--shadow-card); cursor: pointer; margin: 0 0 16px; position: relative; }
+        .login-marketing-banner img { width: 100%; height: 154px; object-fit: cover; display: block; }
+        .login-marketing-banner .marketing-caption { position: absolute; left: 12px; right: 12px; bottom: 10px; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.45); }
+        .login-marketing-banner .marketing-title { font-weight: 900; font-size: 14px; line-height: 1.15; }
+        .login-marketing-banner .marketing-cta { background: #fff; color: #bf1238; border-radius: 999px; padding: 5px 10px; font-size: 10px; font-weight: 900; white-space: nowrap; text-shadow: none; }
+        .quick-profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+        .quick-profile-btn { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 38px; padding: 8px 10px; border-radius: 22px; border: 1px solid var(--border-color); background: #fff; color: var(--text-secondary); font-size: 12px; font-weight: 800; cursor: pointer; transition: var(--transition); }
+        .quick-profile-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
+        .quick-profile-btn .q-icon { width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: rgba(107,63,160,0.08); font-size: 14px; flex-shrink: 0; }
+        .teacher-pay-card { background: linear-gradient(135deg, #101828, #56307f); color: #fff; border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow-lg); margin: 12px 0; overflow: hidden; position: relative; }
+        .teacher-pay-card::after { content: ''; position: absolute; right: -40px; top: -50px; width: 140px; height: 140px; border-radius: 50%; background: rgba(212,168,67,0.25); }
+        .teacher-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 12px 0; }
+        .teacher-class-row { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+        .teacher-class-row:last-child { border-bottom: none; }
+
+        .recebimento-area { background: var(--bg-card); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); }
+        .recebimento-area .point-input { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .recebimento-area .point-input input { flex: 1; min-width: 120px; }
+        .recebimento-area .point-input button { flex-shrink: 0; }
+
+        .dashboard-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+        .section-title { font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 16px 0 10px; }
+        .prod-cat { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
+        .btn-gold { background: var(--secondary); color: #1a1a14; }
+        .app-content { flex: 1; overflow-y: auto; overflow-x: hidden; }
+        .period-toggle { display: inline-flex; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 3px; gap: 2px; box-shadow: var(--shadow-card); }
+        .period-btn { font-size: 12px; font-weight: 600; color: var(--text-secondary); padding: 6px 14px; border-radius: 16px; cursor: pointer; transition: var(--transition); }
+        .period-btn.active { background: var(--primary); color: #fff; }
+        .breakdown-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+        .breakdown-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .breakdown-info { flex: 1; min-width: 0; }
+        .breakdown-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .breakdown-bar { height: 5px; border-radius: 6px; background: rgba(0,0,0,0.06); margin-top: 4px; overflow: hidden; }
+        .breakdown-bar-fill { height: 100%; border-radius: 6px; }
+        .breakdown-value { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+        .breakdown-pct { font-size: 10.5px; color: var(--text-tertiary); white-space: nowrap; }
+        .chart-card { background: var(--bg-card); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); }
+        .chart-wrap { position: relative; height: 200px; margin-top: 8px; }
+        .chart-wrap canvas { width: 100% !important; height: 100% !important; }
+
+        .recebivel-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border-color); }
+        .recebivel-item:last-child { border-bottom: none; }
+        .wallet-list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: var(--transition); }
+        .wallet-list-item:hover { background: var(--bg-card-hover); }
+        .wallet-list-item:last-child { border-bottom: none; }
+        .wallet-list-item .wl-name { font-weight: 600; font-size: 14px; }
+        .wallet-list-item .wl-doc { font-size: 12px; color: var(--text-tertiary); }
+    </style>
+</head>
+<body>
+
+    <div class="login-screen" id="loginScreen" style="position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px 16px;">
+        <div class="login-box" style="width:100%;max-width:420px;">
+            <img class="login-brand-logo" src="Gemini_Generated_Image_l0eahzl0eahzl0ea.png" alt="IPOGPay">
+            <div style="text-align:center;font-size:13px;color:var(--text-secondary);margin:4px 0 20px;">Ecossistema financeiro do IPOG</div>
+            <div class="login-error" id="loginError" style="display:none;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);color:#E74C3C;padding:10px;border-radius:12px;margin-bottom:14px;text-align:center;font-weight:600;">Senha incorreta. Use <b>123456</b></div>
+            <div class="field-label">Eventos e promoções IPOG</div>
+            <div class="login-marketing-banner" id="loginMarketingBanner" onclick="openMarketingBanner()">
+                <img id="loginMarketingImage" src="ipogpay-evento-oratoria.png" alt="Evento IPOG">
+                <div class="marketing-caption">
+                    <div>
+                        <div class="marketing-title" id="loginMarketingTitle">Os Impactos da Oratória</div>
+                        <div style="font-size:11px;opacity:0.92;" id="loginMarketingSubtitle">Fala, presença e posicionamento</div>
+                    </div>
+                    <span class="marketing-cta" id="loginMarketingCta">Garanta sua inscrição</span>
+                </div>
+            </div>
+            <div class="field-label">Usuário</div>
+            <input class="field-input" id="loginUser" type="text" placeholder="seu.email@ipog.edu.br">
+            <div class="field-label">Senha</div>
+            <input class="field-input" id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+            <button class="btn btn-primary" style="width:100%;" onclick="doLogin()">Entrar no IPOGPay</button>
+            <div style="font-size:11px;color:var(--text-tertiary);text-align:center;margin-top:12px;">Ambiente de testes • senha <b style="color:var(--primary);">123456</b></div>
+            <div class="quick-profile-grid">
+                <button class="quick-profile-btn" onclick="quickLogin('aluno')"><span class="q-icon">🎓</span>Aluno</button>
+                <button class="quick-profile-btn" onclick="quickLogin('docente')"><span class="q-icon">👨‍🏫</span>Docente</button>
+                <button class="quick-profile-btn" onclick="quickLogin('franqueado')"><span class="q-icon">🏢</span>Franqueado</button>
+                <button class="quick-profile-btn" onclick="quickLogin('egresso')"><span class="q-icon">🤝</span>Egresso</button>
+                <button class="quick-profile-btn" onclick="quickLogin('marketplace')"><span class="q-icon">🛍️</span>Parceiro</button>
+                <button class="quick-profile-btn" onclick="quickLogin('admin')"><span class="q-icon">🛠️</span>Admin</button>
+                <button class="quick-profile-btn" onclick="quickLogin('estabelecimento')" style="grid-column:1/-1;"><span class="q-icon">🏪</span>Estabelecimento</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div class="quick-modal-overlay" id="quickModalOverlay" onclick="closeQuickModal()">
+        <div class="quick-modal" id="quickModal" onclick="event.stopPropagation()"></div>
+    </div>
+
+    <div class="layout" id="mainLayout" style="display:none;">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand" style="display:flex;align-items:center;gap:12px;">
+                <div class="header-logo" id="sidebarLogo"><img src="Gemini_Generated_Image_l0eahzl0eahzl0ea.png" alt="IPOGPay"></div>
+                <span class="header-title">IPOGPay</span>
+            </div>
+            <div class="sidebar-user">
+                <div class="header-avatar" id="sidebarAvatar">P</div>
+                <div><div class="sidebar-user-name" id="sidebarUserName" style="font-weight:700;font-size:14px;">Paulo R.</div><span class="role-pill" id="sidebarRolePill" style="font-size:11px;background:rgba(107,63,160,0.08);color:var(--primary);padding:2px 10px;border-radius:12px;">🎓 Aluno</span></div>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <button class="btn btn-outline" style="width:100%;" onclick="logout()">🚪 Sair</button>
+        </aside>
+
+        <div class="app-wrapper" id="appWrapper">
+            <header class="app-header">
+                <div class="header-brand">
+                    <div class="header-logo" id="headerLogo"><img src="Gemini_Generated_Image_l0eahzl0eahzl0ea.png" alt="IPOGPay"></div>
+                    <span class="header-title">IPOGPay</span>
+                </div>
+                <div class="header-actions">
+                    <button class="header-icon-btn" onclick="showToast('🔔 Notificações')">🔔<span class="badge-dot"></span></button>
+                    <div class="header-avatar" id="headerAvatar" onclick="navigateTo('perfil')">P</div>
+                </div>
+            </header>
+
+            <div class="app-content" id="appContent">
+                <div class="screen active" id="screen-home">
+                    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+                        <div style="font-size:44px;background:var(--bg-card);border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border-color);">👋</div>
+                        <div><div style="font-size:22px;font-weight:800;color:var(--text-primary);">Olá, <span id="homeUserName" class="student-switch" onclick="openStudentSelector()">Paulo</span></div>
+                        <div style="display:flex;align-items:center;gap:8px;margin-top:4px;"><span class="badge-cat" id="homeBadge" style="background:rgba(107,63,160,0.08);color:var(--primary);border:1px solid rgba(107,63,160,0.15);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;">🏆 Platinum</span></div></div>
+                    </div>
+                    <div class="card" style="margin-bottom:16px;border-left:4px solid var(--secondary);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div><div style="font-size:12px;color:var(--text-secondary);">Saldo de Pontos</div><div style="font-size:32px;font-weight:900;color:var(--secondary);" id="homePointBalance">125.480</div></div>
+                            <div style="font-size:48px;filter:drop-shadow(0 0 8px rgba(212,168,67,0.2));">💎</div>
+                        </div>
+                        <div style="margin-top:10px;display:flex;justify-content:space-between;font-size:11px;color:var(--text-tertiary);"><span>Diamond (500k)</span><span>25%</span></div>
+                        <div style="height:6px;border-radius:10px;background:var(--border-color);margin-top:6px;overflow:hidden;"><div id="homePointProgress" style="height:100%;border-radius:10px;background:var(--secondary);width:25%;"></div></div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="card" style="padding:14px;text-align:center;cursor:pointer;" onclick="navigateTo('carteira')"><div style="font-size:36px;">🏦</div><div style="font-weight:600;font-size:13px;margin-top:4px;">Conta Digital</div></div>
+                        <div class="card" style="padding:14px;text-align:center;cursor:pointer;" onclick="navigateTo('investimentos')"><div style="font-size:36px;">📈</div><div style="font-weight:600;font-size:13px;margin-top:4px;">Investimentos</div></div>
+                        <div class="card" style="padding:14px;text-align:center;cursor:pointer;" onclick="navigateTo('vouchers')"><div style="font-size:36px;">🎁</div><div style="font-weight:600;font-size:13px;margin-top:4px;">Vouchers</div></div>
+                        <div class="card" style="padding:14px;text-align:center;cursor:pointer;" onclick="navigateTo('marketplace')"><div style="font-size:36px;">🛍️</div><div style="font-weight:600;font-size:13px;margin-top:4px;">Marketplace</div></div>
+                    </div>
+                    <div class="card" style="margin-top:14px;padding:14px;display:flex;align-items:center;gap:14px;cursor:pointer;background:var(--bg-card);" onclick="navigateTo('carteira')">
+                        <span style="font-size:32px;">💳</span>
+                        <div><div style="font-weight:700;">Cartão IPOG Platinum</div><div style="font-size:12px;color:var(--text-secondary);">Limite disponível R$ 20.000</div></div>
+                        <span style="margin-left:auto;color:var(--primary);">→</span>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <div class="card" style="padding:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="navigateTo('comunidade')">
+                            <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:28px;">🤝</span><div><div style="font-weight:600;">Comunidade IPOG</div><div style="font-size:12px;color:var(--text-secondary);">8.500+ profissionais ativos</div></div></div>
+                            <span style="color:var(--primary);">→</span>
+                        </div>
+                        <div class="card" style="padding:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin-top:8px;" onclick="navigateTo('estab-selecao')">
+                            <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:28px;">🏪</span><div><div style="font-weight:600;">Estabelecimentos</div><div style="font-size:12px;color:var(--text-secondary);">Escolha um parceiro</div></div></div>
+                            <span style="color:var(--primary);">→</span>
+                        </div>
+                        <div class="card" style="padding:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin-top:8px;" onclick="navigateTo('franqueado')">
+                            <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:28px;">🏢</span><div><div style="font-weight:600;">Franqueado</div><div style="font-size:12px;color:var(--text-secondary);">Antecipação de recebíveis</div></div></div>
+                            <span style="color:var(--primary);">→</span>
+                        </div>
+                        <div class="card" id="homeConfigCard" style="padding:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin-top:8px;" onclick="navigateTo('config')">
+                            <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:28px;">⚙️</span><div><div style="font-weight:600;">Configurações</div><div style="font-size:12px;color:var(--text-secondary);">Whitelabel • Logotipo • Cores</div></div></div>
+                            <span style="color:var(--primary);">→</span>
+                        </div>
+                        <div class="card" style="padding:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin-top:8px;background:linear-gradient(135deg,rgba(107,63,160,0.06),rgba(212,168,67,0.06));" onclick="navigateTo('admin-dashboard')">
+                            <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:28px;">📈</span><div><div style="font-weight:600;">Rentabilidade IPOGPay</div><div style="font-size:12px;color:var(--text-secondary);">Dashboard de resultados</div></div></div>
+                            <span style="color:var(--primary);">→</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="screen" id="screen-carteira">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                        <div style="font-size:22px;font-weight:800;">💳 Carteira Digital</div>
+                        <div class="point-display"><span>🔐 Token</span><span class="point-value" id="dynamic-token">------</span><span style="font-size:11px;color:var(--text-tertiary);" id="token-timer">60s</span></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;">
+                        <div class="metric-card"><div style="font-size:11px;color:var(--text-secondary);">Saldo disponível</div><div style="font-size:26px;font-weight:800;color:var(--primary);" id="walletBalance">R$ 12.450</div></div>
+                        <div class="metric-card"><div style="font-size:11px;color:var(--text-secondary);">Pontos (IPOG)</div><div style="font-size:26px;font-weight:800;color:var(--secondary);" id="pointBalance">125.480</div></div>
+                        <div class="metric-card"><div style="font-size:11px;color:var(--text-secondary);">Limite do Cartão</div><div style="font-size:26px;font-weight:800;">R$ 20.000</div></div>
+                        <div class="metric-card"><div style="font-size:11px;color:var(--text-secondary);">Fatura atual</div><div style="font-size:26px;font-weight:800;color:#E74C3C;" id="currentBill">R$ 1.320</div></div>
+                    </div>
+                    <div class="wallet-id-card">
+                        <div class="mini-bank-card">
+                            <div class="mini-bank-label">Carteira</div>
+                            <div class="mini-bank-value" id="walletNumber">000000001</div>
+                            <div style="font-size:12px;opacity:0.78;margin-top:22px;">Conta IPOGPay</div>
+                        </div>
+                        <div class="mini-bank-card" style="background:#0F766E;">
+                            <div class="mini-bank-label">Chave PIX</div>
+                            <div class="mini-bank-value" id="pixKey">000000001</div>
+                            <div style="font-size:12px;opacity:0.78;margin-top:22px;">Tipo: Carteira IPOGPay</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                        <button class="btn btn-primary btn-sm" onclick="abrirPixTransferencia()">🔁 Transferir para aluno</button>
+                        <button class="btn btn-secondary btn-sm" onclick="showToast('💳 Pagamento com Pontos efetuado')">💳 Pagar com Pontos</button>
+                        <button class="btn btn-outline btn-sm" onclick="showToast('📄 Boleto gerado')">📄 Boleto</button>
+                        <button class="btn btn-outline btn-sm" onclick="navigateTo('investimentos')">📈 Investir</button>
+                    </div>
+
+                    <div class="chart-card" style="margin-bottom:14px;">
+                        <div class="section-title" style="margin-top:0;font-size:14px;">📊 Dashboard financeiro</div>
+                        <div class="dashboard-kpi-grid" style="margin-bottom:8px;">
+                            <div class="metric-card"><div class="metric-value" id="dashEntradas">R$ 0</div><div class="metric-label">Entradas</div></div>
+                            <div class="metric-card"><div class="metric-value" id="dashSaidas">R$ 0</div><div class="metric-label">Saídas</div></div>
+                            <div class="metric-card"><div class="metric-value" id="dashPix">0</div><div class="metric-label">PIX</div></div>
+                            <div class="metric-card"><div class="metric-value" id="dashCashback">0 pts</div><div class="metric-label">Cashback</div></div>
+                        </div>
+                        <div class="chart-wrap" style="height:190px;"><canvas id="walletChart"></canvas></div>
+                    </div>
+
+                    <div class="section-title" style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 10px;">
+                        <span style="font-size:15px;font-weight:700;color:var(--text-primary);">📋 Extrato</span>
+                        <button class="btn btn-outline btn-sm" onclick="downloadExtratoPDF()">📥 Baixar PDF</button>
+                    </div>
+            
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                        <input type="date" id="filterDate" class="field-input" style="margin-bottom:0;" onchange="renderStatement()">
+                        <select id="filterType" class="field-input" style="margin-bottom:0;" onchange="renderStatement()">
+                            <option value="all">Todas as transações</option>
+                            <option value="credit">Entradas (Reais)</option>
+                            <option value="debit">Saídas (Reais)</option>
+                            <option value="points">Compras com Pontos</option>
+                        </select>
+                    </div>
+            
+                    <div id="statementList" style="display:flex;flex-direction:column;gap:8px;"></div>
+                </div>
+
+                <div class="screen" id="screen-investimentos">
+                    <div style="font-size:22px;font-weight:800;">📈 Investimentos IPOG</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Rendimento de 120% do CDI • Gestão automatizada</div>
+                    <div class="card" style="padding:18px;text-align:center;margin-bottom:12px;">
+                        <div style="font-size:12px;color:var(--text-secondary);">Saldo investido</div>
+                        <div style="font-size:34px;font-weight:900;color:var(--primary);" id="investmentBalance">R$ 8.450,00</div>
+                        <div style="font-size:12px;color:var(--secondary);" id="investmentYield">Rendimento acumulado: +R$ 240,32</div>
+                    </div>
+                    <div class="chart-container" style="background:var(--bg-card);border-radius:var(--radius);padding:12px;border:1px solid var(--border-color);height:160px;">
+                        <canvas id="investChart" style="width:100%;height:100%;"></canvas>
+                    </div>
+                    <div style="display:flex;gap:10px;margin:14px 0;">
+                        <button class="btn btn-secondary" style="flex:1;" onclick="abrirModalAporte()">➕ Aportar</button>
+                        <button class="btn btn-outline" style="flex:1;" onclick="abrirModalResgate()">🔄 Resgatar</button>
+                    </div>
+                    <div class="section-title">📊 Carteira</div>
+                    <div class="card" style="display:flex;justify-content:space-between;padding:12px 14px;border-radius:var(--radius-sm);"><span>Renda Fixa (CDB)</span><span style="font-weight:700;">R$ 6.200</span></div>
+                    <div class="card" style="display:flex;justify-content:space-between;padding:12px 14px;border-radius:var(--radius-sm);"><span>Fundos (FIP)</span><span style="font-weight:700;">R$ 2.250</span></div>
+                </div>
+
+                <div class="screen" id="screen-vouchers">
+                    <div style="font-size:22px;font-weight:800;">🎁 Vouchers IPOG</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Compre com saldo ou pontos • Descontos exclusivos</div>
+                    <div id="voucherGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;"></div>
+                </div>
+
+                <div class="screen" id="screen-marketplace">
+                    <div style="font-size:22px;font-weight:800;">🛍️ Marketplace IPOG</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">10+ ofertas por categoria • Preços de mercado</div>
+                    <div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:14px;"><span>🔍</span><span style="color:var(--text-tertiary);font-size:14px;">Buscar produtos...</span></div>
+                    <div class="section-title">📂 Cursos & Educação</div>
+                    <div class="product-grid" id="produtos-cursos"></div>
+                    <div class="section-title">📚 Livros & Publicações</div>
+                    <div class="product-grid" id="produtos-livros"></div>
+                    <div class="section-title">💻 Tecnologia & Gadgets</div>
+                    <div class="product-grid" id="produtos-tech"></div>
+                    <div class="section-title">✈️ Viagens & Turismo</div>
+                    <div class="product-grid" id="produtos-viagens"></div>
+                    <div class="section-title">🏥 Saúde & Bem-estar</div>
+                    <div class="product-grid" id="produtos-saude"></div>
+                    <div class="section-title">🍔 Alimentação (Lanchonete)</div>
+                    <div class="product-grid" id="produtos-lanchonete"></div>
+                    <div class="section-title">🏢 Coworking & Espaços</div>
+                    <div class="product-grid" id="produtos-coworking"></div>
+                </div>
+
+                <div class="screen" id="screen-comunidade">
+                    <div style="font-size:22px;font-weight:800;">🤝 Comunidade IPOG Premium</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Rede profissional com mais de 8.500 médicos, advogados, gestores, engenheiros, CEOs, RH, professores, executivos SAP, especialistas IA, franqueados IPOG e recrutadores</div>
+                    <div class="network-hero">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <div class="profile-photo" id="communityUserPhoto" style="width:58px;height:58px;font-size:22px;margin:0;">PR</div>
+                            <div style="min-width:0;">
+                                <div style="font-weight:900;font-size:16px;" id="communityUserName">Paulo R. Albuquerque</div>
+                                <div style="font-size:12px;color:var(--text-secondary);" id="communityUserHeadline">Gestor Financeiro • MBA IPOG</div>
+                            </div>
+                        </div>
+                        <div class="network-stats">
+                            <div class="network-stat"><strong>8.500+</strong><span style="font-size:10px;color:var(--text-secondary);">profissionais</span></div>
+                            <div class="network-stat"><strong id="communityConnections">1.248</strong><span style="font-size:10px;color:var(--text-secondary);">conexões</span></div>
+                            <div class="network-stat"><strong id="communityFollowers">3.920</strong><span style="font-size:10px;color:var(--text-secondary);">seguidores</span></div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                        <span class="demo-chip" onclick="filterComunidade('todos')" style="border-color:var(--primary);">Todos</span>
+                        <span class="demo-chip" onclick="filterComunidade('tech')">💻 Tech</span>
+                        <span class="demo-chip" onclick="filterComunidade('gestao')">📊 Gestão</span>
+                        <span class="demo-chip" onclick="filterComunidade('saude')">🏥 Saúde</span>
+                        <span class="demo-chip" onclick="filterComunidade('direito')">⚖️ Direito</span>
+                        <span class="demo-chip" onclick="filterComunidade('educacao')">🎓 Educação</span>
+                        <span class="demo-chip" onclick="filterComunidade('recrutadores')">💼 Recrutadores</span>
+                        <span class="demo-chip" onclick="filterComunidade('ia')">🤖 IA</span>
+                    </div>
+                    <div class="linkedin-feed" id="comunidadeFeed"></div>
+                    <button class="btn btn-secondary" style="width:100%;margin-top:14px;" onclick="showToast('📩 Solicitação de conexão enviada!')">🔗 Conectar com recrutadores</button>
+                </div>
+
+                <div class="screen" id="screen-estab-selecao">
+                    <div style="font-size:22px;font-weight:800;">🏪 Escolha um Estabelecimento</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Selecione um parceiro para visualizar produtos ou fazer pedidos</div>
+                    <div class="estab-card" style="margin-bottom:12px;" onclick="navigateTo('estabelecimentos')">
+                        <div style="display:flex;align-items:center;gap:14px;">
+                            <span class="estab-icon">🍔</span>
+                            <div>
+                                <div class="estab-name">Burguer IPOG</div>
+                                <div class="estab-address">📍 Campus Goiânia</div>
+                            </div>
+                            <span style="margin-left:auto;color:var(--primary);">→</span>
+                        </div>
+                    </div>
+                    <div class="estab-card" style="margin-bottom:12px;" onclick="navigateTo('estabelecimentos')">
+                        <div style="display:flex;align-items:center;gap:14px;">
+                            <span class="estab-icon">🏢</span>
+                            <div>
+                                <div class="estab-name">Cowork IPOG Hub</div>
+                                <div class="estab-address">📍 Brasília</div>
+                            </div>
+                            <span style="margin-left:auto;color:var(--primary);">→</span>
+                        </div>
+                    </div>
+                    <div class="estab-card" onclick="navigateTo('estabelecimentos')">
+                        <div style="display:flex;align-items:center;gap:14px;">
+                            <span class="estab-icon">🛍️</span>
+                            <div>
+                                <div class="estab-name">TechStore IPOG</div>
+                                <div class="estab-address">📍 Nacional</div>
+                            </div>
+                            <span style="margin-left:auto;color:var(--primary);">→</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline" style="width:100%;margin-top:16px;" onclick="navigateTo('home')">Voltar</button>
+                </div>
+
+                <div class="screen" id="screen-estabelecimentos">
+                    <div style="font-size:22px;font-weight:800;">🏪 Estabelecimentos Parceiros</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Compre com pontos e ganhe cashback</div>
+                    <div class="estab-card" style="margin-bottom:14px;" onclick="abrirEstabelecimento('lanchonete')">
+                        <div style="display:flex;align-items:center;gap:14px;">
+                            <span class="estab-icon">🍔</span>
+                            <div>
+                                <div class="estab-name">Burguer IPOG</div>
+                                <div class="estab-address">📍 Campus Goiânia • Seg-Sex 08h-20h</div>
+                                <div style="font-size:11px;color:var(--primary);">✅ Aceita pontos • Cashback 0,5%</div>
+                            </div>
+                            <span style="margin-left:auto;color:var(--primary);">→</span>
+                        </div>
+                    </div>
+                    <div class="estab-card" onclick="abrirEstabelecimento('coworking')">
+                        <div style="display:flex;align-items:center;gap:14px;">
+                            <span class="estab-icon">🏢</span>
+                            <div>
+                                <div class="estab-name">Cowork IPOG Hub</div>
+                                <div class="estab-address">📍 Brasília • 24h • Sala de reunião</div>
+                                <div style="font-size:11px;color:var(--primary);">✅ Aceita pontos • Cashback 0,4%</div>
+                            </div>
+                            <span style="margin-left:auto;color:var(--primary);">→</span>
+                        </div>
+                    </div>
+                    <div class="card" onclick="navigateTo('estab-recebimento')" style="text-align:center;padding:16px;margin-top:12px;">
+                        <span style="font-size:40px;">💳</span>
+                        <div style="font-weight:700;color:var(--text-primary);">Receber pagamento via pontos</div>
+                        <div style="font-size:12px;color:var(--text-secondary);">Digite CPF/CNPJ, valor e token do cliente</div>
+                    </div>
+                    <div class="section-title">📊 Seu Estabelecimento (se for parceiro)</div>
+                    <div class="card" onclick="navigateTo('estab-dashboard')" style="text-align:center;padding:16px;">
+                        <span style="font-size:40px;">🏪</span>
+                        <div style="font-weight:700;color:var(--text-primary);">Acessar dashboard do estabelecimento</div>
+                        <div style="font-size:12px;color:var(--text-secondary);">Gerencie produtos, vendas e recebíveis</div>
+                    </div>
+                </div>
+
+                <div class="screen" id="screen-estab-recebimento">
+                    <div style="font-size:22px;font-weight:800;">💳 Receber com Pontos</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Insira os dados do cliente e o token para autorizar a transação</div>
+                    <div class="recebimento-area">
+                        <div class="field-label">CPF / CNPJ do cliente</div>
+                        <input class="field-input" id="recebimentoCpfCnpj" type="text" placeholder="000.000.000-00 ou 00.000.000/0000-00">
+                        <div class="field-label">Valor (em reais ou pontos)</div>
+                        <input class="field-input" id="recebimentoValor" type="text" placeholder="R$ 0,00 ou Pontos 0">
+                        <div class="field-label">Token de autorização (gerado pelo cliente)</div>
+                        <div class="point-input" style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <input class="field-input" id="recebimentoToken" type="text" placeholder="6 dígitos" style="flex:1;min-width:100px;margin-bottom:0;">
+                            <button class="btn btn-primary" onclick="processarRecebimento()">🔓 Autorizar</button>
+                        </div>
+                        <div style="margin-top:12px;font-size:12px;color:var(--text-tertiary);text-align:center;">O token deve ser informado pelo cliente no momento do pagamento.</div>
+                    </div>
+                    <div class="card" style="margin-top:12px;padding:12px;">
+                        <div style="font-weight:600;color:var(--text-primary);">Últimos recebimentos</div>
+                        <div id="recebimentoHistorico"></div>
+                    </div>
+                </div>
+
+                <div class="screen" id="screen-estab-dashboard">
+                    <div style="font-size:22px;font-weight:800;">🏪 Dashboard do Estabelecimento</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Gerencie seu negócio no IPOGPay</div>
+                    <div class="kpi-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:14px;">
+                        <div class="metric-card"><div class="metric-value" id="estabVendas">₮ 12.450</div><div class="metric-label">Vendas com pontos (mês)</div></div>
+                        <div class="metric-card"><div class="metric-value" id="estabCashback">₮ 890</div><div class="metric-label">Cashback gerado</div></div>
+                        <div class="metric-card"><div class="metric-value" id="estabRecebiveis">₮ 3.200</div><div class="metric-label">Recebíveis a antecipar</div></div>
+                        <div class="metric-card"><div class="metric-value" id="estabTransacoes">87</div><div class="metric-label">Transações no mês</div></div>
+                    </div>
+                    <div class="section-title">📦 Meus Produtos</div>
+                    <div id="estabProdutosLista"></div>
+                    <button class="btn btn-primary" style="width:100%;margin-top:12px;" onclick="showToast('📦 Novo produto cadastrado (demo)')">+ Cadastrar novo produto</button>
+                    <button class="btn btn-gold" style="width:100%;margin-top:8px;" onclick="solicitarAntecipacaoEstabelecimento()">⚡ Solicitar Antecipação de Recebíveis</button>
+                </div>
+
+                <div class="screen" id="screen-franqueado">
+                    <div style="font-size:22px;font-weight:800;">🏢 Dashboard do Franqueado</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Polo: IPOG Brasília — Unidade Asa Sul</div>
+                    <div class="kpi-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:14px;">
+                        <div class="metric-card"><div class="metric-value">R$ 342K</div><div class="metric-label">Recebimentos (Jun/26)</div></div>
+                        <div class="metric-card"><div class="metric-value">R$ 89K</div><div class="metric-label">Antecipação Disponível</div></div>
+                        <div class="metric-card"><div class="metric-value">4,2%</div><div class="metric-label">Inadimplência</div></div>
+                        <div class="metric-card"><div class="metric-value">1.280</div><div class="metric-label">Alunos Ativos</div></div>
+                    </div>
+                    <div class="section-title">📋 Recebíveis a Antecipar</div>
+                    <div class="card" style="padding:14px;margin-bottom:12px;">
+                        <div class="recebivel-item"><span>Mensalidades D+10</span><span style="font-weight:700;">R$ 28.500</span></div>
+                        <div class="recebivel-item"><span>Mensalidades D+20</span><span style="font-weight:700;">R$ 31.200</span></div>
+                        <div class="recebivel-item"><span>Mensalidades D+30</span><span style="font-weight:700;">R$ 29.300</span></div>
+                        <div style="margin-top:12px;text-align:right;font-weight:700;color:var(--secondary);">Total: R$ 89.000</div>
+                    </div>
+                    <button class="btn btn-secondary" style="width:100%;" onclick="anteciparRecebiveis()">⚡ Antecipar Recebíveis Agora</button>
+                    <div style="margin-top:8px;font-size:12px;color:var(--text-tertiary);text-align:center;">Taxa de 1,8% sobre o valor antecipado</div>
+                    <div class="card" style="margin-top:14px;padding:14px;">
+                        <div style="font-weight:600;color:var(--text-primary);">Últimas antecipações</div>
+                        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-top:6px;"><span>Antecipação 10/06</span><span>R$ 15.200</span></div>
+                        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-top:4px;"><span>Antecipação 02/06</span><span>R$ 12.800</span></div>
+                    </div>
+                    <button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="showToast('📊 Relatório de fluxo de caixa gerado')">📊 Ver fluxo de caixa</button>
+                </div>
+
+                <div class="screen" id="screen-docente">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+                        <div>
+                            <div style="font-size:22px;font-weight:800;">👨‍🏫 Painel do Docente</div>
+                            <div style="font-size:13px;color:var(--text-secondary);" id="teacherSubtitle">Horas-aula, recebíveis e antecipação IPOGPay</div>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="openTeacherSelector()">Trocar docente</button>
+                    </div>
+                    <div class="teacher-pay-card">
+                        <div style="font-size:12px;opacity:0.78;">Saldo de horas-aula a receber</div>
+                        <div style="font-size:34px;font-weight:900;margin-top:4px;" id="teacherReceivableAmount">R$ 0,00</div>
+                        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:12px;opacity:0.9;">
+                            <span id="teacherReceivableHours">0h confirmadas</span>
+                            <span id="teacherHourlyRate">R$ 0/h</span>
+                            <span id="teacherNextPay">Próximo pagamento</span>
+                        </div>
+                    </div>
+                    <div class="teacher-kpi-grid">
+                        <div class="metric-card"><div class="metric-value" id="teacherFutureHours">0h</div><div class="metric-label">Aulas futuras confirmadas</div></div>
+                        <div class="metric-card"><div class="metric-value" id="teacherFutureAmount">R$ 0</div><div class="metric-label">Previsão futura</div></div>
+                        <div class="metric-card"><div class="metric-value" id="teacherAdvanceLimit">R$ 0</div><div class="metric-label">Limite antecipável</div></div>
+                        <div class="metric-card"><div class="metric-value" id="teacherAdvancePct">0%</div><div class="metric-label">% sobre futuras</div></div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                        <button class="btn btn-primary btn-sm" onclick="openTeacherAdvanceModal('receivable')">Antecipar aulas a receber</button>
+                        <button class="btn btn-secondary btn-sm" onclick="openTeacherAdvanceModal('future')">Antecipar aulas futuras</button>
+                        <button class="btn btn-outline btn-sm" onclick="navigateTo('carteira')">Carteira docente</button>
+                    </div>
+                    <div class="chart-card" style="margin-bottom:12px;">
+                        <div class="section-title" style="margin-top:0;">📅 Próximas aulas confirmadas</div>
+                        <div id="teacherClassesList"></div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="section-title" style="margin-top:0;">💳 Últimas movimentações docentes</div>
+                        <div id="teacherStatementPreview"></div>
+                    </div>
+                </div>
+
+                <div class="screen" id="screen-admin-dashboard">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
+                        <div style="font-size:22px;font-weight:800;color:var(--text-primary);">📈 Rentabilidade do IPOGPay</div>
+                        <div class="period-toggle" id="periodToggle">
+                            <span class="period-btn active" data-period="1" onclick="setAdminPeriod(1, event)">Mês</span>
+                            <span class="period-btn" data-period="3" onclick="setAdminPeriod(3, event)">Trimestre</span>
+                            <span class="period-btn" data-period="12" onclick="setAdminPeriod(12, event)">Ano</span>
+                        </div>
+                    </div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Receitas e custos por tipo — programa de fidelidade e infraestrutura financeira do ecossistema IPOG</div>
+                    <div class="dashboard-kpi-grid">
+                        <div class="metric-card"><div class="metric-value" id="kpiReceita">R$ 370K</div><div class="metric-label">Receita Total</div></div>
+                        <div class="metric-card"><div class="metric-value" id="kpiCusto">R$ 265K</div><div class="metric-label">Custo Total</div></div>
+                        <div class="metric-card"><div class="metric-value" id="kpiMargem" style="color:var(--secondary);">R$ 105K</div><div class="metric-label" id="kpiMargemPct">Margem líquida • 28,4%</div></div>
+                        <div class="metric-card"><div class="metric-value" id="kpiInadimplencia">4,2%</div><div class="metric-label">Inadimplência</div></div>
+                        <div class="metric-card"><div class="metric-value" id="kpiUnidades">52</div><div class="metric-label">Unidades conectadas</div></div>
+                        <div class="metric-card"><div class="metric-value" id="kpiParceiros">38</div><div class="metric-label">Parceiros Marketplace</div></div>
+                    </div>
+                    <div class="grid-2" style="gap:12px;margin-bottom:12px;">
+                        <div class="chart-card">
+                            <div class="section-title" style="margin-top:0;font-size:14px;">💰 Receita por tipo</div>
+                            <div id="receitaBreakdown"></div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="section-title" style="margin-top:0;font-size:14px;">📉 Custo por tipo</div>
+                            <div id="custoBreakdown"></div>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="section-title" style="margin-top:0;font-size:14px;">📊 Receita, Custo e Lucratividade</div>
+                        <div class="chart-wrap"><canvas id="adminChart"></canvas></div>
+                    </div>
+                    <button class="btn btn-outline" style="width:100%;margin-top:14px;" onclick="showToast('📄 Relatório de rentabilidade exportado (demo)')">Exportar relatório completo</button>
+                </div>
+
+                <div class="screen" id="screen-config">
+                    <div style="font-size:22px;font-weight:800;">⚙️ Configurações do App</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Personalize a identidade visual do IPOGPay (Whitelabel)</div>
+                    <div class="config-section">
+                        <div style="font-weight:700;margin-bottom:12px;">Logotipo</div>
+                        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                            <div class="logo-preview" id="logoPreview"><img src="" alt="Logotipo" style="display:none;width:100%;height:100%;object-fit:contain;"/><span style="font-size:12px;color:var(--text-tertiary);">Sem logo</span></div>
+                            <input type="file" id="logoUpload" accept="image/*" style="font-size:13px;" onchange="previewLogo(event)">
+                            <button class="btn btn-outline btn-sm" onclick="resetLogo()">Restaurar padrão</button>
+                        </div>
+                    </div>
+                    <div class="config-section">
+                        <div style="font-weight:700;margin-bottom:12px;">Cores</div>
+                        <div class="config-row">
+                            <label>Cor Primária</label>
+                            <input type="color" id="colorPrimary" value="#6B3FA0" onchange="applyColors()">
+                            <span style="font-size:12px;color:var(--text-tertiary);">#6B3FA0</span>
+                        </div>
+                        <div class="config-row">
+                            <label>Cor Secundária</label>
+                            <input type="color" id="colorSecondary" value="#D4A843" onchange="applyColors()">
+                            <span style="font-size:12px;color:var(--text-tertiary);">#D4A843</span>
+                        </div>
+                        <div class="config-row">
+                            <label>Fundo do App</label>
+                            <input type="color" id="colorBg" value="#F4F4F9" onchange="applyColors()">
+                            <span style="font-size:12px;color:var(--text-tertiary);">#F4F4F9</span>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="resetColors()">Restaurar cores padrão</button>
+                    </div>
+                    <div class="config-section">
+                        <div style="font-weight:700;margin-bottom:6px;">Marketing do login</div>
+                        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">Banner de eventos e promoções exibido antes do login.</div>
+                        <div class="field-label">Título</div>
+                        <input class="field-input" id="marketingTitleInput" type="text" placeholder="Título da campanha">
+                        <div class="field-label">Subtítulo</div>
+                        <input class="field-input" id="marketingSubtitleInput" type="text" placeholder="Descrição curta">
+                        <div class="field-label">Chamada do botão</div>
+                        <input class="field-input" id="marketingCtaInput" type="text" placeholder="Garanta sua inscrição">
+                        <div class="field-label">Link da landing page</div>
+                        <input class="field-input" id="marketingLinkInput" type="url" placeholder="https://...">
+                        <div class="field-label">Imagem do banner</div>
+                        <input type="file" id="marketingImageUpload" accept="image/*" style="font-size:13px;margin-bottom:10px;" onchange="previewMarketingImage(event)">
+                        <div class="login-marketing-banner" style="margin-bottom:12px;" onclick="openMarketingBanner()">
+                            <img id="marketingPreviewImage" src="ipogpay-evento-oratoria.png" alt="Prévia do banner">
+                            <div class="marketing-caption">
+                                <div>
+                                    <div class="marketing-title" id="marketingPreviewTitle">Os Impactos da Oratória</div>
+                                    <div style="font-size:11px;opacity:0.92;" id="marketingPreviewSubtitle">Fala, presença e posicionamento</div>
+                                </div>
+                                <span class="marketing-cta" id="marketingPreviewCta">Garanta sua inscrição</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="saveMarketingBanner()">Salvar banner</button>
+                        <button class="btn btn-outline btn-sm" onclick="resetMarketingBanner()">Restaurar exemplo</button>
+                    </div>
+                    <div style="font-size:12px;color:var(--text-tertiary);text-align:center;margin-top:12px;">As alterações são aplicadas em tempo real.</div>
+                </div>
+
+                <div class="screen" id="screen-perfil">
+                    <div style="text-align:center;margin-bottom:16px;">
+                        <div id="perfilAvatar" class="profile-photo">PR</div>
+                        <div id="perfilNome" style="font-weight:700;font-size:20px;margin-top:8px;">Paulo R. Albuquerque</div>
+                        <span id="perfilRolePill" class="role-pill" style="background:rgba(107,63,160,0.08);color:var(--primary);padding:4px 14px;border-radius:20px;">🎓 Aluno</span>
+                    </div>
+                    <div id="profileDetails"></div>
+                    <div class="card" style="padding:14px;margin-bottom:8px;cursor:pointer;" onclick="openActiveProfileSelector()"><span>🔄 Trocar perfil da demonstração</span><span style="float:right;color:var(--text-tertiary);">→</span></div>
+                    <div class="card" style="padding:14px;margin-bottom:8px;cursor:pointer;" onclick="showToast('Dados pessoais')"><span>👤 Dados Pessoais</span><span style="float:right;color:var(--text-tertiary);">→</span></div>
+                    <div class="card" style="padding:14px;margin-bottom:8px;cursor:pointer;" onclick="showToast('Configurações')"><span>⚙️ Configurações</span><span style="float:right;color:var(--text-tertiary);">→</span></div>
+                    <div class="card" style="padding:14px;margin-bottom:8px;cursor:pointer;border-color:rgba(231,76,60,0.2);" onclick="logout()"><span style="color:#E74C3C;">🚪 Sair</span></div>
+                    <div style="text-align:center;font-size:10px;color:var(--text-tertiary);margin-top:16px;">IPOGPay Whitelabel v9.0</div>
+                </div>
+            </div>
+            <nav class="bottom-nav" id="bottomNav"></nav>
+        </div>
+    </div>
+
+    <script>
+        const DATA_VERSION = 12;
+        const DEMO_SCALE = { alunos: 200, professores: 50, empresas: 80, estabelecimentos: 40, franqueados: 20, recrutadores: 15, transacoes: 500, pix: 300, compras: 150, vouchers: 100, investimentos: 80 };
+        const firstNames = ['Paulo', 'Ana Paula', 'Carlos', 'Mariana', 'João Victor', 'Fernanda', 'Rafael', 'Camila', 'Bruna', 'Lucas', 'Patricia', 'Gustavo', 'Renata', 'Eduardo', 'Larissa', 'Felipe', 'Juliana', 'Marcelo', 'Bianca', 'Henrique'];
+        const lastNames = ['Marques', 'Souza', 'Henrique', 'Albuquerque', 'Lima', 'Costa', 'Nogueira', 'Silveira', 'Rocha', 'Mendes'];
+        const courses = ['MBA em Gestão Estratégica', 'Pós em Engenharia de Software', 'Gestão de Pessoas', 'Direito Médico', 'IA para Negócios', 'Engenharia Diagnóstica', 'Finanças Corporativas', 'Docência Superior'];
+        const cities = ['Goiânia', 'Brasília', 'São Paulo', 'Belo Horizonte', 'Rio de Janeiro', 'Curitiba', 'Recife', 'Salvador', 'Fortaleza', 'Florianópolis'];
+        const specialties = ['Gestão', 'Finanças', 'IA', 'SAP', 'Direito', 'Saúde', 'RH', 'Vendas', 'Engenharia', 'Educação'];
+        const companies = ['Hospital IPOG Saúde', 'Vilela & Associados', 'Grupo Atria', 'SAP Labs', 'Meta RH', 'Construtora Nexus', 'IPOG Franchising', 'C6 Educação', 'Nubank Parceiros', 'Hub IA Brasil'];
+
+        function padWallet(n) { return String(n).padStart(9, '0'); }
+        function initialsFromName(name) { return name.split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase(); }
+        function fakeCpf(i) { return String(100 + i).padStart(3, '0') + '.' + String(200 + i).padStart(3, '0') + '.' + String(300 + i).padStart(3, '0') + '-' + String((10 + i) % 99).padStart(2, '0'); }
+        function avatarDataUri(name, index, size = 160) {
+            const initials = initialsFromName(name);
+            const palettes = [
+                ['#6B3FA0', '#0EA5A4'],
+                ['#1D4ED8', '#D4A843'],
+                ['#0F766E', '#7C3AED'],
+                ['#B45309', '#2563EB'],
+                ['#4338CA', '#16A34A']
+            ];
+            const [a, b] = palettes[index % palettes.length];
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+                <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs>
+                <rect width="${size}" height="${size}" rx="${size / 2}" fill="url(#g)"/>
+                <circle cx="${size * 0.74}" cy="${size * 0.22}" r="${size * 0.18}" fill="rgba(255,255,255,0.18)"/>
+                <circle cx="${size * 0.22}" cy="${size * 0.82}" r="${size * 0.28}" fill="rgba(255,255,255,0.10)"/>
+                <text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-family="Inter,Arial,sans-serif" font-size="${size * 0.34}" font-weight="900" fill="#fff">${initials}</text>
+            </svg>`;
+            return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+        }
+        function shortDate(offset) {
+            const d = new Date();
+            d.setDate(d.getDate() - offset);
+            return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        }
+        function formatPoints(v) { return parseFloat(v || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 }); }
+
+        const ROLES = {
+            aluno: { label: 'Aluno', pillClass: 'r-aluno', icon: '🎓', userName: 'Paulo R. Albuquerque', initials: 'PR', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Invest' }, { id: 'vouchers', icon: '🎁', label: 'Vouchers' }, { id: 'marketplace', icon: '🛍️', label: 'Market' }, { id: 'comunidade', icon: '🤝', label: 'Comunidade' }, { id: 'estab-selecao', icon: '🏪', label: 'Estab.' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'home', cashback: 0.2 },
+            franqueado: { label: 'Franqueado', pillClass: 'r-franqueado', icon: '🏢', userName: 'Camila Nogueira', initials: 'CN', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Invest' }, { id: 'vouchers', icon: '🎁', label: 'Vouchers' }, { id: 'marketplace', icon: '🛍️', label: 'Market' }, { id: 'comunidade', icon: '🤝', label: 'Comunidade' }, { id: 'estab-selecao', icon: '🏪', label: 'Estab.' }, { id: 'franqueado', icon: '🏢', label: 'Franq.' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'franqueado', cashback: 0.3 },
+            egresso: { label: 'Egresso', pillClass: 'r-egresso', icon: '🤝', userName: 'Rafael Lima', initials: 'RL', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Invest' }, { id: 'vouchers', icon: '🎁', label: 'Vouchers' }, { id: 'marketplace', icon: '🛍️', label: 'Market' }, { id: 'comunidade', icon: '🤝', label: 'Comunidade' }, { id: 'estab-selecao', icon: '🏪', label: 'Estab.' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'comunidade', cashback: 0.4 },
+            docente: { label: 'Docente', pillClass: 'r-docente', icon: '👨‍🏫', userName: 'Profa. Helena Martins', initials: 'HM', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'docente', icon: '👨‍🏫', label: 'Docente' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Invest' }, { id: 'vouchers', icon: '🎁', label: 'Vouchers' }, { id: 'marketplace', icon: '🛍️', label: 'Market' }, { id: 'comunidade', icon: '🤝', label: 'Comunidade' }, { id: 'estab-selecao', icon: '🏪', label: 'Estab.' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'docente', cashback: 0.5 },
+            marketplace: { label: 'Parceiro', pillClass: 'r-marketplace', icon: '🛍️', userName: 'TechStore IPOG', initials: 'TI', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Invest' }, { id: 'vouchers', icon: '🎁', label: 'Vouchers' }, { id: 'marketplace', icon: '🛍️', label: 'Market' }, { id: 'comunidade', icon: '🤝', label: 'Comunidade' }, { id: 'estab-selecao', icon: '🏪', label: 'Estab.' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'home', cashback: 0.35 },
+            admin: { label: 'Admin', pillClass: 'r-admin', icon: '🛠️', userName: 'Equipe IPOGPay', initials: 'IP', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Invest' }, { id: 'vouchers', icon: '🎁', label: 'Vouchers' }, { id: 'marketplace', icon: '🛍️', label: 'Market' }, { id: 'comunidade', icon: '🤝', label: 'Comunidade' }, { id: 'estab-selecao', icon: '🏪', label: 'Estab.' }, { id: 'admin-dashboard', icon: '📈', label: 'Dashboard' }, { id: 'config', icon: '⚙️', label: 'Config' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'admin-dashboard', cashback: 0.5 },
+            estabelecimento: {
+                label: 'Estabelecimento', pillClass: 'r-estabelecimento', icon: '🏪',
+                userName: 'Burguer IPOG', initials: 'BI',
+                nav: [
+                    { id: 'home', icon: '🏠', label: 'Home' },
+                    { id: 'carteira', icon: '💳', label: 'Carteira' },
+                    { id: 'investimentos', icon: '📈', label: 'Invest' },
+                    { id: 'vouchers', icon: '🎁', label: 'Vouchers' },
+                    { id: 'marketplace', icon: '🛍️', label: 'Market' },
+                    { id: 'comunidade', icon: '🤝', label: 'Comunidade' },
+                    { id: 'estab-selecao', icon: '🏪', label: 'Estab.' },
+                    { id: 'estab-dashboard', icon: '📊', label: 'Dashboard' },
+                    { id: 'perfil', icon: '👤', label: 'Perfil' }
+                ],
+                default: 'estab-dashboard', cashback: 0.5
+            }
+        };
+
+        let appData = {};
+        let currentToken = '';
+        let currentUser = null, selectedRole = null, tokenInterval = null, tokenTimer = null;
+        let timerCount = 60;
+        function initChart() {}
+
+        function createStudent(index) {
+            const name = index === 1 ? 'Paulo Marques' : index === 2 ? 'Ana Paula Souza' : index === 3 ? 'Carlos Henrique' : index === 4 ? 'Mariana Souza' : index === 5 ? 'João Victor' : `${firstNames[(index - 1) % firstNames.length]} ${lastNames[(index - 1) % lastNames.length]}`;
+            const walletNumber = padWallet(index);
+            const points = 38000 + (index * 437) % 220000;
+            const balance = 2800 + (index * 257) % 42000;
+            const bill = 180 + (index * 43) % 4200;
+            const invested = index % 3 === 0 ? 0 : 1200 + (index * 91) % 28000;
+            const course = courses[index % courses.length];
+            const city = cities[index % cities.length];
+            const company = companies[index % companies.length];
+            const area = specialties[index % specialties.length];
+            const statement = buildStatement(index, walletNumber);
+            return {
+                id: 'aluno-' + walletNumber,
+                name,
+                initials: initialsFromName(name),
+                walletNumber,
+                pixKey: walletNumber,
+                cpf: fakeCpf(index),
+                photo: avatarDataUri(name, index, 160),
+                banner: `linear-gradient(135deg, ${index % 2 ? '#6B3FA0' : '#0F766E'}, ${index % 3 ? '#D4A843' : '#2563EB'})`,
+                title: `${area === 'IA' ? 'Especialista IA' : area === 'SAP' ? 'Executivo SAP' : area === 'Saúde' ? 'Gestor de Saúde' : area === 'Direito' ? 'Advogado' : 'Gestor'} • ${course}`,
+                company,
+                education: `IPOG • ${course}`,
+                course,
+                className: 'Turma IPOG ' + (2024 + (index % 3)) + '.' + ((index % 4) + 1),
+                campus: city,
+                city,
+                level: index % 5 === 0 ? 'Diamond' : index % 2 === 0 ? 'Gold' : 'Platinum',
+                entryDate: `${String((index % 12) + 1).padStart(2, '0')}/202${index % 5}`,
+                ranking: index,
+                connections: 420 + (index * 37) % 2600,
+                followers: 1100 + (index * 89) % 7200,
+                openToWork: index % 4 === 0,
+                openToBusiness: index % 3 === 0,
+                specialties: [area, specialties[(index + 3) % specialties.length], specialties[(index + 6) % specialties.length]],
+                certifications: ['Excelência Profissional IPOG', index % 2 ? 'Liderança Digital' : 'IA Aplicada aos Negócios', index % 3 ? 'Finanças para Gestores' : 'Gestão de Projetos'],
+                completedCourses: [course, 'Comunicação Executiva', 'Data Driven Decision'],
+                wallet: { balance, points, bill, invested, yield: invested * 0.032 },
+                statement,
+                investmentHistory: Array.from({ length: 12 }, (_, i) => Math.round(80 + i * 25 + index * 3 + Math.sin(i + index) * 18))
+            };
+        }
+
+        function buildStatement(index, walletNumber) {
+            const receivedWallet = padWallet(((index + 44) % 200) + 1);
+            const sentWallet = padWallet(((index + 153) % 200) + 1);
+            return [
+                { desc: 'Recebimento Bolsa', detail: 'Programa IPOG Talentos', date: shortDate(1), amount: 1250 + (index % 5) * 90, type: 'credit' },
+                { desc: 'Compra', detail: 'Livraria IPOG', date: shortDate(2), amount: -89.90, type: 'purchase' },
+                { desc: 'PIX enviado', detail: 'Carteira ' + sentWallet, date: shortDate(3), amount: -42.50 - (index % 6) * 7, type: 'pix_sent' },
+                { desc: 'PIX recebido', detail: 'Carteira ' + receivedWallet, date: shortDate(4), amount: 42.50 + (index % 4) * 12, type: 'pix_received' },
+                { desc: 'Voucher Starbucks', detail: 'Resgate no app', date: shortDate(5), amount: -12500, type: 'voucher' },
+                { desc: 'Cashback', detail: 'Marketplace IPOG', date: shortDate(6), amount: 4500, type: 'cashback' },
+                { desc: 'Aporte em Investimento', detail: 'IPOG CDB 120% CDI', date: shortDate(7), amount: -350 + (index % 6) * -40, type: 'invest' },
+                { desc: 'Compra', detail: 'Cowork IPOG Hub', date: shortDate(8), amount: -64.50, type: 'purchase' },
+                { desc: 'PIX recebido', detail: 'Carteira ' + walletNumber, date: shortDate(9), amount: 180, type: 'pix_received' }
+            ];
+        }
+
+        function createCommunityPosts() {
+            const roles = ['Médica', 'Advogado', 'CEO', 'Executiva SAP', 'Especialista IA', 'Recrutadora', 'Professor', 'Engenheira', 'Gestor RH', 'Franqueada IPOG'];
+            const cats = ['saude', 'direito', 'gestao', 'tech', 'ia', 'recrutadores', 'educacao', 'gestao', 'gestao', 'gestao'];
+            return Array.from({ length: 72 }, (_, i) => {
+                const name = `${firstNames[i % firstNames.length]} ${lastNames[(i + 4) % lastNames.length]}`;
+                const role = roles[i % roles.length];
+                return {
+                    name,
+                    initials: initialsFromName(name),
+                    photo: avatarDataUri(name, i + 12, 120),
+                    title: `${role} • ${companies[i % companies.length]}`,
+                    education: `Formação IPOG em ${courses[i % courses.length]}`,
+                    city: cities[i % cities.length],
+                    category: cats[i % cats.length],
+                    connections: 620 + i * 41,
+                    followers: 1800 + i * 103,
+                    openToWork: i % 7 === 0,
+                    openToBusiness: i % 3 === 0,
+                    tags: [specialties[i % specialties.length], specialties[(i + 2) % specialties.length], courses[i % courses.length].split(' ')[0]],
+                    certifications: ['Certificação IPOG', i % 2 ? 'Liderança' : 'Inovação', i % 3 ? 'Gestão Ágil' : 'IA Aplicada'],
+                    post: i % 4 === 0 ? 'Compartilhei uma oportunidade para alunos IPOG em projetos de transformação digital.' : i % 4 === 1 ? 'Novo case publicado sobre carreira, networking e educação continuada no ecossistema IPOG.' : i % 4 === 2 ? 'Buscando conexões para parceria entre empresas, professores e alunos da rede IPOG.' : 'Concluí mais uma certificação e recomendo para quem quer acelerar a carreira.',
+                    likes: 120 + i * 9,
+                    comments: 14 + (i % 18),
+                    shares: 8 + (i % 12)
+                };
+            });
+        }
+
+        function createTeacher(index) {
+            const names = ['Helena Martins', 'Roberto Azevedo', 'Clara Ribeiro', 'Sérgio Brandão', 'Patrícia Goulart', 'André Vasconcelos', 'Lívia Cardoso', 'Marcelo Antunes'];
+            const name = index <= names.length ? names[index - 1] : `${firstNames[(index + 7) % firstNames.length]} ${lastNames[(index + 2) % lastNames.length]}`;
+            const walletNumber = 'D' + padWallet(index).slice(1);
+            const area = specialties[(index + 4) % specialties.length];
+            const hourlyRate = 145 + (index % 7) * 18;
+            const receivableHours = 18 + (index % 9) * 4;
+            const futureHours = 24 + (index % 11) * 5;
+            const futureAdvancePct = 25 + (index % 4) * 10;
+            const receivableAmount = receivableHours * hourlyRate;
+            const futureAmount = futureHours * hourlyRate;
+            const course = courses[(index + 2) % courses.length];
+            const city = cities[(index + 3) % cities.length];
+            const classes = Array.from({ length: 6 }, (_, i) => ({
+                date: shortDate(-7 - i * 5),
+                course: courses[(index + i) % courses.length],
+                campus: cities[(index + i) % cities.length],
+                hours: 3 + (i % 3),
+                status: i < 2 ? 'Confirmada' : 'Programada'
+            }));
+            return {
+                id: 'docente-' + walletNumber,
+                name: index === 1 ? 'Profa. Helena Martins' : 'Prof. ' + name,
+                initials: initialsFromName(name),
+                walletNumber,
+                pixKey: walletNumber,
+                cpf: fakeCpf(index + 500),
+                photo: avatarDataUri(name, index + 80, 160),
+                title: `Docente IPOG • ${area}`,
+                company: 'IPOG',
+                education: `Docente convidado • ${course}`,
+                course,
+                className: 'Corpo Docente IPOGPay',
+                campus: city,
+                city,
+                level: index % 3 === 0 ? 'Platinum Docente' : 'Master Docente',
+                entryDate: `${String((index % 12) + 1).padStart(2, '0')}/202${index % 4}`,
+                ranking: index,
+                connections: 980 + index * 76,
+                followers: 2400 + index * 144,
+                openToWork: false,
+                openToBusiness: true,
+                specialties: [area, 'Docência Superior', 'Mentoria Executiva'],
+                certifications: ['Docente Certificado IPOG', 'Metodologias Ativas', area + ' Aplicada'],
+                completedCourses: [course, 'Didática para Pós-graduação', 'Avaliação por Competências'],
+                hourlyRate,
+                receivableHours,
+                futureHours,
+                futureAdvancePct,
+                nextPayDate: shortDate(-12),
+                classes,
+                wallet: { balance: 6200 + index * 730, points: 58000 + index * 2900, bill: 340 + index * 37, invested: 4500 + index * 420, yield: 180 + index * 16 },
+                statement: [
+                    { desc: 'Repasse horas-aula', detail: `${receivableHours}h confirmadas`, date: shortDate(2), amount: receivableAmount * 0.35, type: 'credit' },
+                    { desc: 'Antecipação docente', detail: 'Horas-aula a receber', date: shortDate(5), amount: receivableAmount * 0.25, type: 'credit' },
+                    { desc: 'Compra', detail: 'Livraria IPOG', date: shortDate(6), amount: -112.40, type: 'purchase' },
+                    { desc: 'Cashback', detail: 'Benefício docente', date: shortDate(7), amount: 3200, type: 'cashback' },
+                    { desc: 'PIX enviado', detail: 'Carteira 000000002', date: shortDate(9), amount: -180, type: 'pix_sent' }
+                ],
+                investmentHistory: Array.from({ length: 12 }, (_, i) => Math.round(130 + i * 31 + index * 7))
+            };
+        }
+
+        function createSeedData() {
+            const students = Array.from({ length: DEMO_SCALE.alunos }, (_, i) => createStudent(i + 1));
+            const teachers = Array.from({ length: DEMO_SCALE.professores }, (_, i) => createTeacher(i + 1));
+            return {
+                version: DATA_VERSION,
+                activeStudentWallet: '000000001',
+                activeTeacherWallet: 'D00000001',
+                marketingBanner: {
+                    title: 'Os Impactos da Oratória',
+                    subtitle: 'Fala, presença e posicionamento',
+                    cta: 'Garanta sua inscrição',
+                    image: 'ipogpay-evento-oratoria.png',
+                    link: 'https://www.sympla.com.br/evento/os-impactos-da-oratoria-fala-presenca-e-posicionamento/3443146?utm_source=site&utm_medium=banner&utm_campaign=EVENTOS&utm_term=mktgo&utm_content=banner_site'
+                },
+                demo: {
+                    stats: DEMO_SCALE,
+                    students,
+                    teachers,
+                    communityPosts: createCommunityPosts(),
+                    companies: Array.from({ length: DEMO_SCALE.empresas }, (_, i) => ({ name: companies[i % companies.length] + ' ' + (i + 1), segment: specialties[i % specialties.length] })),
+                    professors: Array.from({ length: DEMO_SCALE.professores }, (_, i) => ({ name: `${firstNames[(i + 5) % firstNames.length]} ${lastNames[i % lastNames.length]}`, area: specialties[i % specialties.length] })),
+                    establishments: Array.from({ length: DEMO_SCALE.estabelecimentos }, (_, i) => ({ name: ['Livraria IPOG', 'Burguer IPOG', 'Cowork IPOG Hub', 'TechStore IPOG'][i % 4] + ' ' + (i + 1), city: cities[i % cities.length] }))
+                },
+                users: {
+                    franqueado: { wallet: { balance: 342000, points: 0, bill: 0, invested: 0, yield: 0 }, statement: [], points: 0, investmentHistory: [] },
+                    egresso: { wallet: { balance: 15000, points: 85000, bill: 0, invested: 4000, yield: 120 }, statement: buildStatement(71, '000000071'), points: 85000, investmentHistory: [80, 90, 110, 130, 150, 170, 190, 210, 230, 250, 270, 290] },
+                    marketplace: { wallet: { balance: 42800, points: 9400, bill: 0, invested: 0, yield: 0 }, statement: [], points: 0, investmentHistory: [] },
+                    admin: { wallet: { balance: 0, points: 0, bill: 0, invested: 0, yield: 0 }, statement: [], points: 0, investmentHistory: [] },
+                    estabelecimento: {
+                        wallet: { balance: 12450, points: 890, bill: 0, invested: 0, yield: 0 },
+                        statement: [], points: 0, investmentHistory: [],
+                        sales: 12450, cashback_generated: 890, receivables: 3200, transactions: 87,
+                        sales_history: [{ client: 'Paulo Marques', product: 'Combo Executivo', amount: 35, method: 'points', date: '10/06' }],
+                        received_history: [{ client: 'Paulo Marques', doc: '101.201.301-11', token: 'A3B2C1', amount: 320, date: '10/06' }, { client: 'Ana Paula Souza', doc: '102.202.302-12', token: 'D4E5F6', amount: 89, date: '08/06' }]
+                    }
+                },
+                adminMetrics: { receita: 370000, custo: 265000, inadimplencia: 4.2, unidades: 52, parceiros: 38 }
+            };
+        }
+
+        function loadAppData() {
+            const stored = localStorage.getItem('ipogpay_data');
+            if (stored) {
+                try { appData = JSON.parse(stored); } catch (e) { appData = createSeedData(); }
+            }
+            if (!appData || appData.version !== DATA_VERSION || !appData.demo || !appData.demo.students) {
+                appData = createSeedData();
+                saveAppData();
+            }
+        }
+
+        function saveAppData() {
+            localStorage.setItem('ipogpay_data', JSON.stringify(appData));
+        }
+
+        function getActiveStudent() {
+            return (appData.demo && appData.demo.students || []).find(s => s.walletNumber === appData.activeStudentWallet) || (appData.demo && appData.demo.students ? appData.demo.students[0] : null);
+        }
+
+        function getActiveTeacher() {
+            return (appData.demo && appData.demo.teachers || []).find(t => t.walletNumber === appData.activeTeacherWallet) || (appData.demo && appData.demo.teachers ? appData.demo.teachers[0] : null);
+        }
+
+        function getWalletRegistry() {
+            const students = (appData.demo && appData.demo.students || []).map(s => ({ name: s.name, doc: s.cpf, walletNumber: s.walletNumber }));
+            const teachers = (appData.demo && appData.demo.teachers || []).map(t => ({ name: t.name, doc: t.cpf, walletNumber: t.walletNumber }));
+            return students.concat(teachers).concat([
+                { name: 'TechStore IPOG', doc: '12.345.678/0001-90', walletNumber: '900000001' },
+                { name: 'Burguer IPOG', doc: '98.765.432/0001-10', walletNumber: '900000002' },
+                { name: 'Cowork IPOG Hub', doc: '11.222.333/0001-55', walletNumber: '900000003' }
+            ]);
+        }
+
+        function getUserData(role) {
+            if (role === 'aluno') return getActiveStudent();
+            if (role === 'docente') return getActiveTeacher();
+            return appData.users[role] || appData.users.aluno;
+        }
+
+        function updateUserData(role, data) {
+            if (role === 'aluno') {
+                const idx = appData.demo.students.findIndex(s => s.walletNumber === appData.activeStudentWallet);
+                if (idx >= 0) appData.demo.students[idx] = { ...appData.demo.students[idx], ...data };
+                saveAppData();
+                return;
+            }
+            if (role === 'docente') {
+                const idx = appData.demo.teachers.findIndex(t => t.walletNumber === appData.activeTeacherWallet);
+                if (idx >= 0) appData.demo.teachers[idx] = { ...appData.demo.teachers[idx], ...data };
+                saveAppData();
+                return;
+            }
+            appData.users[role] = { ...appData.users[role], ...data };
+            saveAppData();
+        }
+
+        function selectRole(role) {
+            selectedRole = role;
+            document.querySelectorAll('.role-option').forEach(el => el.classList.toggle('selected', el.dataset.role === role));
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        function doLogin() {
+            const pass = document.getElementById('loginPass').value;
+            if (!selectedRole) selectedRole = 'aluno';
+            if (pass !== '123456') { document.getElementById('loginError').innerHTML = 'Senha incorreta. Use <b>123456</b>'; document.getElementById('loginError').style.display = 'block'; return; }
+            loginAs(selectedRole);
+        }
+
+        function quickLogin(role) {
+            selectedRole = role;
+            document.querySelectorAll('.role-option').forEach(el => el.classList.toggle('selected', el.dataset.role === role));
+            document.getElementById('loginPass').value = '123456';
+            loginAs(role);
+        }
+
+        function loginAs(role) {
+            loadAppData();
+            currentUser = Object.assign({ role: role }, ROLES[role]);
+            refreshCurrentUser();
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainLayout').style.display = 'flex';
+            applyUI();
+            renderNav();
+            navigateTo(currentUser.default);
+            showToast('👋 Bem-vindo, ' + currentUser.userName.split(' ')[0]);
+            initToken();
+            initChart();
+            renderMarketplace();
+            renderComunidade('todos');
+            renderVouchers();
+            renderEstabDashboard();
+            renderWallet();
+            renderStatement();
+            renderInvestment();
+            renderRecebimentoHistorico();
+            renderAdminDashboard(1);
+            renderFinancialDashboard();
+            renderProfileDetails();
+            renderTeacherDashboard();
+            renderMarketingBanner();
+        }
+
+        function logout() {
+            if (tokenInterval) clearInterval(tokenInterval);
+            if (tokenTimer) clearInterval(tokenTimer);
+            currentUser = null; selectedRole = null;
+            document.getElementById('loginPass').value = '';
+            document.getElementById('mainLayout').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+        }
+
+        function applyUI() {
+            refreshCurrentUser();
+            const u = currentUser;
+            ['headerAvatar', 'sidebarAvatar', 'perfilAvatar'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const profile = u.role === 'aluno' ? getActiveStudent() : u.role === 'docente' ? getActiveTeacher() : null;
+                if (profile && profile.photo) el.innerHTML = `<img src="${profile.photo}" alt="${profile.name}">`;
+                else el.textContent = u.initials;
+            });
+            document.getElementById('sidebarUserName').textContent = u.userName;
+            document.getElementById('perfilNome').textContent = u.userName;
+            document.getElementById('homeUserName').textContent = u.userName.split(' ')[0];
+            document.getElementById('homeBadge').textContent = u.icon + ' ' + u.label;
+            const configCard = document.getElementById('homeConfigCard');
+            if (configCard) configCard.style.display = u.role === 'admin' ? 'flex' : 'none';
+            [['sidebarRolePill'], ['perfilRolePill']].forEach(([id]) => {
+                const el = document.getElementById(id); if (el) { el.className = 'role-pill ' + u.pillClass;
+                    el.textContent = u.icon + ' ' + u.label; }
+            });
+            const data = getUserData(u.role);
+            if (data && data.wallet) {
+                const homePoints = document.getElementById('homePointBalance');
+                if (homePoints) homePoints.textContent = formatPoints(data.wallet.points);
+                const progress = document.getElementById('homePointProgress');
+                if (progress) progress.style.width = Math.min(100, (data.wallet.points / 500000) * 100).toFixed(0) + '%';
+            }
+            renderProfileDetails();
+        }
+
+        function refreshCurrentUser() {
+            if (!currentUser) return;
+            if (currentUser.role === 'aluno') {
+                const s = getActiveStudent();
+                if (!s) return;
+                currentUser.userName = s.name;
+                currentUser.initials = s.initials;
+                currentUser.cashback = s.level === 'Diamond' ? 0.65 : s.level === 'Platinum' ? 0.45 : 0.3;
+            }
+            if (currentUser.role === 'docente') {
+                const t = getActiveTeacher();
+                if (!t) return;
+                currentUser.userName = t.name;
+                currentUser.initials = t.initials;
+                currentUser.cashback = 0.5;
+            }
+        }
+
+        function renderNav() {
+            const nav = currentUser.nav;
+            document.getElementById('bottomNav').innerHTML = nav.map(i =>
+                `<div class="nav-item" data-screen="${i.id}" onclick="navigateTo('${i.id}')"><span class="nav-icon">${i.icon}</span>${i.label}</div>`
+            ).join('');
+            document.getElementById('sidebarNav').innerHTML = nav.map(i =>
+                `<div class="sidebar-item" data-screen="${i.id}" onclick="navigateTo('${i.id}')"><span class="nav-icon">${i.icon}</span>${i.label}</div>`
+            ).join('');
+        }
+
+        function navigateTo(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById('screen-' + screen);
+            if (target) { target.classList.add('active');
+                currentScreen = screen;
+                document.getElementById('appContent').scrollTop = 0;
+                updateNav(screen); }
+            if (screen === 'investimentos') renderInvestment();
+            if (screen === 'vouchers') renderVouchers();
+            if (screen === 'marketplace') renderMarketplace();
+            if (screen === 'comunidade') renderComunidade('todos');
+            if (screen === 'estab-dashboard') renderEstabDashboard();
+            if (screen === 'admin-dashboard') renderAdminDashboard(1);
+            if (screen === 'docente') renderTeacherDashboard();
+            if (screen === 'config') renderMarketingAdmin();
+            if (screen === 'carteira') { renderWallet();
+                renderStatement(); renderFinancialDashboard(); }
+            if (screen === 'estab-recebimento') renderRecebimentoHistorico();
+            if (screen === 'perfil') renderProfileDetails();
+        }
+
+        function updateNav(screen) {
+            document.querySelectorAll('.nav-item, .sidebar-item').forEach(el => el.classList.toggle('active', el.dataset.screen === screen));
+        }
+
+        function initToken() {
+            if (tokenInterval) clearInterval(tokenInterval);
+            if (tokenTimer) clearInterval(tokenTimer);
+            generateToken();
+            timerCount = 60;
+            tokenInterval = setInterval(generateToken, 60000);
+            tokenTimer = setInterval(() => {
+                timerCount--;
+                const el = document.getElementById('token-timer');
+                if (el) el.textContent = timerCount + 's';
+                if (timerCount <= 0) timerCount = 60;
+            }, 1000);
+        }
+
+        function generateToken() {
+            currentToken = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const el = document.getElementById('dynamic-token');
+            if (el) el.textContent = currentToken;
+            timerCount = 60;
+            const elTimer = document.getElementById('token-timer');
+            if (elTimer) elTimer.textContent = '60s';
+        }
+
+        function getCurrentToken() { return currentToken; }
+
+        function renderWallet() {
+            const data = getUserData(currentUser.role);
+            document.getElementById('walletBalance').textContent = formatCurrency(data.wallet.balance);
+            document.getElementById('pointBalance').textContent = formatPoints(data.wallet.points);
+            document.getElementById('currentBill').textContent = formatCurrency(data.wallet.bill);
+            const walletNumber = document.getElementById('walletNumber');
+            const pixKey = document.getElementById('pixKey');
+            if (walletNumber) walletNumber.textContent = data.walletNumber || '900000001';
+            if (pixKey) pixKey.textContent = data.pixKey || data.walletNumber || '900000001';
+            const homePoints = document.getElementById('homePointBalance');
+            if (homePoints) homePoints.textContent = formatPoints(data.wallet.points);
+            renderFinancialDashboard();
+        }
+
+        let walletChartInstance = null;
+        function renderFinancialDashboard() {
+            if (!currentUser) return;
+            const data = getUserData(currentUser.role);
+            if (!data || !data.statement) return;
+            const moneyTransactions = data.statement.filter(t => !['voucher', 'cashback', 'points'].includes(t.type));
+            const entradas = moneyTransactions.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
+            const saidas = Math.abs(moneyTransactions.filter(t => t.amount < 0).reduce((s, t) => s + t.amount, 0));
+            const pix = data.statement.filter(t => t.type === 'pix_sent' || t.type === 'pix_received');
+            const cashback = data.statement.filter(t => t.type === 'cashback').reduce((s, t) => s + Math.abs(t.amount), 0);
+            const elEntradas = document.getElementById('dashEntradas');
+            if (!elEntradas) return;
+            elEntradas.textContent = fmtMoneyShort(entradas);
+            document.getElementById('dashSaidas').textContent = fmtMoneyShort(saidas);
+            document.getElementById('dashPix').textContent = pix.length;
+            document.getElementById('dashCashback').textContent = formatPoints(cashback) + ' pts';
+            const canvas = document.getElementById('walletChart');
+            if (!canvas || typeof Chart === 'undefined') return;
+            if (walletChartInstance) walletChartInstance.destroy();
+            const compras = Math.abs(data.statement.filter(t => t.type === 'purchase').reduce((s, t) => s + t.amount, 0));
+            const pixEnviados = Math.abs(data.statement.filter(t => t.type === 'pix_sent').reduce((s, t) => s + t.amount, 0));
+            const pixRecebidos = data.statement.filter(t => t.type === 'pix_received').reduce((s, t) => s + t.amount, 0);
+            walletChartInstance = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Entradas', 'Saídas', 'PIX env.', 'PIX rec.', 'Compras', 'Cashback'],
+                    datasets: [{ data: [entradas, saidas, pixEnviados, pixRecebidos, compras, cashback / 20], backgroundColor: ['#168A4B', '#D92D20', '#E67E22', '#0F766E', '#6B3FA0', '#D4A843'], borderRadius: 6 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8A8A9E', font: { size: 9 } }, grid: { display: false } }, y: { ticks: { color: '#8A8A9E', font: { size: 9 }, callback: v => fmtMoneyShort(v) }, grid: { color: 'rgba(0,0,0,0.05)' } } } }
+            });
+        }
+
+        // ==========================================
+        // RENDER STATEMENT (C/ FILTROS APLICADOS)
+        // ==========================================
+        function renderStatement() {
+            const data = getUserData(currentUser.role);
+            const container = document.getElementById('statementList');
+            
+            const filterDateEl = document.getElementById('filterDate');
+            const filterDate = filterDateEl ? filterDateEl.value : '';
+            
+            const filterTypeEl = document.getElementById('filterType');
+            const filterType = filterTypeEl ? filterTypeEl.value : 'all';
+
+            const iconMap = {
+                'voucher': '🎁', 'marketplace': '🛍️', 'estabelecimento': '🏪', 
+                'lanchonete': '🍔', 'curso': '📚', 'viagem': '✈️',
+                'pix': '💳', 'invest': '📈', 'redeem': '🔄', 'credit': '💰', 
+                'debit': '💸', 'points': '⭐', 'purchase': '🛒', 'pix_sent': '🔁',
+                'pix_received': '✅', 'cashback': '💎'
+            };
+
+            if (!data.statement || data.statement.length === 0) {
+                container.innerHTML = '<div class="card" style="text-align:center;padding:12px;color:var(--text-tertiary);">Nenhuma movimentação recente</div>';
+                return;
+            }
+
+            let transacoesFiltradas = data.statement;
+
+            if (filterDate) {
+                const [y, m, d] = filterDate.split('-');
+                const dataFormatada = `${d}/${m}`;
+                transacoesFiltradas = transacoesFiltradas.filter(t => t.date === dataFormatada);
+            }
+
+            if (filterType !== 'all') {
+                const isPointType = (t) => ['points', 'voucher', 'marketplace', 'estabelecimento', 'lanchonete', 'curso', 'viagem', 'cashback'].includes(t.type);
+                if (filterType === 'credit') transacoesFiltradas = transacoesFiltradas.filter(t => t.amount >= 0 && !isPointType(t));
+                if (filterType === 'debit') transacoesFiltradas = transacoesFiltradas.filter(t => t.amount < 0 && !isPointType(t));
+                if (filterType === 'points') transacoesFiltradas = transacoesFiltradas.filter(t => isPointType(t));
+            }
+
+            if (transacoesFiltradas.length === 0) {
+                container.innerHTML = '<div class="card" style="text-align:center;padding:12px;color:var(--text-tertiary);">Nenhuma transação encontrada para este filtro</div>';
+                return;
+            }
+
+            container.innerHTML = transacoesFiltradas.slice(0, 15).map(t => {
+                const icon = iconMap[t.type] || '🔹';
+                const isPoint = ['points', 'voucher', 'cashback'].includes(t.type);
+                const amountClass = isPoint ? 'points' : t.amount >= 0 ? 'credit' : 'debit';
+                const sign = t.amount >= 0 ? '+' : '-';
+                const amountText = isPoint ? `${sign} ${formatPoints(Math.abs(t.amount))} pts` : `${sign} ${formatCurrency(Math.abs(t.amount))}`;
+                
+                return `<div class="card extrato-item" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:var(--radius-sm);margin-bottom:8px;">
+                    <div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:20px;">${icon}</span>
+                            <span style="font-weight:600;">${t.desc}</span>
+                        </div>
+                        <span style="font-size:11px;color:var(--text-tertiary);">${t.detail ? t.detail + ' • ' : ''}${t.date}</span>
+                    </div>
+                    <div class="statement-amount ${amountClass}" style="font-weight:800;text-align:right;">${amountText}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // ==========================================
+        // DOWNLOAD EM PDF NATIVO DO EXTRATO
+        // ==========================================
+        function downloadExtratoPDF() {
+            const style = document.createElement('style');
+            style.id = 'print-style';
+            style.innerHTML = `
+                @media print {
+                    body, .app-wrapper, .layout { height: auto !important; max-height: none !important; overflow: visible !important; display: block !important; box-shadow: none !important; border: none !important; }
+                    body * { visibility: hidden; }
+                    #screen-carteira, #screen-carteira * { visibility: visible; }
+                    #screen-carteira { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
+                    .btn, .bottom-nav, .app-header, .sidebar, #filterDate, #filterType { display: none !important; }
+                    .card { box-shadow: none !important; border: 1px solid #ccc !important; margin-bottom: 5px !important; page-break-inside: avoid; }
+                    body { background-color: white; }
+                }
+            `;
+            document.head.appendChild(style);
+            window.print();
+            setTimeout(() => {
+                const printStyle = document.getElementById('print-style');
+                if (printStyle) printStyle.remove();
+            }, 1000);
+        }
+
+        function renderInvestment() {
+            const data = getUserData(currentUser.role);
+            document.getElementById('investmentBalance').textContent = formatCurrency(data.wallet.invested || 0);
+            document.getElementById('investmentYield').textContent = 'Rendimento acumulado: +' + formatCurrency(data.wallet.yield || 0);
+            renderInvestChart(data.investmentHistory || []);
+        }
+
+        function renderInvestChart(data) {
+            const canvas = document.getElementById('investChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.clientWidth * 2;
+            canvas.height = canvas.clientHeight * 2;
+            ctx.scale(2, 2);
+            const w = canvas.width / 2,
+                h = canvas.height / 2;
+            ctx.clearRect(0, 0, w, h);
+            if (!data || data.length === 0) {
+                ctx.fillStyle = '#8A8A9E';
+                ctx.font = '12px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('Sem dados de investimento', w / 2, h / 2);
+                return;
+            }
+            const max = Math.max(...data);
+            const min = Math.min(...data);
+            const padding = 15;
+            const graphH = h - padding * 2;
+            const graphW = w - padding * 2;
+            const grad = ctx.createLinearGradient(0, padding, 0, h - padding);
+            grad.addColorStop(0, 'rgba(107,63,160,0.4)');
+            grad.addColorStop(1, 'rgba(107,63,160,0.0)');
+            ctx.beginPath();
+            data.forEach((v, i) => {
+                const x = padding + (i / (data.length - 1)) * graphW;
+                const y = padding + graphH - ((v - min) / (max - min)) * graphH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.lineTo(padding + graphW, h - padding);
+            ctx.lineTo(padding, h - padding);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.beginPath();
+            data.forEach((v, i) => {
+                const x = padding + (i / (data.length - 1)) * graphW;
+                const y = padding + graphH - ((v - min) / (max - min)) * graphH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.strokeStyle = '#D4A843';
+            ctx.lineWidth = 3;
+            ctx.shadowColor = 'rgba(212,168,67,0.3)';
+            ctx.shadowBlur = 8;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            data.forEach((v, i) => {
+                const x = padding + (i / (data.length - 1)) * graphW;
+                const y = padding + graphH - ((v - min) / (max - min)) * graphH;
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                ctx.fillStyle = '#D4A843';
+                ctx.fill();
+            });
+        }
+
+        function addTransaction(role, desc, amount, type, detail) {
+            const data = getUserData(role);
+            const date = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+            data.statement = data.statement || [];
+            data.statement.unshift({ desc, detail, date, amount, type });
+            if (type === 'credit' || type === 'pix_received') {
+                data.wallet.balance += amount;
+                data.wallet.points += amount * 2;
+            } else if (type === 'debit' || type === 'purchase') {
+                data.wallet.balance -= Math.abs(amount);
+                data.wallet.bill += Math.abs(amount);
+            } else if (type === 'pix_sent') {
+                data.wallet.balance -= Math.abs(amount);
+            } else if (type === 'cashback') {
+                data.wallet.points += Math.abs(amount);
+            } else if (type === 'points' || type === 'voucher' || type === 'marketplace' || type === 'estabelecimento' || type === 'lanchonete' || type === 'curso' || type === 'viagem') {
+                data.wallet.points -= Math.abs(amount);
+            } else if (type === 'invest') {
+                data.wallet.invested += Math.abs(amount);
+                data.wallet.balance -= Math.abs(amount);
+            } else if (type === 'redeem') {
+                data.wallet.invested -= Math.abs(amount);
+                data.wallet.balance += Math.abs(amount);
+            }
+            updateUserData(role, data);
+            if (role === currentUser.role) {
+                renderWallet();
+                renderStatement();
+                renderInvestment();
+                renderFinancialDashboard();
+            }
+        }
+
+        function formatCurrency(v) {
+            return 'R$ ' + parseFloat(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function abrirPixTransferencia() {
+            const students = (appData.demo && appData.demo.students || []).filter(s => s.walletNumber !== appData.activeStudentWallet).slice(0, 8);
+            const sugestoes = students.map(s => `<div class="wallet-list-item" onclick="document.getElementById('pixDestino').value='${s.walletNumber}'"><div><div class="wl-name">${s.name}</div><div class="wl-doc">Carteira ${s.walletNumber} • ${s.city}</div></div><span style="color:var(--primary);font-weight:800;">PIX</span></div>`).join('');
+            openQuickModal(`
+                <div>
+                    <div style="text-align:center;margin-bottom:12px;">
+                        <div style="font-size:46px;">🔁</div>
+                        <div style="font-size:20px;font-weight:900;">Transferir para aluno</div>
+                        <div style="font-size:12px;color:var(--text-secondary);">PIX interno instantâneo por Carteira IPOGPay</div>
+                    </div>
+                    <label class="field-label">Pesquisar por nome ou carteira</label>
+                    <input class="field-input" id="pixDestino" placeholder="Ex: Ana Paula ou 000000154">
+                    <label class="field-label">Valor</label>
+                    <input class="field-input" id="pixValor" placeholder="R$ 250,00" inputmode="decimal">
+                    <label class="field-label">Mensagem</label>
+                    <input class="field-input" id="pixMensagem" value="Pagamento almoço">
+                    <div style="font-weight:700;margin:8px 0;">Alunos recentes</div>
+                    <div style="max-height:180px;overflow:auto;border:1px solid var(--border-color);border-radius:var(--radius-sm);padding:0 8px;">${sugestoes}</div>
+                    <button class="btn btn-primary" style="width:100%;margin-top:14px;" onclick="confirmarPixTransferencia()">Enviar PIX</button>
+                    <button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="closeQuickModal()">Cancelar</button>
+                </div>
+            `);
+        }
+
+        function parseMoneyInput(value) {
+            return parseFloat(String(value || '').replace(/[R$\s.]/g, '').replace(',', '.'));
+        }
+
+        function confirmarPixTransferencia() {
+            const query = document.getElementById('pixDestino').value.trim().toLowerCase();
+            const valor = parseMoneyInput(document.getElementById('pixValor').value);
+            const mensagem = document.getElementById('pixMensagem').value.trim() || 'Transferência IPOGPay';
+            const origem = getActiveStudent();
+            const destino = (appData.demo.students || []).find(s => s.walletNumber.toLowerCase() === query || s.name.toLowerCase().includes(query));
+            if (!destino || destino.walletNumber === origem.walletNumber) { showToast('⚠️ Aluno não encontrado.'); return; }
+            if (isNaN(valor) || valor <= 0) { showToast('⚠️ Valor inválido.'); return; }
+            if (origem.wallet.balance < valor) { showToast('❌ Saldo insuficiente.'); return; }
+            origem.wallet.balance -= valor;
+            destino.wallet.balance += valor;
+            origem.statement.unshift({ desc: 'PIX enviado', detail: 'Carteira ' + destino.walletNumber + ' • ' + mensagem, date: shortDate(0), amount: -valor, type: 'pix_sent' });
+            destino.statement.unshift({ desc: 'PIX recebido', detail: 'Carteira ' + origem.walletNumber + ' • ' + mensagem, date: shortDate(0), amount: valor, type: 'pix_received' });
+            saveAppData();
+            closeQuickModal();
+            renderWallet();
+            renderStatement();
+            renderFinancialDashboard();
+            exibirModalSucesso(
+                'Transferência realizada',
+                'PIX interno IPOGPay instantâneo',
+                [
+                    { label: 'Valor', value: formatCurrency(valor) },
+                    { label: 'De', value: 'Carteira ' + origem.walletNumber },
+                    { label: 'Para', value: 'Carteira ' + destino.walletNumber },
+                    { label: 'Mensagem', value: mensagem }
+                ],
+                'PIX-' + Date.now(),
+                true
+            );
+        }
+
+        function openStudentSelector() {
+            if (!appData.demo || !appData.demo.students) return;
+            const featured = appData.demo.students.slice(0, 12);
+            const rows = featured.map(s => `
+                <div class="student-list-item" onclick="switchStudent('${s.walletNumber}')">
+                    <span class="radio-dot ${s.walletNumber === appData.activeStudentWallet ? 'active' : ''}"></span>
+                    <div style="width:42px;height:42px;border-radius:50%;overflow:hidden;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;"><img src="${s.photo}" alt="${s.name}" style="width:100%;height:100%;object-fit:cover;"></div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:800;">${s.name}</div>
+                        <div style="font-size:12px;color:var(--text-secondary);">Carteira ${s.walletNumber} • ${s.course}</div>
+                    </div>
+                </div>
+            `).join('');
+            openQuickModal(`
+                <div>
+                    <div style="font-size:20px;font-weight:900;text-align:center;margin-bottom:4px;">Selecionar aluno</div>
+                    <div style="font-size:12px;color:var(--text-secondary);text-align:center;margin-bottom:12px;">Troque o ambiente de demonstração em tempo real</div>
+                    <div>${rows}</div>
+                    <div style="font-size:11px;color:var(--text-tertiary);text-align:center;margin:12px 0;">Base simulada com ${DEMO_SCALE.alunos} alunos e ${DEMO_SCALE.transacoes}+ transações.</div>
+                    <button class="btn btn-outline" style="width:100%;" onclick="closeQuickModal()">Fechar</button>
+                </div>
+            `);
+        }
+
+        function switchStudent(walletNumber) {
+            appData.activeStudentWallet = walletNumber;
+            saveAppData();
+            refreshCurrentUser();
+            applyUI();
+            renderWallet();
+            renderStatement();
+            renderInvestment();
+            renderComunidade('todos');
+            renderProfileDetails();
+            closeQuickModal();
+            showToast('🔄 Demonstração alterada para ' + getActiveStudent().name);
+        }
+
+        function openTeacherSelector() {
+            if (!appData.demo || !appData.demo.teachers) return;
+            const rows = appData.demo.teachers.slice(0, 12).map(t => `
+                <div class="student-list-item" onclick="switchTeacher('${t.walletNumber}')">
+                    <span class="radio-dot ${t.walletNumber === appData.activeTeacherWallet ? 'active' : ''}"></span>
+                    <div style="width:42px;height:42px;border-radius:50%;overflow:hidden;background:var(--primary);display:flex;align-items:center;justify-content:center;"><img src="${t.photo}" alt="${t.name}" style="width:100%;height:100%;object-fit:cover;"></div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:800;">${t.name}</div>
+                        <div style="font-size:12px;color:var(--text-secondary);">Carteira ${t.walletNumber} • ${t.specialties[0]} • ${t.receivableHours}h a receber</div>
+                    </div>
+                </div>
+            `).join('');
+            openQuickModal(`
+                <div>
+                    <div style="font-size:20px;font-weight:900;text-align:center;margin-bottom:4px;">Selecionar docente</div>
+                    <div style="font-size:12px;color:var(--text-secondary);text-align:center;margin-bottom:12px;">Ambiente de demonstração com ${DEMO_SCALE.professores} docentes simulados</div>
+                    ${rows}
+                    <button class="btn btn-outline" style="width:100%;margin-top:12px;" onclick="closeQuickModal()">Fechar</button>
+                </div>
+            `);
+        }
+
+        function switchTeacher(walletNumber) {
+            appData.activeTeacherWallet = walletNumber;
+            saveAppData();
+            refreshCurrentUser();
+            applyUI();
+            renderTeacherDashboard();
+            renderWallet();
+            renderStatement();
+            renderInvestment();
+            renderProfileDetails();
+            closeQuickModal();
+            showToast('👨‍🏫 Docente alterado para ' + getActiveTeacher().name);
+        }
+
+        function openActiveProfileSelector() {
+            if (currentUser && currentUser.role === 'docente') openTeacherSelector();
+            else openStudentSelector();
+        }
+
+        function renderTeacherDashboard() {
+            if (!currentUser || currentUser.role !== 'docente') return;
+            const t = getActiveTeacher();
+            if (!t) return;
+            const receivableAmount = t.receivableHours * t.hourlyRate;
+            const futureAmount = t.futureHours * t.hourlyRate;
+            const advanceLimit = receivableAmount + (futureAmount * (t.futureAdvancePct / 100));
+            const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+            setText('teacherSubtitle', `${t.name} • ${t.specialties.join(' • ')}`);
+            setText('teacherReceivableAmount', formatCurrency(receivableAmount));
+            setText('teacherReceivableHours', `${t.receivableHours}h confirmadas a receber`);
+            setText('teacherHourlyRate', formatCurrency(t.hourlyRate) + '/h');
+            setText('teacherNextPay', 'Próximo pagamento: ' + t.nextPayDate);
+            setText('teacherFutureHours', t.futureHours + 'h');
+            setText('teacherFutureAmount', fmtMoneyShort(futureAmount));
+            setText('teacherAdvanceLimit', fmtMoneyShort(advanceLimit));
+            setText('teacherAdvancePct', t.futureAdvancePct + '%');
+            const list = document.getElementById('teacherClassesList');
+            if (list) {
+                list.innerHTML = (t.classes || []).map(c => `
+                    <div class="teacher-class-row">
+                        <div>
+                            <div style="font-weight:800;">${c.course}</div>
+                            <div style="font-size:12px;color:var(--text-secondary);">${c.date} • ${c.campus} • ${c.status}</div>
+                        </div>
+                        <div style="font-weight:900;color:var(--primary);">${c.hours}h</div>
+                    </div>
+                `).join('');
+            }
+            const preview = document.getElementById('teacherStatementPreview');
+            if (preview) {
+                preview.innerHTML = (t.statement || []).slice(0, 5).map(item => `
+                    <div class="teacher-class-row">
+                        <div>
+                            <div style="font-weight:800;">${item.desc}</div>
+                            <div style="font-size:12px;color:var(--text-secondary);">${item.detail || ''} • ${item.date}</div>
+                        </div>
+                        <div style="font-weight:900;color:${item.amount >= 0 ? '#168A4B' : '#D92D20'};">${item.amount >= 0 ? '+' : '-'} ${item.type === 'cashback' ? formatPoints(Math.abs(item.amount)) + ' pts' : formatCurrency(Math.abs(item.amount))}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function openTeacherAdvanceModal(type) {
+            const t = getActiveTeacher();
+            const receivableAmount = t.receivableHours * t.hourlyRate;
+            const futureAmount = t.futureHours * t.hourlyRate;
+            const max = type === 'future' ? futureAmount * (t.futureAdvancePct / 100) : receivableAmount;
+            const label = type === 'future' ? `Até ${t.futureAdvancePct}% das aulas futuras confirmadas` : 'Horas-aula já confirmadas a receber';
+            openQuickModal(`
+                <div style="text-align:center;">
+                    <div style="font-size:46px;">👨‍🏫</div>
+                    <div style="font-size:20px;font-weight:900;">Antecipação docente</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">${label}</div>
+                    <div class="metric-card" style="margin-bottom:12px;"><div class="metric-label">Disponível para antecipar</div><div class="metric-value" style="font-size:24px;color:var(--primary);">${formatCurrency(max)}</div></div>
+                    <label class="field-label" style="text-align:left;">Valor desejado</label>
+                    <input class="field-input" id="teacherAdvanceValue" value="${max.toFixed(2).replace('.', ',')}" inputmode="decimal">
+                    <button class="btn btn-primary" style="width:100%;" onclick="confirmTeacherAdvance('${type}')">Confirmar antecipação</button>
+                    <button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="closeQuickModal()">Cancelar</button>
+                </div>
+            `);
+        }
+
+        function confirmTeacherAdvance(type) {
+            const t = getActiveTeacher();
+            const value = parseMoneyInput(document.getElementById('teacherAdvanceValue').value);
+            const receivableAmount = t.receivableHours * t.hourlyRate;
+            const futureAmount = t.futureHours * t.hourlyRate;
+            const max = type === 'future' ? futureAmount * (t.futureAdvancePct / 100) : receivableAmount;
+            if (isNaN(value) || value <= 0) { showToast('⚠️ Valor inválido.'); return; }
+            if (value > max + 0.01) { showToast('❌ Valor acima do limite disponível.'); return; }
+            const fee = value * (type === 'future' ? 0.028 : 0.018);
+            const net = value - fee;
+            t.wallet.balance += net;
+            if (type === 'receivable') {
+                t.receivableHours = Math.max(0, t.receivableHours - Math.round(value / t.hourlyRate));
+            } else {
+                t.futureHours = Math.max(0, t.futureHours - Math.round((value / t.hourlyRate) * (100 / t.futureAdvancePct)));
+            }
+            t.statement.unshift({ desc: 'Antecipação docente', detail: type === 'future' ? 'Percentual de aulas futuras' : 'Horas-aula a receber', date: shortDate(0), amount: net, type: 'credit' });
+            updateUserData('docente', t);
+            closeQuickModal();
+            renderTeacherDashboard();
+            renderWallet();
+            renderStatement();
+            exibirModalSucesso(
+                'Antecipação realizada',
+                'Crédito liberado na carteira docente',
+                [
+                    { label: 'Valor solicitado', value: formatCurrency(value) },
+                    { label: 'Taxa', value: formatCurrency(fee) },
+                    { label: 'Crédito líquido', value: formatCurrency(net) }
+                ],
+                'DOC-' + Date.now(),
+                true
+            );
+        }
+
+        function filterComunidade(category) {
+            renderComunidade(category);
+        }
+
+        function renderComunidade(category) {
+            const feed = document.getElementById('comunidadeFeed');
+            if (!feed || !appData.demo) return;
+            const active = currentUser && currentUser.role === 'docente' ? getActiveTeacher() : getActiveStudent();
+            if (active) {
+                const nameEl = document.getElementById('communityUserName');
+                const headlineEl = document.getElementById('communityUserHeadline');
+                const photoEl = document.getElementById('communityUserPhoto');
+                if (nameEl) nameEl.textContent = active.name;
+                if (headlineEl) headlineEl.textContent = active.title;
+                if (photoEl) photoEl.innerHTML = `<img src="${active.photo}" alt="${active.name}">`;
+                document.getElementById('communityConnections').textContent = active.connections.toLocaleString('pt-BR');
+                document.getElementById('communityFollowers').textContent = active.followers.toLocaleString('pt-BR');
+            }
+            const posts = (appData.demo.communityPosts || []).filter(p => category === 'todos' || p.category === category).slice(0, 30);
+            feed.innerHTML = posts.map(p => `
+                <div class="pro-card">
+                    <div class="pro-banner" style="background:linear-gradient(135deg,var(--primary),${p.category === 'saude' ? '#10B981' : p.category === 'direito' ? '#374151' : p.category === 'ia' ? '#2563EB' : '#D4A843'});"></div>
+                    <div class="pro-body">
+                        <div style="display:flex;gap:12px;align-items:flex-start;">
+                            <div class="pro-avatar"><img src="${p.photo}" alt="${p.name}"></div>
+                            <div style="flex:1;min-width:0;padding-top:8px;">
+                                <div style="font-weight:900;font-size:16px;">${p.name}</div>
+                                <div style="font-size:12px;color:var(--text-secondary);">${p.title}</div>
+                                <div style="font-size:11px;color:var(--text-tertiary);">${p.education} • ${p.city}</div>
+                            </div>
+                        </div>
+                        <div class="tag-row">
+                            ${p.openToWork ? '<span class="status-pill">Open to Work</span>' : ''}
+                            ${p.openToBusiness ? '<span class="status-pill">Open to Business</span>' : ''}
+                            <span class="tag-pill">${p.connections.toLocaleString('pt-BR')} conexões</span>
+                            <span class="tag-pill">${p.followers.toLocaleString('pt-BR')} seguidores</span>
+                        </div>
+                        <div class="tag-row">${p.tags.map(t => `<span class="tag-pill">${t}</span>`).join('')}</div>
+                        <div style="font-size:12px;color:var(--text-secondary);margin-top:8px;">Certificações: ${p.certifications.join(' • ')}</div>
+                        <div class="linkedin-post-desc" style="font-size:14px;margin-top:10px;">${p.post}</div>
+                        <div class="linkedin-post-actions" style="justify-content:space-between;border-top:1px solid var(--border-color);padding-top:10px;">
+                            <span>👍 ${p.likes}</span><span>💬 ${p.comments}</span><span>🔄 ${p.shares}</span><span>📨 Enviar</span><span>❤️ Reagir</span>
+                        </div>
+                        <div class="pro-actions">
+                            <button class="btn btn-primary" onclick="showToast('🔗 Convite enviado para ${p.name}')">Conectar</button>
+                            <button class="btn btn-outline" onclick="showToast('💬 Mensagem aberta para ${p.name}')">Mensagem</button>
+                            <button class="btn btn-secondary" onclick="showToast('☕ Café agendado com ${p.name}')">Café</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderProfileDetails() {
+            const el = document.getElementById('profileDetails');
+            if (!el || !currentUser) return;
+            const data = getUserData(currentUser.role);
+            const profile = (currentUser.role === 'aluno' || currentUser.role === 'docente') ? data : {
+                name: currentUser.userName,
+                walletNumber: '900000001',
+                pixKey: '900000001',
+                cpf: '00.000.000/0001-00',
+                course: currentUser.label,
+                className: 'Ecossistema IPOGPay',
+                campus: 'Nacional',
+                level: currentUser.label,
+                entryDate: '06/2026',
+                ranking: '-',
+                wallet: data.wallet || { points: 0 },
+                certifications: ['Parceiro IPOGPay'],
+                completedCourses: ['Onboarding IPOGPay']
+            };
+            const teacherExtra = currentUser.role === 'docente' ? `
+                <div class="card" style="padding:14px;margin-bottom:10px;">
+                    <div style="font-weight:900;margin-bottom:8px;">Dados docentes</div>
+                    ${[
+                        ['Valor hora-aula', formatCurrency(profile.hourlyRate)],
+                        ['Horas a receber', profile.receivableHours + 'h'],
+                        ['Aulas futuras confirmadas', profile.futureHours + 'h'],
+                        ['Antecipação futura', profile.futureAdvancePct + '% das aulas futuras']
+                    ].map(([label, value]) => `<div style="display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--border-color);padding:7px 0;font-size:13px;"><span style="color:var(--text-secondary);">${label}</span><strong style="text-align:right;">${value}</strong></div>`).join('')}
+                </div>
+            ` : '';
+            el.innerHTML = `
+                <div class="card" style="padding:16px;margin-bottom:10px;text-align:center;">
+                    <div class="qr-pix"></div>
+                    <div style="font-weight:900;margin-top:10px;">PIX ${profile.pixKey || profile.walletNumber}</div>
+                    <div style="font-size:12px;color:var(--text-secondary);">Tipo: Carteira IPOGPay</div>
+                </div>
+                <div class="grid-2" style="margin-bottom:10px;">
+                    <div class="metric-card"><div class="metric-label">Carteira</div><div class="metric-value" style="font-size:18px;">${profile.walletNumber || '900000001'}</div></div>
+                    <div class="metric-card"><div class="metric-label">Nível</div><div class="metric-value" style="font-size:18px;color:var(--secondary);">${profile.level || currentUser.label}</div></div>
+                    <div class="metric-card"><div class="metric-label">Pontuação</div><div class="metric-value" style="font-size:18px;">${formatPoints(profile.wallet.points)}</div></div>
+                    <div class="metric-card"><div class="metric-label">Ranking</div><div class="metric-value" style="font-size:18px;">#${profile.ranking}</div></div>
+                </div>
+                <div class="card" style="padding:14px;margin-bottom:10px;">
+                    <div style="font-weight:900;margin-bottom:8px;">Dados IPOG</div>
+                    ${[
+                        ['CPF', profile.cpf],
+                        ['Curso', profile.course],
+                        ['Turma', profile.className],
+                        ['Campus', profile.campus],
+                        ['Ingresso', profile.entryDate]
+                    ].map(([label, value]) => `<div style="display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--border-color);padding:7px 0;font-size:13px;"><span style="color:var(--text-secondary);">${label}</span><strong style="text-align:right;">${value}</strong></div>`).join('')}
+                </div>
+                ${teacherExtra}
+                <div class="card" style="padding:14px;margin-bottom:10px;">
+                    <div style="font-weight:900;">Certificados e cursos</div>
+                    <div class="tag-row">${(profile.certifications || []).map(c => `<span class="tag-pill">${c}</span>`).join('')}</div>
+                    <div class="tag-row">${(profile.completedCourses || []).map(c => `<span class="tag-pill">${c}</span>`).join('')}</div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // FLUXO FINTECH - EFEITOS SONOROS E TELA VERDE
+        // ==========================================
+        function playSuccessSound() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0, ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.3);
+            } catch(e) { }
+        }
+
+        function exibirModalSucesso(titulo, subtitulo, detalhes, protocolo, mostrarComprovante) {
+            playSuccessSound();
+
+            let successScreen = document.getElementById('fintechSuccessScreen');
+            if (!successScreen) {
+                successScreen = document.createElement('div');
+                successScreen.id = 'fintechSuccessScreen';
+                successScreen.className = 'fintech-success-screen';
+                document.body.appendChild(successScreen);
+            }
+
+            const detalhesHtml = detalhes.map(d =>
+                `<div style="display:flex; justify-content:space-between; margin-bottom:14px; font-size:14px; border-bottom:1px solid var(--border-color); padding-bottom:10px;">
+                    <span style="color:var(--text-secondary);">${d.label}</span>
+                    <span style="font-weight:700; color:var(--text-primary);">${d.value}</span>
+                </div>`
+            ).join('');
+
+            successScreen.innerHTML = `
+                <div class="success-icon-anim">✅</div>
+                <h1 style="margin-top:20px; font-size:26px; font-weight:900; text-align:center; letter-spacing:-0.5px;">${titulo}</h1>
+                <div style="font-size:16px; margin-top:8px; opacity:0.9; text-align:center;">${subtitulo}</div>
+
+                <div class="success-details-card">
+                    ${detalhesHtml}
+                    <div style="font-size:12px; color:var(--text-tertiary); text-align:center; margin-top:20px;">
+                        Protocolo<br>
+                        <strong style="color:var(--text-primary); font-size:14px;">${protocolo}</strong>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width:100%; margin-top:24px; padding:14px;" onclick="fecharTelaSucesso()">
+                        Ver Extrato da Carteira
+                    </button>
+                </div>
+            `;
+
+            setTimeout(() => {
+                successScreen.classList.add('show');
+            }, 50);
+        }
+
+        function fecharTelaSucesso() {
+            const successScreen = document.getElementById('fintechSuccessScreen');
+            if (successScreen) {
+                successScreen.classList.remove('show');
+            }
+            navigateTo('carteira');
+            const appContent = document.getElementById('appContent');
+            if (appContent) appContent.scrollTop = 0;
+            showToast('✅ Pagamento efetuado com sucesso');
+        }
+        // ==========================================
+
+        function abrirModalAporte() {
+            openQuickModal(`
+                <div style="text-align:center;">
+                    <div style="font-size:48px;">💰</div>
+                    <div style="font-size:20px;font-weight:700;color:var(--text-primary);">Aportar Investimento</div>
+                    <div style="font-size:14px;color:var(--text-secondary);margin-bottom:12px;">Digite o valor que deseja investir:</div>
+                    <input id="aporteValor" type="number" min="0.01" step="0.01" placeholder="R$ 0,00" style="width:100%;padding:12px;border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:16px;margin-bottom:12px;">
+                    <button class="btn btn-secondary" style="width:100%;" id="btnConfirmarAporte" onclick="confirmarAporte()">Confirmar Aporte</button>
+                    <button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="closeQuickModal()">Cancelar</button>
+                </div>
+            `);
+        }
+
+        function confirmarAporte() {
+            const btn = document.getElementById('btnConfirmarAporte');
+            if (btn) btn.disabled = true;
+            const valor = parseFloat(document.getElementById('aporteValor').value);
+            if (isNaN(valor) || valor <= 0) {
+                showToast('⚠️ Digite um valor válido.');
+                if (btn) btn.disabled = false;
+                return;
+            }
+            const data = getUserData(currentUser.role);
+            if (parseFloat(data.wallet.balance) < valor) {
+                showToast('❌ Saldo insuficiente em reais.');
+                if (btn) btn.disabled = false;
+                return;
+            }
+            closeQuickModal();
+            addTransaction(currentUser.role, 'Aporte em Investimento', -valor, 'invest', 'IPOG CDB 120% CDI');
+            const hist = data.investmentHistory || [];
+            const last = hist.length > 0 ? hist[hist.length - 1] : 100;
+            hist.push(last + valor * 0.02);
+            updateUserData(currentUser.role, { investmentHistory: hist });
+            renderInvestment();
+            const protocolo = 'TX-' + Date.now();
+            
+            exibirModalSucesso(
+                'Investimento realizado!',
+                'Seu dinheiro está rendendo 120% do CDI.',
+                [{ label: 'Valor', value: formatCurrency(valor) }],
+                protocolo,
+                false
+            );
+        }
+
+        function abrirModalResgate() {
+            openQuickModal(`
+                <div style="text-align:center;">
+                    <div style="font-size:48px;">🔄</div>
+                    <div style="font-size:20px;font-weight:700;color:var(--text-primary);">Resgatar Investimento</div>
+                    <div style="font-size:14px;color:var(--text-secondary);margin-bottom:12px;">Digite o valor que deseja resgatar:</div>
+                    <input id="resgateValor" type="number" min="0.01" step="0.01" placeholder="R$ 0,00" style="width:100%;padding:12px;border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:16px;margin-bottom:12px;">
+                    <button class="btn btn-outline" style="width:100%;" id="btnConfirmarResgate" onclick="confirmarResgate()">Confirmar Resgate</button>
+                    <button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="closeQuickModal()">Cancelar</button>
+                </div>
+            `);
+        }
+
+        function confirmarResgate() {
+            const btn = document.getElementById('btnConfirmarResgate');
+            if (btn) btn.disabled = true;
+            const valor = parseFloat(document.getElementById('resgateValor').value);
+            if (isNaN(valor) || valor <= 0) {
+                showToast('⚠️ Digite um valor válido.');
+                if (btn) btn.disabled = false;
+                return;
+            }
+            const data = getUserData(currentUser.role);
+            if (parseFloat(data.wallet.invested) < valor) {
+                showToast('❌ Saldo investido insuficiente.');
+                if (btn) btn.disabled = false;
+                return;
+            }
+            closeQuickModal();
+            addTransaction(currentUser.role, 'Resgate de Investimento', valor, 'redeem', 'IPOG CDB 120% CDI');
+            renderInvestment();
+            const protocolo = 'TX-' + Date.now();
+            
+            exibirModalSucesso(
+                'Resgate realizado!',
+                'Seu dinheiro está a caminho da sua carteira.',
+                [{ label: 'Valor', value: formatCurrency(valor) }],
+                protocolo,
+                false
+            );
+        }
+
+        const PRODUTOS = {
+            cursos: [{ nome: 'MBA em Gestão Estratégica', preco: 12000, icon: '🎓', cat: 'Cursos' }, { nome: 'Pós em Engenharia de Software', preco: 8500, icon: '💻', cat: 'Cursos' }],
+            livros: [{ nome: 'Gestão Estratégica 4.0', preco: 89, icon: '📖', cat: 'Livros' }, { nome: 'Inteligência Artificial Aplicada', preco: 112, icon: '🤖', cat: 'Livros' }],
+            tech: [{ nome: 'Notebook Pro 15"', preco: 4200, icon: '💻', cat: 'Tecnologia' }, { nome: 'Monitor 4K 27"', preco: 1800, icon: '🖥️', cat: 'Tecnologia' }],
+            viagens: [{ nome: 'Pacote Imersão Lisboa', preco: 4500, icon: '✈️', cat: 'Viagens' }, { nome: 'Curso em San Francisco', preco: 5800, icon: '🌉', cat: 'Viagens' }],
+            saude: [{ nome: 'Plano de Saúde Executivo', preco: 3200, icon: '🏥', cat: 'Saúde' }, { nome: 'Check-up Completo', preco: 890, icon: '🩺', cat: 'Saúde' }],
+            lanchonete: [
+                { nome: 'Combo Executivo', preco: 35, icon: '🍱', cat: 'Hamburgueria' },
+                { nome: 'Hambúrguer Artesanal', preco: 28, icon: '🍔', cat: 'Hamburgueria' },
+                { nome: 'Smash IPOG Duplo', preco: 32, icon: '🍔', cat: 'Hamburgueria' },
+                { nome: 'Cheddar Bacon Premium', preco: 36, icon: '🥓', cat: 'Hamburgueria' },
+                { nome: 'Chicken Crispy', preco: 29, icon: '🍗', cat: 'Hamburgueria' },
+                { nome: 'Veggie Burger', preco: 31, icon: '🥬', cat: 'Hamburgueria' },
+                { nome: 'Batata Rústica', preco: 18, icon: '🍟', cat: 'Acompanhamento' },
+                { nome: 'Onion Rings', preco: 16, icon: '🧅', cat: 'Acompanhamento' },
+                { nome: 'Milkshake Chocolate', preco: 22, icon: '🥤', cat: 'Bebida' },
+                { nome: 'Café Gelado IPOG', preco: 14, icon: '☕', cat: 'Bebida' },
+                { nome: 'Combo Aluno', preco: 42, icon: '🎓', cat: 'Combo' },
+                { nome: 'Combo Networking', preco: 58, icon: '🤝', cat: 'Combo' }
+            ],
+            coworking: [
+                { nome: 'Coworking 1 dia', preco: 50, icon: '🏢', cat: 'Coworking' },
+                { nome: 'Plano Mensal', preco: 320, icon: '📅', cat: 'Coworking' },
+                { nome: 'Mesa Flex 4h', preco: 28, icon: '💻', cat: 'Estação' },
+                { nome: 'Mesa Flex 8h', preco: 45, icon: '🧑‍💻', cat: 'Estação' },
+                { nome: 'Sala Reunião 1h', preco: 75, icon: '👥', cat: 'Sala' },
+                { nome: 'Sala Reunião 4h', preco: 260, icon: '📊', cat: 'Sala' },
+                { nome: 'Auditório 2h', preco: 420, icon: '🎤', cat: 'Evento' },
+                { nome: 'Cabine Podcast 1h', preco: 95, icon: '🎙️', cat: 'Estúdio' },
+                { nome: 'Estúdio Aula Online', preco: 140, icon: '🎥', cat: 'Estúdio' },
+                { nome: 'Endereço Fiscal Mensal', preco: 180, icon: '📬', cat: 'Serviço' },
+                { nome: 'Mentoria de Carreira 1h', preco: 120, icon: '🧭', cat: 'Serviço' },
+                { nome: 'Day Pass com Café', preco: 68, icon: '☕', cat: 'Coworking' }
+            ]
+        };
+
+        const vouchersList = [
+            { name: 'Amazon', icon: '🛒', price: 100 },
+            { name: 'Netflix', icon: '🎬', price: 50 },
+            { name: 'Spotify', icon: '🎵', price: 35 },
+            { name: 'iFood', icon: '🍕', price: 80 },
+            { name: 'Uber', icon: '🚗', price: 60 }
+        ];
+
+        function renderVouchers() {
+            const grid = document.getElementById('voucherGrid');
+            grid.innerHTML = vouchersList.map(v => `
+                <div class="voucher-card" onclick="comprarVoucher('${v.name}', ${v.price})">
+                    <span class="v-icon">${v.icon}</span>
+                    <div class="v-name">${v.name}</div>
+                    <div class="v-price">${v.price} pontos ou R$ ${(v.price * 0.05).toFixed(2)}</div>
+                </div>
+            `).join('');
+        }
+
+        function comprarVoucher(nome, preco) {
+            openQuickModal(`
+                <div style="text-align:center;">
+                    <div style="font-size:48px;">🎁</div>
+                    <div style="font-size:20px;font-weight:700;">${nome}</div>
+                    <div style="font-size:14px;color:var(--text-secondary);">Preço: ${preco} pontos ou R$ ${(preco * 0.05).toFixed(2)}</div>
+                    <div style="font-size:12px;color:var(--text-tertiary);margin-top:4px;">1 ponto = R$ 0,05</div>
+                    <div style="margin-top:12px;font-size:13px;color:var(--text-secondary);">Digite seu token de autorização (6 dígitos):</div>
+                    <input id="tokenInput" type="text" maxlength="6" placeholder="XXXXXX" style="width:100%;padding:12px;border:1px solid var(--border-color);border-radius:var(--radius-sm);text-align:center;font-size:18px;letter-spacing:4px;font-weight:700;margin-bottom:12px;">
+                    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="validarTokenECompra('${nome}', ${preco}, 'points')">🟣 Pagar com Pontos</button>
+                        <button class="btn btn-secondary" onclick="validarTokenECompra('${nome}', ${preco}, 'reais')">💰 Pagar com Reais</button>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top:8px;" onclick="closeQuickModal()">Cancelar</button>
+                </div>
+            `);
+        }
+
+        function validarTokenECompra(nome, preco, forma) {
+            const token = document.getElementById('tokenInput').value.trim().toUpperCase();
+            if (token.length !== 6) { showToast('❌ Token inválido. Deve conter 6 dígitos.'); return; }
+            if (token !== getCurrentToken()) { showToast('❌ Token incorreto. Verifique o token.'); return; }
+            
+            const data = getUserData(currentUser.role);
+            let valorFinal, tipo, valorDisplay, detalhesCompra;
+            const protocolo = 'TX-' + Date.now();
+
+            if (forma === 'points') {
+                if (parseFloat(data.wallet.points) < parseFloat(preco)) {
+                    showToast('❌ Saldo insuficiente em pontos.');
+                    return;
+                }
+                closeQuickModal();
+                addTransaction(currentUser.role, 'Voucher ' + nome, -preco, 'voucher', 'Resgate com pontos');
+                const cbPontos = preco * 0.005;
+                addTransaction(currentUser.role, 'Cashback ' + nome, cbPontos, 'cashback', 'Benefício IPOGPay');
+                valorDisplay = preco + ' Pontos';
+                detalhesCompra = [
+                    { label: 'Produto', value: nome }, { label: 'Valor', value: valorDisplay },
+                    { label: 'Cashback', value: cbPontos.toFixed(0) + ' Pontos' }, { label: 'Forma', value: 'Pontos IPOG' }
+                ];
+            } else {
+                const valorReais = preco * 0.05;
+                if (parseFloat(data.wallet.balance) < parseFloat(valorReais)) {
+                    showToast('❌ Saldo insuficiente em reais.');
+                    return;
+                }
+                closeQuickModal();
+                addTransaction(currentUser.role, 'Voucher ' + nome, -valorReais, 'purchase', 'Compra de voucher');
+                const cbPontos = valorReais * 0.005 * 20;
+                addTransaction(currentUser.role, 'Cashback ' + nome, cbPontos, 'cashback', 'Benefício IPOGPay');
+                valorDisplay = formatCurrency(valorReais);
+                detalhesCompra = [
+                    { label: 'Produto', value: nome }, { label: 'Valor', value: valorDisplay },
+                    { label: 'Cashback', value: cbPontos.toFixed(0) + ' Pontos' }, { label: 'Forma', value: 'Saldo da Carteira' }
+                ];
+            }
+
+            exibirModalSucesso('Compra efetuada!', 'Voucher ' + nome, detalhesCompra, protocolo, true);
+        }
+
+        function renderMarketplace() {
+            const categorias = ['cursos', 'livros', 'tech', 'viagens', 'saude', 'lanchonete', 'coworking'];
+            categorias.forEach(cat => {
+                const container = document.getElementById('produtos-' + cat);
+                if (!container) return;
+                const produtos = PRODUTOS[cat] || [];
+                container.innerHTML = produtos.map(p => `
+                    <div class="product-card" onclick="comprarProduto('${p.nome}', ${p.preco}, '${p.icon}')">
+                        <span class="prod-icon">${p.icon}</span>
+                        <div class="prod-name">${p.nome}</div>
+                        <div class="prod-cat">${p.cat}</div>
+                        <div class="prod-price">${p.preco} pts ou R$ ${(p.preco * 0.05).toFixed(2)}</div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function comprarProduto(nome, preco, icon) {
+            openQuickModal(`
+                <div style="text-align:center;">
+                    <div style="font-size:48px;">${icon}</div>
+                    <div style="font-size:18px;font-weight:700;color:var(--text-primary);">${nome}</div>
+                    <div style="font-size:14px;color:var(--text-secondary);">Preço: ${preco} pontos ou R$ ${(preco * 0.05).toFixed(2)}</div>
+                    <div style="font-size:12px;color:var(--text-tertiary);margin-top:4px;">1 ponto = R$ 0,05</div>
+                    <div style="margin-top:12px;font-size:13px;color:var(--text-secondary);">Digite seu token de autorização (6 dígitos):</div>
+                    <input id="tokenInput" type="text" maxlength="6" placeholder="XXXXXX" style="width:100%;padding:12px;border:1px solid var(--border-color);border-radius:var(--radius-sm);text-align:center;font-size:18px;letter-spacing:4px;font-weight:700;margin-bottom:12px;">
+                    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="validarTokenECompraMarketplace('${nome}', ${preco}, 'points')">🟣 Pagar com Pontos</button>
+                        <button class="btn btn-secondary" onclick="validarTokenECompraMarketplace('${nome}', ${preco}, 'reais')">💰 Pagar com Reais</button>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top:8px;" onclick="closeQuickModal()">Cancelar</button>
+                </div>
+            `);
+        }
+
+        function validarTokenECompraMarketplace(nome, preco, forma) {
+            const token = document.getElementById('tokenInput').value.trim().toUpperCase();
+            if (token.length !== 6) { showToast('❌ Token inválido.'); return; }
+            if (token !== getCurrentToken()) { showToast('❌ Token incorreto.'); return; }
+            
+            const data = getUserData(currentUser.role);
+            let valorFinal, valorDisplay, detalhesCompra;
+            const protocolo = 'TX-' + Date.now();
+            const cashbackRate = currentUser.cashback || 0.2;
+
+            if (forma === 'points') {
+                if (parseFloat(data.wallet.points) < parseFloat(preco)) {
+                    showToast('❌ Saldo insuficiente em pontos.');
+                    return;
+                }
+                closeQuickModal();
+                addTransaction(currentUser.role, 'Compra: ' + nome, -preco, 'marketplace', 'Marketplace IPOG');
+                const cbPontos = preco * (cashbackRate / 100);
+                addTransaction(currentUser.role, 'Cashback ' + nome, cbPontos, 'cashback', 'Marketplace IPOG');
+                detalhesCompra = [
+                    { label: 'Produto', value: nome }, { label: 'Valor', value: preco + ' Pontos' },
+                    { label: 'Cashback', value: cbPontos.toFixed(0) + ' Pontos' }, { label: 'Forma', value: 'Pontos IPOG' }
+                ];
+            } else {
+                const valorReais = preco * 0.05;
+                if (parseFloat(data.wallet.balance) < parseFloat(valorReais)) {
+                    showToast('❌ Saldo insuficiente em reais.');
+                    return;
+                }
+                closeQuickModal();
+                addTransaction(currentUser.role, 'Compra: ' + nome, -valorReais, 'purchase', 'Marketplace IPOG');
+                const cbPontos = valorReais * (cashbackRate / 100) * 20;
+                addTransaction(currentUser.role, 'Cashback ' + nome, cbPontos, 'cashback', 'Marketplace IPOG');
+                detalhesCompra = [
+                    { label: 'Produto', value: nome }, { label: 'Valor', value: formatCurrency(valorReais) },
+                    { label: 'Cashback', value: cbPontos.toFixed(0) + ' Pontos' }, { label: 'Forma', value: 'Saldo da Carteira' }
+                ];
+            }
+            exibirModalSucesso('Compra efetuada!', 'Produto do Marketplace', detalhesCompra, protocolo, true);
+        }
+
+        function abrirEstabelecimento(tipo) {
+            const dados = PRODUTOS[tipo] || [];
+            const nome = tipo === 'lanchonete' ? '🍔 Burguer IPOG' : '🏢 Cowork IPOG Hub';
+            const itens = dados.map(p => `
+                <div class="estab-menu-item" onclick="comprarEstabProduto('${p.nome}', ${p.preco}, '${tipo}')">
+                    <div>
+                        <div class="item-name">${p.nome}</div>
+                        <div class="item-desc">${p.cat}</div>
+                    </div>
+                    <div class="item-price">${p.preco} pts ou R$ ${(p.preco * 0.05).toFixed(2)}</div>
+                </div>
+            `).join('');
+            openQuickModal(`
+                <div>
+                    <div style="font-size:20px;font-weight:700;color:var(--text-primary);">${nome}</div>
+                    <div style="font-size:12px;color:var(--text-secondary);">Pague com pontos ou reais e ganhe cashback</div>
+                    <div style="margin-top:12px;">${itens}</div>
+                    <button class="btn btn-outline" style="width:100%;margin-top:16px;" onclick="closeQuickModal()">Cancelar</button>
+                </div>
+            `);
+        }
+
+        function comprarEstabProduto(nome, preco, tipo) {
+            openQuickModal(`
+                <div style="text-align:center;">
+                    <div style="font-size:48px;">${tipo === 'lanchonete' ? '🍔' : '🏢'}</div>
+                    <div style="font-size:18px;font-weight:700;color:var(--text-primary);">${nome}</div>
+                    <div style="font-size:14px;color:var(--text-secondary);">Preço: ${preco} pontos ou R$ ${(preco * 0.05).toFixed(2)}</div>
+                    <div style="margin-top:12px;font-size:13px;color:var(--text-secondary);">Digite seu token de autorização (6 dígitos):</div>
+                    <input id="tokenInput" type="text" maxlength="6" placeholder="XXXXXX" style="width:100%;padding:12px;border:1px solid var(--border-color);border-radius:var(--radius-sm);text-align:center;font-size:18px;letter-spacing:4px;font-weight:700;margin-bottom:12px;">
+                    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="validarTokenECompraEstab('${nome}', ${preco}, 'points', '${tipo}')">🟣 Pagar com Pontos</button>
+                        <button class="btn btn-secondary" onclick="validarTokenECompraEstab('${nome}', ${preco}, 'reais', '${tipo}')">💰 Pagar com Reais</button>
+                    </div>
+                    <button class="btn btn-outline" style="margin-top:8px;" onclick="closeQuickModal()">Cancelar</button>
+                </div>
+            `);
+        }
+
+        function validarTokenECompraEstab(nome, preco, forma, tipo) {
+            const token = document.getElementById('tokenInput').value.trim().toUpperCase();
+            if (token.length !== 6) { showToast('❌ Token inválido.'); return; }
+            if (token !== getCurrentToken()) { showToast('❌ Token incorreto.'); return; }
+            
+            const data = getUserData(currentUser.role);
+            const cashbackRate = currentUser.cashback || 0.2;
+            let valorFinal, tipoPagamento, valorDisplay, detalhesCompra;
+            const protocolo = 'TX-' + Date.now();
+            const nomeEstab = tipo === 'lanchonete' ? 'Burguer IPOG' : 'Cowork IPOG Hub';
+
+            if (forma === 'points') {
+                if (parseFloat(data.wallet.points) < parseFloat(preco)) {
+                    showToast('❌ Saldo insuficiente em pontos.');
+                    return;
+                }
+                closeQuickModal();
+                addTransaction(currentUser.role, 'Compra: ' + nome + ' (Estab.)', -preco, 'estabelecimento', nomeEstab);
+                const cbPontos = preco * (cashbackRate / 100);
+                addTransaction(currentUser.role, 'Cashback ' + nome, cbPontos, 'cashback', nomeEstab);
+                valorFinal = preco; tipoPagamento = 'pontos';
+                detalhesCompra = [
+                    { label: 'Estabelecimento', value: nomeEstab }, { label: 'Produto', value: nome },
+                    { label: 'Valor', value: preco + ' Pontos' }, { label: 'Cashback', value: cbPontos.toFixed(0) + ' Pontos' }
+                ];
+            } else {
+                const valorReais = preco * 0.05;
+                if (parseFloat(data.wallet.balance) < parseFloat(valorReais)) {
+                    showToast('❌ Saldo insuficiente em reais.');
+                    return;
+                }
+                closeQuickModal();
+                addTransaction(currentUser.role, 'Compra: ' + nome + ' (Estab.)', -valorReais, 'purchase', nomeEstab);
+                const cbPontos = valorReais * (cashbackRate / 100) * 20;
+                addTransaction(currentUser.role, 'Cashback ' + nome, cbPontos, 'cashback', nomeEstab);
+                valorFinal = valorReais; tipoPagamento = 'reais';
+                detalhesCompra = [
+                    { label: 'Estabelecimento', value: nomeEstab }, { label: 'Produto', value: nome },
+                    { label: 'Valor', value: formatCurrency(valorReais) }, { label: 'Cashback', value: cbPontos.toFixed(0) + ' Pontos' }
+                ];
+            }
+
+            if (currentUser.role === 'estabelecimento') {
+                const dataEstab = getUserData('estabelecimento');
+                dataEstab.sales = (dataEstab.sales || 0) + valorFinal;
+                dataEstab.cashback_generated = (dataEstab.cashback_generated || 0) + (valorFinal * (cashbackRate / 100));
+                dataEstab.transactions = (dataEstab.transactions || 0) + 1;
+                dataEstab.sales_history = dataEstab.sales_history || [];
+                dataEstab.sales_history.unshift({ client: currentUser.userName, product: nome, amount: valorFinal, method: tipoPagamento, date: new Date().toLocaleDateString('pt-BR') });
+                updateUserData('estabelecimento', dataEstab);
+                renderEstabDashboard();
+            }
+
+            exibirModalSucesso('Compra efetuada!', 'Estabelecimento Parceiro', detalhesCompra, protocolo, true);
+        }
+
+        function renderEstabDashboard() {
+            const container = document.getElementById('estabProdutosLista');
+            if (!container) return;
+            container.innerHTML = PRODUTOS.lanchonete.map(p => `
+                <div class="estab-menu-item">
+                    <div><div class="item-name">${p.nome}</div><div class="item-desc">${p.cat}</div></div>
+                    <div class="item-price">${p.preco} pts ou R$ ${(p.preco * 0.05).toFixed(2)}</div>
+                </div>
+            `).join('');
+            const data = getUserData('estabelecimento');
+            if (data) {
+                document.getElementById('estabVendas').textContent = '₮ ' + (data.sales || 0).toFixed(0);
+                document.getElementById('estabCashback').textContent = '₮ ' + (data.cashback_generated || 0).toFixed(0);
+                document.getElementById('estabRecebiveis').textContent = '₮ ' + (data.receivables || 3200).toFixed(0);
+                document.getElementById('estabTransacoes').textContent = data.transactions || 0;
+            }
+        }
+
+        function processarRecebimento() {
+            const cpfCnpj = document.getElementById('recebimentoCpfCnpj').value.trim();
+            const valorStr = document.getElementById('recebimentoValor').value.trim();
+            const token = document.getElementById('recebimentoToken').value.trim().toUpperCase();
+            if (!cpfCnpj || !valorStr || !token) { showToast('⚠️ Preencha todos os campos.'); return; }
+            if (token.length !== 6) { showToast('❌ Token inválido.'); return; }
+            const valor = parseFloat(valorStr.replace(/[R$₮\s]/g, '').replace(',', '.'));
+            if (isNaN(valor) || valor <= 0) { showToast('⚠️ Valor inválido.'); return; }
+            
+            const taxa = valor * 0.02;
+            const valorLiquido = valor - taxa;
+            const data = getUserData('estabelecimento');
+            data.received_history = data.received_history || [];
+            const wallet = getWalletRegistry().find(w => w.doc === cpfCnpj || w.walletNumber === cpfCnpj);
+            data.received_history.unshift({ client: wallet ? wallet.name : 'Cliente não cadastrado', doc: cpfCnpj, token: token, amount: valor, date: new Date().toLocaleDateString('pt-BR') });
+            data.sales = (data.sales || 0) + valor;
+            data.transactions = (data.transactions || 0) + 1;
+            data.wallet.balance += valorLiquido;
+            data.wallet.points += valor * 2;
+            updateUserData('estabelecimento', data);
+            renderRecebimentoHistorico();
+            renderEstabDashboard();
+            renderWallet();
+            showToast('✅ Pagamento autorizado! Valor: R$ ' + valor.toFixed(2) + ' (taxa 2%: R$ ' + taxa.toFixed(2) + ')');
+            document.getElementById('recebimentoCpfCnpj').value = ''; document.getElementById('recebimentoValor').value = ''; document.getElementById('recebimentoToken').value = '';
+        }
+
+        function renderRecebimentoHistorico() {
+            const data = getUserData('estabelecimento');
+            const container = document.getElementById('recebimentoHistorico');
+            if (!data.received_history || data.received_history.length === 0) { container.innerHTML = '<div style="font-size:12px;color:var(--text-tertiary);">Nenhum recebimento registrado.</div>'; return; }
+            container.innerHTML = data.received_history.slice(0, 5).map(r => `
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-top:4px;border-bottom:1px solid var(--border-color);padding-bottom:4px;">
+                    <span>${r.client} (${r.doc}) • Token: ${r.token}</span><span>R$ ${r.amount.toFixed(2)}</span>
+                </div>
+            `).join('');
+        }
+
+        function solicitarAntecipacaoEstabelecimento() {
+            const data = getUserData('estabelecimento');
+            const recebiveis = data.receivables || 3200;
+            if (recebiveis <= 0) { showToast('⚠️ Nenhum recebível disponível.'); return; }
+            const liquido = recebiveis - (recebiveis * 0.018);
+            showToast('⚡ Antecipação solicitada! Líquido: R$ ' + liquido.toFixed(2));
+            data.receivables = 0; data.wallet.balance += liquido;
+            updateUserData('estabelecimento', data);
+            renderEstabDashboard(); renderWallet();
+        }
+
+        function anteciparRecebiveis() { showToast('⚡ Antecipação de R$ 89.000 solicitada! Líquido: R$ 87.398,00 em até 1 dia útil.'); }
+
+        function previewLogo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.querySelector('#logoPreview img').src = e.target.result;
+                    document.querySelector('#logoPreview img').style.display = 'block';
+                    document.querySelector('#logoPreview span').style.display = 'none';
+                    document.querySelectorAll('.header-logo, #sidebarLogo').forEach(el => { el.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`; });
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function resetLogo() {
+            document.querySelector('#logoPreview img').src = '';
+            document.querySelector('#logoPreview img').style.display = 'none';
+            document.querySelector('#logoPreview span').style.display = 'block';
+            document.querySelectorAll('.header-logo, #sidebarLogo').forEach(el => { el.innerHTML = '<img src="Gemini_Generated_Image_l0eahzl0eahzl0ea.png" alt="IPOGPay">'; });
+        }
+
+        function defaultMarketingBanner() {
+            return {
+                title: 'Os Impactos da Oratória',
+                subtitle: 'Fala, presença e posicionamento',
+                cta: 'Garanta sua inscrição',
+                image: 'ipogpay-evento-oratoria.png',
+                link: 'https://www.sympla.com.br/evento/os-impactos-da-oratoria-fala-presenca-e-posicionamento/3443146?utm_source=site&utm_medium=banner&utm_campaign=EVENTOS&utm_term=mktgo&utm_content=banner_site'
+            };
+        }
+
+        function getMarketingBanner() {
+            appData.marketingBanner = appData.marketingBanner || defaultMarketingBanner();
+            return appData.marketingBanner;
+        }
+
+        function renderMarketingBanner() {
+            if (!appData || !appData.version) return;
+            const banner = getMarketingBanner();
+            const pairs = [
+                ['loginMarketingImage', 'src', banner.image],
+                ['loginMarketingTitle', 'textContent', banner.title],
+                ['loginMarketingSubtitle', 'textContent', banner.subtitle],
+                ['loginMarketingCta', 'textContent', banner.cta],
+                ['marketingPreviewImage', 'src', banner.image],
+                ['marketingPreviewTitle', 'textContent', banner.title],
+                ['marketingPreviewSubtitle', 'textContent', banner.subtitle],
+                ['marketingPreviewCta', 'textContent', banner.cta]
+            ];
+            pairs.forEach(([id, prop, value]) => {
+                const el = document.getElementById(id);
+                if (el) el[prop] = value || '';
+            });
+        }
+
+        function openMarketingBanner() {
+            const banner = getMarketingBanner();
+            if (banner.link) window.open(banner.link, '_blank');
+        }
+
+        let pendingMarketingImage = '';
+        function renderMarketingAdmin() {
+            const banner = getMarketingBanner();
+            const setVal = (id, value) => { const el = document.getElementById(id); if (el) el.value = value || ''; };
+            setVal('marketingTitleInput', banner.title);
+            setVal('marketingSubtitleInput', banner.subtitle);
+            setVal('marketingCtaInput', banner.cta);
+            setVal('marketingLinkInput', banner.link);
+            pendingMarketingImage = '';
+            renderMarketingBanner();
+        }
+
+        function previewMarketingImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                pendingMarketingImage = e.target.result;
+                const preview = document.getElementById('marketingPreviewImage');
+                if (preview) preview.src = pendingMarketingImage;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveMarketingBanner() {
+            const current = getMarketingBanner();
+            appData.marketingBanner = {
+                title: document.getElementById('marketingTitleInput').value.trim() || current.title,
+                subtitle: document.getElementById('marketingSubtitleInput').value.trim() || current.subtitle,
+                cta: document.getElementById('marketingCtaInput').value.trim() || current.cta,
+                link: document.getElementById('marketingLinkInput').value.trim() || current.link,
+                image: pendingMarketingImage || current.image
+            };
+            saveAppData();
+            pendingMarketingImage = '';
+            renderMarketingBanner();
+            showToast('✅ Banner de marketing atualizado');
+        }
+
+        function resetMarketingBanner() {
+            appData.marketingBanner = defaultMarketingBanner();
+            saveAppData();
+            renderMarketingAdmin();
+            renderMarketingBanner();
+            showToast('↩️ Banner restaurado');
+        }
+
+        function applyColors() {
+            const primary = document.getElementById('colorPrimary').value;
+            const secondary = document.getElementById('colorSecondary').value;
+            const bg = document.getElementById('colorBg').value;
+            document.documentElement.style.setProperty('--primary', primary);
+            document.documentElement.style.setProperty('--primary-light', primary + 'cc');
+            document.documentElement.style.setProperty('--primary-dark', primary + '99');
+            document.documentElement.style.setProperty('--secondary', secondary);
+            document.documentElement.style.setProperty('--secondary-light', secondary + 'cc');
+            document.documentElement.style.setProperty('--secondary-dark', secondary + '99');
+            document.documentElement.style.setProperty('--bg-app', bg);
+        }
+
+        function resetColors() {
+            document.getElementById('colorPrimary').value = '#6B3FA0';
+            document.getElementById('colorSecondary').value = '#D4A843';
+            document.getElementById('colorBg').value = '#F4F4F9';
+            applyColors();
+        }
+
+        const ADMIN_BASE = {
+            receitas: [{ nome: 'Mensalidades & Float', valor: 148500, cor: '#8B5FBF' }, { nome: 'Juros de Crédito', valor: 96200, cor: '#5DADE2' }, { nome: 'Fee de Antecipação Franqueados', valor: 62400, cor: '#D4A843' }, { nome: 'Antecipação Estabelecimentos', valor: 12400, cor: '#2ECC71' }, { nome: 'Cartão de Benefícios', valor: 38100, cor: '#A8E6F0' }, { nome: 'Comissão Marketplace', valor: 24800, cor: '#E67E22' }],
+            custos: [{ nome: 'BaaS & Tecnologia', valor: 92000, cor: '#8B5FBF' }, { nome: 'Equipe & Operação', valor: 78000, cor: '#5DADE2' }, { nome: 'Inadimplência & Provisão', valor: 41500, cor: '#E74C3C' }, { nome: 'Marketing & Aquisição', valor: 35000, cor: '#D4A843' }, { nome: 'Compliance & Setup', valor: 18500, cor: '#2ECC71' }]
+        };
+
+        function fmtMoneyShort(v) {
+            if (v >= 1000000) return 'R$ ' + (v / 1000000).toFixed(1).replace('.', ',') + 'M';
+            if (v >= 1000) return 'R$ ' + (v / 1000).toFixed(0) + 'K';
+            return 'R$ ' + v.toFixed(0);
+        }
+
+        let adminChartInstance = null;
+
+        function setAdminPeriod(period, evt) {
+            document.querySelectorAll('#periodToggle .period-btn').forEach(b => b.classList.remove('active'));
+            if (evt && evt.target) evt.target.classList.add('active');
+            renderAdminDashboard(period);
+        }
+
+        function renderBreakdown(containerId, items, total) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            el.innerHTML = items.map(it => {
+                const pct = total > 0 ? (it.valor / total * 100) : 0;
+                return '<div class="breakdown-row"><span class="breakdown-dot" style="background:' + it.cor + ';"></span><div class="breakdown-info"><div class="breakdown-name">' + it.nome + '</div><div class="breakdown-bar"><div class="breakdown-bar-fill" style="width:' + pct.toFixed(1) + '%;background:' + it.cor + ';"></div></div></div><div style="text-align:right;"><div class="breakdown-value">' + fmtMoneyShort(it.valor) + '</div><div class="breakdown-pct">' + pct.toFixed(1).replace('.', ',') + '%</div></div></div>';
+            }).join('');
+        }
+
+        function renderAdminDashboard(period) {
+            const mult = period;
+            const receitas = ADMIN_BASE.receitas.map(r => ({ nome: r.nome, cor: r.cor, valor: r.valor * mult }));
+            const custos = ADMIN_BASE.custos.map(c => ({ nome: c.nome, cor: c.cor, valor: c.valor * mult }));
+            const totalReceita = receitas.reduce((s, r) => s + r.valor, 0);
+            const totalCusto = custos.reduce((s, c) => s + c.valor, 0);
+            const margem = totalReceita - totalCusto;
+            
+            document.getElementById('kpiReceita').textContent = fmtMoneyShort(totalReceita);
+            document.getElementById('kpiCusto').textContent = fmtMoneyShort(totalCusto);
+            document.getElementById('kpiMargem').textContent = fmtMoneyShort(margem);
+            document.getElementById('kpiMargemPct').textContent = 'Margem líquida • ' + (totalReceita > 0 ? (margem / totalReceita * 100).toFixed(1) : 0).replace('.', ',') + '%';
+            
+            renderBreakdown('receitaBreakdown', receitas, totalReceita); renderBreakdown('custoBreakdown', custos, totalCusto);
+            
+            const canvas = document.getElementById('adminChart');
+            if (!canvas) return;
+            if (typeof Chart === 'undefined') {
+                const wrap = canvas.parentElement;
+                if (wrap) wrap.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);font-size:12px;">Gráfico disponível quando a biblioteca de gráficos carregar.</div>';
+                return;
+            }
+            if (adminChartInstance) adminChartInstance.destroy();
+            const allCategories = ADMIN_BASE.receitas.map(r => r.nome);
+            const receitaMap = {}; receitas.forEach(r => { receitaMap[r.nome] = r.valor; });
+            const custoMap = {}; custos.forEach(c => { custoMap[c.nome] = c.valor; });
+            
+            adminChartInstance = new Chart(canvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: allCategories,
+                    datasets: [
+                        { label: 'Receita', data: allCategories.map(n => receitaMap[n] || 0), backgroundColor: '#6B3FA0', borderRadius: 4, barPercentage: 0.6 },
+                        { label: 'Custo', data: allCategories.map(n => custoMap[n] || 0), backgroundColor: '#D4A843', borderRadius: 4, barPercentage: 0.6 },
+                        { label: 'Lucratividade', data: allCategories.map(n => (receitaMap[n] || 0) - (custoMap[n] || 0)), backgroundColor: '#2ECC71', borderRadius: 4, barPercentage: 0.6 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#5A5A6E', font: { size: 10, weight: '600' }, usePointStyle: true } } }, scales: { x: { ticks: { color: '#8A8A9E', font: { size: 8 }, maxRotation: 45 }, grid: { display: false } }, y: { ticks: { color: '#8A8A9E', font: { size: 9 }, callback: v => fmtMoneyShort(v) }, grid: { color: 'rgba(0,0,0,0.05)' } } } }
+            });
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            clearTimeout(t._timeout); t._timeout = setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        function openQuickModal(html) { document.getElementById('quickModal').innerHTML = html; document.getElementById('quickModalOverlay').classList.add('show'); }
+        function closeQuickModal() { document.getElementById('quickModalOverlay').classList.remove('show'); }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAppData();
+            renderVouchers();
+            renderMarketplace();
+            renderEstabDashboard();
+            renderRecebimentoHistorico();
+            applyColors();
+            renderMarketingBanner();
+        });
+    </script>
+</body>
+</html>
