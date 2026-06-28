@@ -357,6 +357,27 @@
         .config-section input[type="file"] { font-size: 12px; }
         .logo-preview { width: 60px; height: 60px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff; }
         .logo-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .fuel-auth-card { background: #fff; border: 1px solid var(--border-color); border-radius: 18px; padding: 14px; color: var(--text-primary); }
+        .fuel-auth-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 12px; }
+        .fuel-auth-logo { width: 104px; height: 42px; object-fit: contain; }
+        .fuel-auth-title { font-size: 16px; font-weight: 900; text-align: right; }
+        .fuel-auth-number { color: var(--primary); font-size: 12px; font-weight: 900; margin-top: 2px; }
+        .fuel-auth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .fuel-auth-section { border: 1px solid rgba(0,84,166,0.10); border-radius: 12px; padding: 10px; background: #F8FBFF; }
+        .fuel-auth-section.full { grid-column: 1 / -1; }
+        .fuel-auth-section-title { font-size: 11px; color: var(--primary); font-weight: 900; margin-bottom: 6px; text-transform: uppercase; }
+        .fuel-auth-line { display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; padding: 3px 0; border-bottom: 1px dashed rgba(16,24,40,0.10); }
+        .fuel-auth-line:last-child { border-bottom: none; }
+        .fuel-auth-line span { color: var(--text-secondary); }
+        .fuel-auth-line strong { text-align: right; }
+        .fuel-auth-codes { display: grid; grid-template-columns: 110px 1fr; gap: 10px; align-items: center; }
+        .fuel-auth-qr { width: 104px; height: 104px; border: 1px solid var(--border-color); border-radius: 10px; background: #fff; padding: 4px; }
+        .fuel-auth-code { font-size: 16px; font-weight: 900; color: var(--primary); letter-spacing: 1px; word-break: break-word; }
+        .fuel-auth-barcode { width: 100%; height: 54px; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 8px; overflow: hidden; }
+        .fuel-auth-footer { margin-top: 10px; display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; font-size: 11px; color: var(--text-secondary); }
+        .fuel-auth-footer img { width: 76px; height: 76px; border: 1px solid var(--border-color); border-radius: 10px; padding: 3px; background: #fff; }
+        .fuel-auth-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+        @media (max-width: 380px) { .fuel-auth-grid, .fuel-auth-codes, .fuel-auth-footer, .fuel-auth-actions { grid-template-columns: 1fr; } .fuel-auth-title { text-align: left; } }
 
         @media (min-width: 900px) {
             body { align-items: stretch; justify-content: flex-start; }
@@ -1094,7 +1115,7 @@
     </div>
 
     <script>
-        const DATA_VERSION = 24;
+        const DATA_VERSION = 25;
         const DEMO_SCALE = { produtores: 200, colaboradores: 50, empresas: 80, canais: 40, fornecedores: 20, instituicoes: 15, transacoes: 500, pix: 300, compras: 150, beneficios: 100, investimentos: 80 };
         const firstNames = ['Paulo', 'Ana Paula', 'Carlos', 'Mariana', 'João Victor', 'Fernanda', 'Rafael', 'Camila', 'Bruna', 'Lucas', 'Patricia', 'Gustavo', 'Renata', 'Eduardo', 'Larissa', 'Felipe', 'Juliana', 'Marcelo', 'Bianca', 'Henrique'];
         const lastNames = ['Marques', 'Souza', 'Henrique', 'Albuquerque', 'Lima', 'Costa', 'Nogueira', 'Silveira', 'Rocha', 'Mendes'];
@@ -2597,6 +2618,125 @@
             return { color: '#DC2626', label: 'Acima da média', price, average };
         }
 
+        function getSelectedFuelStationData() {
+            const stationName = document.getElementById('fuelStation')?.value || '';
+            const source = getVisibleFuelStations(selectedFuelRegion).length ? getVisibleFuelStations(selectedFuelRegion) : PARTNER_STATIONS.filter(s => s.region === selectedFuelRegion);
+            return source.find(s => s.name === stationName) || PARTNER_STATIONS.find(s => s.name === stationName) || source[0] || PARTNER_STATIONS[0];
+        }
+
+        function nextFuelRequestNumber() {
+            const next = parseInt(localStorage.getItem('pirapay_fuel_request_seq') || '0', 10) + 1;
+            localStorage.setItem('pirapay_fuel_request_seq', String(next));
+            return { seq: next, number: `REQ-${new Date().getFullYear()}-${String(next).padStart(6, '0')}` };
+        }
+
+        function qrCodeUrl(payload, size = 132) {
+            return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=8&data=${encodeURIComponent(payload)}`;
+        }
+
+        function barcodeSvg(code) {
+            const values = Array.from(String(code)).map(ch => ch.charCodeAt(0));
+            let x = 6;
+            const bars = values.map((v, i) => {
+                const width = 1 + (v % 4);
+                const gap = 1 + ((v + i) % 2);
+                const h = 36 + (v % 14);
+                const bar = `<rect x="${x}" y="${Math.max(2, 56 - h)}" width="${width}" height="${h}" fill="#111"/>`;
+                x += width + gap;
+                return bar;
+            }).join('');
+            return `<svg viewBox="0 0 ${Math.max(220, x + 6)} 60" preserveAspectRatio="none" aria-label="Código de barras ${escapeHtml(code)}">${bars}</svg>`;
+        }
+
+        function buildFuelAuthorizationPayload(req) {
+            return [
+                'PIRAPAY AUTORIZACAO COMBUSTIVEL',
+                req.number,
+                `AUTH ${req.authCode}`,
+                `${req.productLabel} ${req.liters}L`,
+                `${req.station.name} ${req.station.city}/${req.station.uf}`,
+                `CLIENTE ${req.client.name}`,
+                `VALOR ${formatCurrency(req.total)}`
+            ].join(' | ');
+        }
+
+        function openFuelAuthorization(req) {
+            const authPayload = buildFuelAuthorizationPayload(req);
+            const authQr = qrCodeUrl(authPayload, 132);
+            const mapQr = qrCodeUrl(req.mapLink, 96);
+            const whatsappText = [
+                `Autorização PiraPay ${req.number}`,
+                `Código: ${req.authCode}`,
+                `Posto: ${req.station.name} - ${req.station.city}/${req.station.uf}`,
+                `Cliente: ${req.client.name}`,
+                `Combustível: ${req.productLabel}`,
+                `Litragem: ${req.liters} L`,
+                `Valor autorizado: ${formatCurrency(req.total)}`,
+                `Localização: ${req.mapLink}`
+            ].join('\n');
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
+            openQuickModal(`
+                <div class="fuel-auth-card">
+                    <div class="fuel-auth-header">
+                        <img class="fuel-auth-logo" src="pirapay-logo.png" alt="PiraPay">
+                        <div>
+                            <div class="fuel-auth-title">Requisição de Abastecimento</div>
+                            <div class="fuel-auth-number">${req.number}</div>
+                        </div>
+                    </div>
+                    <div class="fuel-auth-grid">
+                        <div class="fuel-auth-section">
+                            <div class="fuel-auth-section-title">PiraPay</div>
+                            <div class="fuel-auth-line"><span>Empresa</span><strong>PiraPay</strong></div>
+                            <div class="fuel-auth-line"><span>Carteira</span><strong>900000000</strong></div>
+                            <div class="fuel-auth-line"><span>Operação</span><strong>Combustível</strong></div>
+                        </div>
+                        <div class="fuel-auth-section">
+                            <div class="fuel-auth-section-title">Cliente</div>
+                            <div class="fuel-auth-line"><span>Nome</span><strong>${escapeHtml(req.client.name)}</strong></div>
+                            <div class="fuel-auth-line"><span>Documento</span><strong>${escapeHtml(req.client.doc)}</strong></div>
+                            <div class="fuel-auth-line"><span>Carteira</span><strong>${escapeHtml(req.client.walletNumber)}</strong></div>
+                        </div>
+                        <div class="fuel-auth-section full">
+                            <div class="fuel-auth-section-title">Posto parceiro</div>
+                            <div class="fuel-auth-line"><span>Posto</span><strong>${escapeHtml(req.station.name)}</strong></div>
+                            <div class="fuel-auth-line"><span>Cidade</span><strong>${escapeHtml(req.station.city)}/${escapeHtml(req.station.uf)}</strong></div>
+                            <div class="fuel-auth-line"><span>Telefone</span><strong>${escapeHtml(req.station.phone || 'Cadastro PiraPay')}</strong></div>
+                        </div>
+                        <div class="fuel-auth-section full">
+                            <div class="fuel-auth-section-title">Combustível autorizado</div>
+                            <div class="fuel-auth-line"><span>Produto</span><strong>${escapeHtml(req.productLabel)}</strong></div>
+                            <div class="fuel-auth-line"><span>Litragem</span><strong>${req.liters} L</strong></div>
+                            <div class="fuel-auth-line"><span>Preço/L</span><strong>${formatCurrency(req.pricePerLiter)}</strong></div>
+                            <div class="fuel-auth-line"><span>Total</span><strong>${formatCurrency(req.total)}</strong></div>
+                        </div>
+                        <div class="fuel-auth-section full">
+                            <div class="fuel-auth-section-title">Código de autorização</div>
+                            <div class="fuel-auth-codes">
+                                <img class="fuel-auth-qr" src="${escapeHtml(authQr)}" alt="QR Code de autorização">
+                                <div>
+                                    <div class="fuel-auth-code">${escapeHtml(req.authCode)}</div>
+                                    <div class="fuel-auth-barcode">${barcodeSvg(req.authCode)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fuel-auth-footer">
+                        <img src="${escapeHtml(mapQr)}" alt="QR Code localização do posto">
+                        <div>
+                            <strong>Localização do posto</strong><br>
+                            <a href="${escapeHtml(req.mapLink)}" target="_blank" rel="noopener">Abrir no Google Maps</a><br>
+                            Válido para envio ao motorista via WhatsApp.
+                        </div>
+                    </div>
+                    <div class="fuel-auth-actions">
+                        <button class="btn btn-success" onclick="window.open('${escapeHtml(whatsappUrl)}','_blank')">Enviar WhatsApp</button>
+                        <button class="btn btn-outline" onclick="closeQuickModal()">Fechar</button>
+                    </div>
+                </div>
+            `);
+        }
+
         function escapeHtml(value) {
             return String(value || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
@@ -2980,7 +3120,7 @@
                         <div style="font-size:12px;color:var(--text-secondary);">${region.label} • preço PiraPay por litro</div>
                     </div>
                     <label class="field-label">Posto parceiro</label>
-                    <select class="field-input" id="fuelStation">${stationOptions}</select>
+                    <select class="field-input" id="fuelStation" onchange="previewFuelPurchase()">${stationOptions}</select>
                     <label class="field-label">Produto</label>
                     <select class="field-input" id="fuelProduct" onchange="previewFuelPurchase()">${productOptions}</select>
                     <label class="field-label">Litros</label>
@@ -2997,13 +3137,16 @@
             const productKey = document.getElementById('fuelProduct')?.value || selectedFuelProduct;
             const liters = parseFloat(document.getElementById('fuelLiters')?.value || 0);
             const p = FUEL_PRODUCTS.find(item => item.key === productKey) || FUEL_PRODUCTS[1];
-            const market = FUEL_REGIONS[selectedFuelRegion][productKey];
-            const price = fuelPiraPayPrice(selectedFuelRegion, productKey);
+            const station = getSelectedFuelStationData();
+            const opportunity = stationFuelOpportunity(station, productKey);
+            const market = opportunity.average;
+            const price = opportunity.price;
             const total = price * liters;
             const savings = Math.max(0, (market - price) * liters);
             const preview = document.getElementById('fuelPurchasePreview');
             if (preview) preview.innerHTML = `
                 <div style="display:flex;justify-content:space-between;gap:12px;"><span>${p.icon} ${p.label}</span><strong>${formatCurrency(price)}/L</strong></div>
+                <div style="font-size:11px;font-weight:900;color:${opportunity.color};margin-top:5px;">● ${opportunity.label} no posto selecionado</div>
                 <div style="display:flex;justify-content:space-between;gap:12px;margin-top:6px;"><span>Total estimado</span><strong style="color:var(--primary);">${formatCurrency(total || 0)}</strong></div>
                 <div style="font-size:11px;color:#168A4B;margin-top:6px;">Economia estimada contra média regional: ${formatCurrency(savings || 0)}</div>
             `;
@@ -3016,25 +3159,34 @@
             if (!liters || liters <= 0) { showToast('⚠️ Informe a quantidade de litros.'); return; }
             selectedFuelProduct = productKey;
             const product = FUEL_PRODUCTS.find(p => p.key === productKey);
-            const total = +(fuelPiraPayPrice(selectedFuelRegion, productKey) * liters).toFixed(2);
+            const stationData = getSelectedFuelStationData();
+            const opportunity = stationFuelOpportunity(stationData, productKey);
+            const total = +(opportunity.price * liters).toFixed(2);
             const data = getUserData(currentUser.role);
             if (!data || !data.wallet || data.wallet.balance < total) { showToast('❌ Saldo insuficiente na carteira.'); return; }
             closeQuickModal();
             addTransaction(currentUser.role, 'Compra combustível', -total, 'purchase', `${product.label} • ${liters} L • ${station}`);
             addTransaction(currentUser.role, 'Cashback combustível', total * 0.02 * 20, 'cashback', 'Postos Parceiros PiraPay');
             renderFuelStations(selectedFuelRegion);
-            exibirModalSucesso(
-                'Combustível reservado!',
-                'Compra aprovada nos Postos Parceiros PiraPay',
-                [
-                    { label: 'Posto', value: station },
-                    { label: 'Produto', value: product.label },
-                    { label: 'Litros', value: liters + ' L' },
-                    { label: 'Valor', value: formatCurrency(total) }
-                ],
-                'FUEL-' + Date.now(),
-                true
-            );
+            const reqInfo = nextFuelRequestNumber();
+            const authCode = `PIRA-${String(reqInfo.seq).padStart(6, '0')}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+            const client = {
+                name: data.name || currentUser.userName || 'Cliente PiraPay',
+                doc: data.cpf || data.doc || 'Documento em cadastro',
+                walletNumber: data.walletNumber || data.pixKey || '900000001'
+            };
+            const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${stationData.name} ${stationData.city} ${stationData.uf} Brasil`)}`;
+            openFuelAuthorization({
+                number: reqInfo.number,
+                authCode,
+                station: stationData,
+                client,
+                productLabel: product.label,
+                liters,
+                pricePerLiter: opportunity.price,
+                total,
+                mapLink
+            });
         }
 
         function renderRedeParceira() {
