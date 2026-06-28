@@ -779,19 +779,25 @@
                 </div>
 
                 <div class="screen" id="screen-estab-recebimento">
-                    <div style="font-size:22px;font-weight:800;">💳 Receber com Pontos</div>
-                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Insira os dados do cliente e o token para autorizar a transação</div>
+                    <div style="font-size:22px;font-weight:800;">💳 Receber Pagamento</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Insira os dados do cliente e autorize por pontos, reais ou Vale Alimentação</div>
                     <div class="recebimento-area">
                         <div class="field-label">CPF / CNPJ do cliente</div>
                         <input class="field-input" id="recebimentoCpfCnpj" type="text" placeholder="000.000.000-00 ou 00.000.000/0000-00">
+                        <div class="field-label">Forma de recebimento</div>
+                        <select class="field-input" id="recebimentoForma">
+                            <option value="points">Pontos PiraPay</option>
+                            <option value="reais">Reais</option>
+                            <option value="vale">Vale Alimentação</option>
+                        </select>
                         <div class="field-label">Valor (em reais ou pontos)</div>
                         <input class="field-input" id="recebimentoValor" type="text" placeholder="R$ 0,00 ou Pontos 0">
-                        <div class="field-label">Token de autorização (gerado pelo cliente)</div>
+                        <div class="field-label">Token ou senha VA</div>
                         <div class="point-input" style="display:flex;gap:8px;flex-wrap:wrap;">
-                            <input class="field-input" id="recebimentoToken" type="text" placeholder="6 dígitos" style="flex:1;min-width:100px;margin-bottom:0;">
+                            <input class="field-input" id="recebimentoToken" type="text" placeholder="Token ou 123456 no Vale Alimentação" style="flex:1;min-width:100px;margin-bottom:0;">
                             <button class="btn btn-primary" onclick="processarRecebimento()">🔓 Autorizar</button>
                         </div>
-                        <div style="margin-top:12px;font-size:12px;color:var(--text-tertiary);text-align:center;">O token deve ser informado pelo cliente no momento do pagamento.</div>
+                        <div style="margin-top:12px;font-size:12px;color:var(--text-tertiary);text-align:center;">Para Vale Alimentação, use a senha demo <b>123456</b>.</div>
                     </div>
                     <div class="card" style="margin-top:12px;padding:12px;">
                         <div style="font-weight:600;color:var(--text-primary);">Últimos recebimentos</div>
@@ -857,6 +863,27 @@
                             <span id="teacherNextPay">Próximo pagamento</span>
                         </div>
                     </div>
+                    <div class="mini-bank-card" style="background:linear-gradient(135deg,#0054A6,#FF7A00);margin-bottom:12px;">
+                        <div class="mini-bank-label">Cartão Vale Alimentação</div>
+                        <div class="mini-bank-value" id="teacherMealBalance">R$ 0,00</div>
+                        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-top:20px;position:relative;z-index:1;">
+                            <div>
+                                <div style="font-size:11px;opacity:0.76;">Senha demo</div>
+                                <div style="font-size:14px;font-weight:900;">123456</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:11px;opacity:0.76;">Cartão</div>
+                                <div style="font-size:14px;font-weight:900;" id="teacherMealCardNumber">VA 0000</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" style="padding:14px;margin-bottom:12px;display:flex;justify-content:space-between;gap:12px;align-items:center;cursor:pointer;" onclick="navigateTo('vale-alimentacao')">
+                        <div>
+                            <div style="font-weight:900;">🛒 Aba Vale Alimentação</div>
+                            <div style="font-size:12px;color:var(--text-secondary);">Saldo e extrato separados da carteira principal</div>
+                        </div>
+                        <span style="color:var(--primary);font-weight:900;">→</span>
+                    </div>
                     <div class="teacher-kpi-grid">
                         <div class="metric-card"><div class="metric-value" id="teacherFutureHours">0</div><div class="metric-label">Créditos futuros confirmados</div></div>
                         <div class="metric-card"><div class="metric-value" id="teacherFutureAmount">R$ 0</div><div class="metric-label">Previsão futura</div></div>
@@ -867,6 +894,7 @@
                         <button class="btn btn-primary btn-sm" onclick="openTeacherAdvanceModal('receivable')">Antecipar saldo a receber</button>
                         <button class="btn btn-secondary btn-sm" onclick="openTeacherAdvanceModal('future')">Antecipar créditos futuros</button>
                         <button class="btn btn-outline btn-sm" onclick="navigateTo('carteira')">Carteira colaborador</button>
+                        <button class="btn btn-outline btn-sm" onclick="navigateTo('vale-alimentacao')">Vale Alimentação</button>
                     </div>
                     <div class="chart-card" style="margin-bottom:12px;">
                         <div class="section-title" style="margin-top:0;">📅 Próximos créditos confirmados</div>
@@ -875,6 +903,42 @@
                     <div class="chart-card">
                         <div class="section-title" style="margin-top:0;">💳 Últimas movimentações do colaborador</div>
                         <div id="teacherStatementPreview"></div>
+                    </div>
+                </div>
+
+                <div class="screen" id="screen-vale-alimentacao">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+                        <div>
+                            <div style="font-size:22px;font-weight:800;">🛒 Vale Alimentação</div>
+                            <div style="font-size:13px;color:var(--text-secondary);" id="mealCardOwner">Cartão benefício separado da Carteira PiraPay</div>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="openTeacherSelector()">Trocar colaborador</button>
+                    </div>
+                    <div class="mini-bank-card" style="background:linear-gradient(135deg,#0054A6,#FF7A00);margin-bottom:12px;">
+                        <div class="mini-bank-label">Saldo disponível VA</div>
+                        <div class="mini-bank-value" id="mealCardBalance">R$ 0,00</div>
+                        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-top:20px;position:relative;z-index:1;">
+                            <div>
+                                <div style="font-size:11px;opacity:0.76;">Senha demo</div>
+                                <div style="font-size:14px;font-weight:900;">123456</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-size:11px;opacity:0.76;">Cartão</div>
+                                <div style="font-size:14px;font-weight:900;" id="mealCardNumber">VA 0000</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid-2" style="margin-bottom:12px;">
+                        <div class="metric-card"><div class="metric-value" id="mealCardMonthCredit">R$ 0</div><div class="metric-label">Créditos do mês</div></div>
+                        <div class="metric-card"><div class="metric-value" id="mealCardMonthDebit">R$ 0</div><div class="metric-label">Uso do mês</div></div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+                        <button class="btn btn-primary btn-sm" onclick="navigateTo('canals')">Usar na lanchonete</button>
+                        <button class="btn btn-outline btn-sm" onclick="navigateTo('carteira')">Ver carteira principal</button>
+                    </div>
+                    <div class="chart-card">
+                        <div class="section-title" style="margin-top:0;">Extrato do Vale Alimentação</div>
+                        <div id="mealCardStatement"></div>
                     </div>
                 </div>
 
@@ -907,7 +971,7 @@
                         </div>
                     </div>
                     <div class="chart-card">
-                        <div class="section-title" style="margin-top:0;font-size:14px;">📊 Receita, Custo e Lucratividade</div>
+                        <div class="section-title" style="margin-top:0;font-size:14px;">📈 Evolução mensal de receitas e custos</div>
                         <div class="chart-wrap"><canvas id="adminChart"></canvas></div>
                     </div>
                     <button class="btn btn-outline" style="width:100%;margin-top:14px;" onclick="showToast('📄 Relatório de rentabilidade exportado (demo)')">Exportar relatório completo</button>
@@ -991,7 +1055,7 @@
     </div>
 
     <script>
-        const DATA_VERSION = 15;
+        const DATA_VERSION = 17;
         const DEMO_SCALE = { produtores: 200, colaboradores: 50, empresas: 80, canais: 40, fornecedores: 20, instituicoes: 15, transacoes: 500, pix: 300, compras: 150, beneficios: 100, investimentos: 80 };
         const firstNames = ['Paulo', 'Ana Paula', 'Carlos', 'Mariana', 'João Victor', 'Fernanda', 'Rafael', 'Camila', 'Bruna', 'Lucas', 'Patricia', 'Gustavo', 'Renata', 'Eduardo', 'Larissa', 'Felipe', 'Juliana', 'Marcelo', 'Bianca', 'Henrique'];
         const lastNames = ['Marques', 'Souza', 'Henrique', 'Albuquerque', 'Lima', 'Costa', 'Nogueira', 'Silveira', 'Rocha', 'Mendes'];
@@ -1065,7 +1129,7 @@
             produtor: { label: 'Produtor Rural', pillClass: 'r-produtor', icon: '🥛', userName: 'Paulo Marques', initials: 'PM', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'home', cashback: 0.2 },
             fornecedor: { label: 'Fornecedor', pillClass: 'r-fornecedor', icon: '🌾', userName: 'AgroInsumos Cerrado', initials: 'AC', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'fornecedor', icon: '🌾', label: 'Fornecedor' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'fornecedor', cashback: 0.3 },
             logistica: { label: 'Logística', pillClass: 'r-logistica', icon: '🚚', userName: 'Frota Leiteira Centro-Oeste', initials: 'FL', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'comunidade', cashback: 0.4 },
-            colaborador: { label: 'Colaborador', pillClass: 'r-colaborador', icon: '👷', userName: 'Helena Martins', initials: 'HM', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'colaborador', icon: '👷', label: 'Colaborador' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'colaborador', cashback: 0.5 },
+            colaborador: { label: 'Colaborador', pillClass: 'r-colaborador', icon: '👷', userName: 'Helena Martins', initials: 'HM', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'colaborador', icon: '👷', label: 'Colaborador' }, { id: 'vale-alimentacao', icon: '🛒', label: 'VA' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'colaborador', cashback: 0.5 },
             'rede-parceira': { label: 'Parceiro', pillClass: 'r-rede-parceira', icon: '🛍️', userName: 'Canal Distribuidor Piracanjuba', initials: 'CD', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'home', cashback: 0.35 },
             admin: { label: 'Admin', pillClass: 'r-admin', icon: '🛠️', userName: 'Equipe PiraPay', initials: 'LB', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'admin-dashboard', icon: '📈', label: 'Dashboard' }, { id: 'config', icon: '⚙️', label: 'Config' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'admin-dashboard', cashback: 0.5 },
             postos: {
@@ -1243,6 +1307,16 @@
                 futureAdvancePct,
                 nextPayDate: shortDate(-12),
                 classes,
+                mealCard: {
+                    number: 'VA ' + String(880000 + index).slice(-6),
+                    balance: 920 + (index % 6) * 85,
+                    statement: [
+                        { desc: 'Carga mensal VA', detail: 'Piracanjuba Benefícios', date: shortDate(1), amount: 980, type: 'credit' },
+                        { desc: 'Compra lanchonete', detail: 'Clube de Benefícios Piracanjuba', date: shortDate(3), amount: -42.80, type: 'purchase' },
+                        { desc: 'Compra mercado', detail: 'Rede Alimentação Parceira', date: shortDate(6), amount: -186.35, type: 'purchase' },
+                        { desc: 'Estorno parcial VA', detail: 'Ajuste benefício', date: shortDate(8), amount: 28.90, type: 'credit' }
+                    ]
+                },
                 wallet: { balance: 6200 + index * 730, points: 58000 + index * 2900, bill: 340 + index * 37, invested: 4500 + index * 420, yield: 180 + index * 16 },
                 statement: [
                     { desc: 'Crédito folha colaborador', detail: `${receivableHours} lançamentos confirmados`, date: shortDate(2), amount: receivableAmount * 0.35, type: 'credit' },
@@ -1403,6 +1477,7 @@
             renderFinancialDashboard();
             renderProfileDetails();
             renderTeacherDashboard();
+            renderMealCard();
             renderMarketingBanner();
         }
 
@@ -1489,6 +1564,7 @@
             if (screen === 'estab-dashboard') renderEstabDashboard();
             if (screen === 'admin-dashboard') renderAdminDashboard(1);
             if (screen === 'colaborador') renderTeacherDashboard();
+            if (screen === 'vale-alimentacao') renderMealCard();
             if (screen === 'config') renderMarketingAdmin();
             if (screen === 'carteira') { renderWallet();
                 renderStatement(); renderFinancialDashboard(); }
@@ -1896,6 +1972,7 @@
             renderStatement();
             renderInvestment();
             renderProfileDetails();
+            renderMealCard();
             closeQuickModal();
             showToast('👷 Colaborador alterado para ' + getActiveTeacher().name);
         }
@@ -1903,6 +1980,32 @@
         function openActiveProfileSelector() {
             if (currentUser && currentUser.role === 'colaborador') openTeacherSelector();
             else openStudentSelector();
+        }
+
+        function renderMealCard() {
+            const t = getActiveTeacher();
+            if (!t) return;
+            const meal = t.mealCard || { number: 'VA 0000', balance: 0, statement: [] };
+            const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+            setText('mealCardOwner', t.name + ' • cartão benefício separado da Carteira PiraPay');
+            setText('mealCardBalance', formatCurrency(meal.balance || 0));
+            setText('mealCardNumber', meal.number || 'VA 0000');
+            const credits = (meal.statement || []).filter(i => i.amount > 0).reduce((s, i) => s + i.amount, 0);
+            const debits = Math.abs((meal.statement || []).filter(i => i.amount < 0).reduce((s, i) => s + i.amount, 0));
+            setText('mealCardMonthCredit', fmtMoneyShort(credits));
+            setText('mealCardMonthDebit', fmtMoneyShort(debits));
+            const list = document.getElementById('mealCardStatement');
+            if (list) {
+                list.innerHTML = (meal.statement || []).map(item => `
+                    <div class="teacher-class-row">
+                        <div>
+                            <div style="font-weight:800;">${item.desc}</div>
+                            <div style="font-size:12px;color:var(--text-secondary);">${item.detail || ''} • ${item.date}</div>
+                        </div>
+                        <div style="font-weight:900;color:${item.amount >= 0 ? '#168A4B' : '#D92D20'};">${item.amount >= 0 ? '+' : '-'} ${formatCurrency(Math.abs(item.amount))}</div>
+                    </div>
+                `).join('') || '<div style="font-size:12px;color:var(--text-tertiary);">Nenhum lançamento no Vale Alimentação.</div>';
+            }
         }
 
         function renderTeacherDashboard() {
@@ -1922,6 +2025,20 @@
             setText('teacherFutureAmount', fmtMoneyShort(futureAmount));
             setText('teacherAdvanceLimit', fmtMoneyShort(advanceLimit));
             setText('teacherAdvancePct', t.futureAdvancePct + '%');
+            setText('teacherMealBalance', formatCurrency((t.mealCard && t.mealCard.balance) || 0));
+            setText('teacherMealCardNumber', (t.mealCard && t.mealCard.number) || 'VA 0000');
+            const mealList = document.getElementById('teacherMealStatement');
+            if (mealList) {
+                mealList.innerHTML = ((t.mealCard && t.mealCard.statement) || []).slice(0, 5).map(item => `
+                    <div class="teacher-class-row">
+                        <div>
+                            <div style="font-weight:800;">${item.desc}</div>
+                            <div style="font-size:12px;color:var(--text-secondary);">${item.detail || ''} • ${item.date}</div>
+                        </div>
+                        <div style="font-weight:900;color:${item.amount >= 0 ? '#168A4B' : '#D92D20'};">${item.amount >= 0 ? '+' : '-'} ${formatCurrency(Math.abs(item.amount))}</div>
+                    </div>
+                `).join('');
+            }
             const list = document.getElementById('teacherClassesList');
             if (list) {
                 list.innerHTML = (t.classes || []).map(c => `
@@ -2149,8 +2266,10 @@
             } catch(e) { }
         }
 
-        function exibirModalSucesso(titulo, subtitulo, detalhes, protocolo, mostrarComprovante) {
+        let successReturnScreen = 'carteira';
+        function exibirModalSucesso(titulo, subtitulo, detalhes, protocolo, mostrarComprovante, targetScreen = 'carteira', actionLabel = 'Ver Extrato da Carteira') {
             playSuccessSound();
+            successReturnScreen = targetScreen || 'carteira';
 
             let successScreen = document.getElementById('fintechSuccessScreen');
             if (!successScreen) {
@@ -2180,7 +2299,7 @@
                     </div>
                     
                     <button class="btn btn-primary" style="width:100%; margin-top:24px; padding:14px;" onclick="fecharTelaSucesso()">
-                        Ver Extrato da Carteira
+                        ${actionLabel}
                     </button>
                 </div>
             `;
@@ -2195,7 +2314,7 @@
             if (successScreen) {
                 successScreen.classList.remove('show');
             }
-            navigateTo('carteira');
+            navigateTo(successReturnScreen || 'carteira');
             const appContent = document.getElementById('appContent');
             if (appContent) appContent.scrollTop = 0;
             showToast('✅ Pagamento efetuado com sucesso');
@@ -2483,6 +2602,55 @@
             renderFuelStations(selectedFuelRegion);
         }
 
+        function renderGoogleFuelMarkers() {
+            return;
+        }
+
+        function salvarGoogleMapsKey() {
+            const key = document.getElementById('googleMapsKey')?.value.trim();
+            if (!key) { showToast('⚠️ Informe a chave do Google Maps.'); return; }
+            localStorage.setItem('pirapay_google_maps_key', key);
+            showToast('✅ Chave Google Maps salva para a demonstração');
+        }
+
+        function routeUfFromText(text) {
+            const normalized = String(text || '').toUpperCase();
+            const uf = Object.keys(UF_COORDS).find(code => new RegExp('\\\\b' + code + '\\\\b').test(normalized));
+            if (uf) return uf;
+            const station = PARTNER_STATIONS.find(s => normalized.includes(String(s.city || '').toUpperCase()));
+            return station ? station.uf : '';
+        }
+
+        function filtrarPostosRotaDemo() {
+            const originText = document.getElementById('routeOrigin')?.value || 'Goiânia, GO';
+            const destText = document.getElementById('routeDestination')?.value || 'Barreiras, BA';
+            const originUf = routeUfFromText(originText) || 'GO';
+            const destUf = routeUfFromText(destText) || 'BA';
+            const regionSet = new Set([originUf, destUf].map(uf => {
+                const sample = PARTNER_STATIONS.find(s => s.uf === uf);
+                return sample ? sample.region : '';
+            }).filter(Boolean));
+            filteredFuelStations = PARTNER_STATIONS.filter(s => s.uf === originUf || s.uf === destUf || regionSet.has(s.region)).slice(0, 160);
+            selectedFuelRegion = filteredFuelStations[0]?.region || selectedFuelRegion;
+            const summary = document.getElementById('routeSummary');
+            if (summary) summary.textContent = `Modo demo: ${filteredFuelStations.length} postos exibidos na rota ${originText} → ${destText}. Com uma chave Google Maps, a API pode calcular a rota real.`;
+            renderFuelStations(selectedFuelRegion);
+        }
+
+        function calcularRotaPostos() {
+            const key = document.getElementById('googleMapsKey')?.value.trim() || localStorage.getItem('pirapay_google_maps_key');
+            if (key) localStorage.setItem('pirapay_google_maps_key', key);
+            filtrarPostosRotaDemo();
+            showToast(key ? '🗺️ Rota simulada com base cadastrada. API Google pronta para chave real.' : '🗺️ Rota demo aplicada sem chave Google Maps.');
+        }
+
+        function limparRotaPostos() {
+            filteredFuelStations = null;
+            const summary = document.getElementById('routeSummary');
+            if (summary) summary.textContent = 'Mostrando todos os postos cadastrados. Informe origem e destino para filtrar pela rota.';
+            renderFuelStations(selectedFuelRegion);
+        }
+
         function abrirCompraCombustivel(stationName = '') {
             const region = FUEL_REGIONS[selectedFuelRegion] || FUEL_REGIONS['CENTRO OESTE'];
             const stationSource = getVisibleFuelStations(selectedFuelRegion).length ? getVisibleFuelStations(selectedFuelRegion) : PARTNER_STATIONS.filter(s => s.region === selectedFuelRegion);
@@ -2662,7 +2830,9 @@
                     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
                         <button class="btn btn-primary" onclick="validarTokenECompraEstab('${nome}', ${preco}, 'points', '${tipo}')">🟣 Pagar com Pontos</button>
                         <button class="btn btn-secondary" onclick="validarTokenECompraEstab('${nome}', ${preco}, 'reais', '${tipo}')">💰 Pagar com Reais</button>
+                        ${tipo === 'lanchonete' ? `<button class="btn btn-outline" onclick="validarTokenECompraEstab('${nome}', ${preco}, 'vale', '${tipo}')">🛒 Vale Alimentação</button>` : ''}
                     </div>
+                    ${tipo === 'lanchonete' ? '<div style="font-size:11px;color:var(--text-tertiary);margin-top:8px;">Senha demo do Vale Alimentação: <b>123456</b></div>' : ''}
                     <button class="btn btn-outline" style="margin-top:8px;" onclick="closeQuickModal()">Cancelar</button>
                 </div>
             `);
@@ -2671,7 +2841,8 @@
         function validarTokenECompraEstab(nome, preco, forma, tipo) {
             const token = document.getElementById('tokenInput').value.trim().toUpperCase();
             if (token.length !== 6) { showToast('❌ Token inválido.'); return; }
-            if (token !== getCurrentToken()) { showToast('❌ Token incorreto.'); return; }
+            if (forma === 'vale' && token !== '123456') { showToast('❌ Senha do Vale Alimentação incorreta.'); return; }
+            if (forma !== 'vale' && token !== getCurrentToken()) { showToast('❌ Token incorreto.'); return; }
             
             const data = getUserData(currentUser.role);
             const cashbackRate = currentUser.cashback || 0.2;
@@ -2679,7 +2850,26 @@
             const protocolo = 'TX-' + Date.now();
             const nomeEstab = tipo === 'lanchonete' ? 'Clube de Benefícios Piracanjuba' : 'AgroInsumos Hub';
 
-            if (forma === 'points') {
+            if (forma === 'vale') {
+                const valorVale = preco * 0.05;
+                if (!data.mealCard) { showToast('⚠️ Este perfil não possui Vale Alimentação.'); return; }
+                if (parseFloat(data.mealCard.balance) < parseFloat(valorVale)) {
+                    showToast('❌ Saldo insuficiente no Vale Alimentação.');
+                    return;
+                }
+                closeQuickModal();
+                data.mealCard.balance -= valorVale;
+                data.mealCard.statement = data.mealCard.statement || [];
+                data.mealCard.statement.unshift({ desc: 'Compra lanchonete', detail: nomeEstab, date: shortDate(0), amount: -valorVale, type: 'purchase' });
+                updateUserData(currentUser.role, { mealCard: data.mealCard });
+                renderTeacherDashboard();
+                renderMealCard();
+                valorFinal = valorVale; tipoPagamento = 'vale-alimentacao';
+                detalhesCompra = [
+                    { label: 'Canal', value: nomeEstab }, { label: 'Produto', value: nome },
+                    { label: 'Valor', value: formatCurrency(valorVale) }, { label: 'Forma', value: 'Vale Alimentação' }
+                ];
+            } else if (forma === 'points') {
                 if (parseFloat(data.wallet.points) < parseFloat(preco)) {
                     showToast('❌ Saldo insuficiente em pontos.');
                     return;
@@ -2721,7 +2911,15 @@
                 renderEstabDashboard();
             }
 
-            exibirModalSucesso('Compra efetuada!', 'Canal Parceiro', detalhesCompra, protocolo, true);
+            exibirModalSucesso(
+                'Compra efetuada!',
+                'Canal Parceiro',
+                detalhesCompra,
+                protocolo,
+                true,
+                forma === 'vale' ? 'vale-alimentacao' : 'carteira',
+                forma === 'vale' ? 'Ver Extrato do Vale Alimentação' : 'Ver Extrato da Carteira'
+            );
         }
 
         function renderEstabDashboard() {
@@ -2744,10 +2942,12 @@
 
         function processarRecebimento() {
             const cpfCnpj = document.getElementById('recebimentoCpfCnpj').value.trim();
+            const forma = document.getElementById('recebimentoForma') ? document.getElementById('recebimentoForma').value : 'points';
             const valorStr = document.getElementById('recebimentoValor').value.trim();
             const token = document.getElementById('recebimentoToken').value.trim().toUpperCase();
             if (!cpfCnpj || !valorStr || !token) { showToast('⚠️ Preencha todos os campos.'); return; }
             if (token.length !== 6) { showToast('❌ Token inválido.'); return; }
+            if (forma === 'vale' && token !== '123456') { showToast('❌ Senha do Vale Alimentação incorreta.'); return; }
             const valor = parseFloat(valorStr.replace(/[R$₮\s]/g, '').replace(',', '.'));
             if (isNaN(valor) || valor <= 0) { showToast('⚠️ Valor inválido.'); return; }
             
@@ -2756,16 +2956,16 @@
             const data = getUserData('canal');
             data.received_history = data.received_history || [];
             const wallet = getWalletRegistry().find(w => w.doc === cpfCnpj || w.walletNumber === cpfCnpj);
-            data.received_history.unshift({ client: wallet ? wallet.name : 'Cliente não cadastrado', doc: cpfCnpj, token: token, amount: valor, date: new Date().toLocaleDateString('pt-BR') });
+            data.received_history.unshift({ client: wallet ? wallet.name : 'Cliente não cadastrado', doc: cpfCnpj, token: token, amount: valor, method: forma, date: new Date().toLocaleDateString('pt-BR') });
             data.sales = (data.sales || 0) + valor;
             data.transactions = (data.transactions || 0) + 1;
             data.wallet.balance += valorLiquido;
-            data.wallet.points += valor * 2;
+            data.wallet.points += forma === 'points' ? valor * 2 : 0;
             updateUserData('canal', data);
             renderRecebimentoHistorico();
             renderEstabDashboard();
             renderWallet();
-            showToast('✅ Pagamento autorizado! Valor: R$ ' + valor.toFixed(2) + ' (taxa 2%: R$ ' + taxa.toFixed(2) + ')');
+            showToast('✅ Pagamento autorizado por ' + (forma === 'vale' ? 'Vale Alimentação' : forma === 'reais' ? 'reais' : 'pontos') + '! Valor: R$ ' + valor.toFixed(2) + ' (MDR 2%: R$ ' + taxa.toFixed(2) + ')');
             document.getElementById('recebimentoCpfCnpj').value = ''; document.getElementById('recebimentoValor').value = ''; document.getElementById('recebimentoToken').value = '';
         }
 
@@ -2775,7 +2975,7 @@
             if (!data.received_history || data.received_history.length === 0) { container.innerHTML = '<div style="font-size:12px;color:var(--text-tertiary);">Nenhum recebimento registrado.</div>'; return; }
             container.innerHTML = data.received_history.slice(0, 5).map(r => `
                 <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-top:4px;border-bottom:1px solid var(--border-color);padding-bottom:4px;">
-                    <span>${r.client} (${r.doc}) • Token: ${r.token}</span><span>R$ ${r.amount.toFixed(2)}</span>
+                    <span>${r.client} (${r.doc}) • ${r.method === 'vale' ? 'Vale Alimentação' : r.method === 'reais' ? 'Reais' : 'Pontos'} • Token: ${r.token}</span><span>R$ ${r.amount.toFixed(2)}</span>
                 </div>
             `).join('');
         }
@@ -2927,7 +3127,8 @@
                 { nome: 'Antecipação notas do leite', valor: 62400, cor: '#FF7A00' },
                 { nome: 'Crédito consignado', valor: 38100, cor: '#FFD200' },
                 { nome: 'Crédito produção futura', valor: 24800, cor: '#0F766E' },
-                { nome: 'Receita parceiros', valor: 18400, cor: '#E67E22' }
+                { nome: 'Receita parceiros', valor: 18400, cor: '#E67E22' },
+                { nome: 'Taxa MDR 2% estabelecimentos e parceiros', valor: 46800, cor: '#7C3AED' }
             ],
             custos: [
                 { nome: 'BaaS, SCD e FIDC', valor: 92000, cor: '#0054A6' },
@@ -2984,21 +3185,20 @@
                 return;
             }
             if (adminChartInstance) adminChartInstance.destroy();
-            const allCategories = ADMIN_BASE.receitas.map(r => r.nome);
-            const receitaMap = {}; receitas.forEach(r => { receitaMap[r.nome] = r.valor; });
-            const custoMap = {}; custos.forEach(c => { custoMap[c.nome] = c.valor; });
+            const monthLabels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            const receitaTrend = monthLabels.map((_, i) => Math.round(totalReceita * (0.72 + i * 0.034 + Math.sin(i) * 0.018)));
+            const custoTrend = monthLabels.map((_, i) => Math.round(totalCusto * (0.78 + i * 0.022 + Math.cos(i) * 0.014)));
             
             adminChartInstance = new Chart(canvas.getContext('2d'), {
-                type: 'bar',
+                type: 'line',
                 data: {
-                    labels: allCategories,
+                    labels: monthLabels,
                     datasets: [
-                        { label: 'Receita', data: allCategories.map(n => receitaMap[n] || 0), backgroundColor: '#0054A6', borderRadius: 4, barPercentage: 0.6 },
-                        { label: 'Custo', data: allCategories.map(n => custoMap[n] || 0), backgroundColor: '#FF7A00', borderRadius: 4, barPercentage: 0.6 },
-                        { label: 'Lucratividade', data: allCategories.map(n => (receitaMap[n] || 0) - (custoMap[n] || 0)), backgroundColor: '#2ECC71', borderRadius: 4, barPercentage: 0.6 }
+                        { label: 'Receitas', data: receitaTrend, borderColor: '#0054A6', backgroundColor: 'rgba(0,84,166,0.12)', borderWidth: 3, pointRadius: 3, pointBackgroundColor: '#0054A6', fill: true, tension: 0.36 },
+                        { label: 'Custos', data: custoTrend, borderColor: '#FF7A00', backgroundColor: 'rgba(255,122,0,0.10)', borderWidth: 3, pointRadius: 3, pointBackgroundColor: '#FF7A00', fill: true, tension: 0.36 }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#5A5A6E', font: { size: 10, weight: '600' }, usePointStyle: true } } }, scales: { x: { ticks: { color: '#8A8A9E', font: { size: 8 }, maxRotation: 45 }, grid: { display: false } }, y: { ticks: { color: '#8A8A9E', font: { size: 9 }, callback: v => fmtMoneyShort(v) }, grid: { color: 'rgba(0,0,0,0.05)' } } } }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#5A5A6E', font: { size: 11, weight: '700' }, usePointStyle: true } } }, scales: { x: { ticks: { color: '#8A8A9E', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#8A8A9E', font: { size: 9 }, callback: v => fmtMoneyShort(v) }, grid: { color: 'rgba(0,0,0,0.05)' } } } }
             });
         }
 
