@@ -241,14 +241,15 @@
         .estab-menu-item .item-price { color: var(--secondary); font-weight: 700; }
         .estab-menu-item .item-desc { font-size: 11px; color: var(--text-tertiary); }
 
-        .fuel-map { position: relative; min-height: 360px; border-radius: var(--radius); border: 1px solid var(--border-color); overflow: hidden; background: linear-gradient(145deg, #EAF5FF, #FFF7DF); box-shadow: var(--shadow-card); }
-        .fuel-map::before { content: ''; position: absolute; inset: 34px 28px; background: linear-gradient(145deg, rgba(0,84,166,0.16), rgba(255,122,0,0.18)); clip-path: polygon(45% 0, 63% 7%, 70% 19%, 84% 27%, 79% 42%, 91% 55%, 77% 64%, 72% 78%, 58% 84%, 51% 100%, 40% 88%, 29% 91%, 22% 75%, 9% 68%, 17% 54%, 6% 38%, 22% 28%, 27% 12%); }
-        .fuel-region-card { position: absolute; min-width: 112px; background: rgba(255,255,255,0.92); border: 1px solid rgba(0,84,166,0.16); border-radius: 14px; padding: 9px; box-shadow: 0 10px 26px rgba(16,24,40,0.12); cursor: pointer; transition: var(--transition); }
-        .fuel-region-card:hover, .fuel-region-card.active { transform: translateY(-2px); border-color: var(--primary); box-shadow: 0 12px 30px rgba(0,84,166,0.20); }
-        .fuel-region-card strong { display: block; color: var(--primary); font-size: 12px; }
-        .fuel-region-card span { display: block; color: var(--text-secondary); font-size: 10.5px; margin-top: 2px; }
-        .fuel-pin { position: absolute; width: 12px; height: 12px; border-radius: 50% 50% 50% 0; background: var(--secondary); transform: rotate(-45deg); box-shadow: 0 0 0 3px rgba(255,122,0,0.18); }
-        .fuel-pin::after { content: ''; position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #fff; left: 3.5px; top: 3.5px; }
+        .fuel-map { position: relative; min-height: 360px; border-radius: var(--radius); border: 1px solid var(--border-color); overflow: hidden; background: linear-gradient(145deg, #F8FBFF, #FFFFFF); box-shadow: var(--shadow-card); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: center; gap: 10px; padding: 56px 14px 14px; }
+        .fuel-map::before { content: ''; position: absolute; left: 50%; top: 51%; width: 58%; height: 72%; transform: translate(-50%, -50%); background: linear-gradient(145deg, rgba(0,84,166,0.10), rgba(49,151,149,0.09)); clip-path: polygon(45% 0, 63% 7%, 70% 19%, 84% 27%, 79% 42%, 91% 55%, 77% 64%, 72% 78%, 58% 84%, 51% 100%, 40% 88%, 29% 91%, 22% 75%, 9% 68%, 17% 54%, 6% 38%, 22% 28%, 27% 12%); opacity: 0.9; }
+        .fuel-map-title { position: absolute; left: 16px; top: 14px; z-index: 1; font-size: 13px; font-weight: 900; color: var(--primary); }
+        .fuel-region-card { position: relative; z-index: 1; min-width: 0; background: rgba(255,255,255,0.94); border: 1px solid var(--border-color); border-left: 4px solid var(--primary); border-radius: 14px; padding: 10px; box-shadow: 0 10px 24px rgba(16,24,40,0.08); cursor: pointer; transition: var(--transition); }
+        .fuel-region-card:hover, .fuel-region-card.active { transform: translateY(-2px); border-color: rgba(0,84,166,0.30); box-shadow: 0 14px 30px rgba(0,84,166,0.14); }
+        .fuel-region-card strong { display: block; color: var(--primary); font-size: 13px; }
+        .fuel-region-card span { display: block; color: var(--text-secondary); font-size: 11px; margin-top: 2px; }
+        .fuel-region-card em { display: block; color: var(--secondary); font-style: normal; font-size: 13px; font-weight: 900; margin-top: 4px; }
+        .fuel-pin, .fuel-pin::after { display: none; }
         .fuel-price-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); gap: 8px; margin-top: 12px; }
         .fuel-price-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 10px; box-shadow: var(--shadow-card); }
         .fuel-price-card .fuel-name { font-size: 12px; font-weight: 900; color: var(--text-primary); }
@@ -644,9 +645,9 @@
                     <div class="card" style="padding:12px;margin-bottom:12px;">
                         <div style="font-weight:900;margin-bottom:8px;">🗺️ Roteirizador Google Maps</div>
                         <div class="route-planner">
-                            <input class="field-input" id="routeOrigin" placeholder="Origem: Goiânia, GO">
-                            <input class="field-input" id="routeDestination" placeholder="Destino: Barreiras, BA">
-                            <input class="field-input" id="googleMapsKey" placeholder="Chave Google Maps API">
+                            <input class="field-input" id="routeOrigin" value="Goiânia, GO, Brasil" placeholder="Origem: Goiânia, GO">
+                            <input class="field-input" id="routeDestination" value="Barreiras, BA, Brasil" placeholder="Destino: Barreiras, BA">
+                            <input class="field-input" id="googleMapsKey" value="AIzaSyCNsMZV0MsQtY8YpG2u1TutXdp7xc0rGrA" placeholder="Chave Google Maps API">
                             <button class="btn btn-primary" onclick="calcularRotaPostos()">Roteirizar</button>
                         </div>
                         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
@@ -1055,7 +1056,7 @@
     </div>
 
     <script>
-        const DATA_VERSION = 17;
+        const DATA_VERSION = 18;
         const DEMO_SCALE = { produtores: 200, colaboradores: 50, empresas: 80, canais: 40, fornecedores: 20, instituicoes: 15, transacoes: 500, pix: 300, compras: 150, beneficios: 100, investimentos: 80 };
         const firstNames = ['Paulo', 'Ana Paula', 'Carlos', 'Mariana', 'João Victor', 'Fernanda', 'Rafael', 'Camila', 'Bruna', 'Lucas', 'Patricia', 'Gustavo', 'Renata', 'Eduardo', 'Larissa', 'Felipe', 'Juliana', 'Marcelo', 'Bianca', 'Henrique'];
         const lastNames = ['Marques', 'Souza', 'Henrique', 'Albuquerque', 'Lima', 'Costa', 'Nogueira', 'Silveira', 'Rocha', 'Mendes'];
@@ -1116,6 +1117,9 @@
         let googleFuelMap = null;
         let googleFuelMarkers = [];
         let googleFuelDirections = null;
+        let googleFuelRoutePath = [];
+        let googleMapsLoadingPromise = null;
+        let routeAutocompleteReady = false;
         const UF_COORDS = {
             AC: [-9.02, -70.81], AL: [-9.62, -36.82], AM: [-3.47, -65.10], AP: [1.41, -51.77], BA: [-12.58, -41.70],
             CE: [-5.20, -39.53], DF: [-15.78, -47.93], ES: [-19.19, -40.34], GO: [-15.98, -49.86], MA: [-5.42, -45.44],
@@ -2548,19 +2552,18 @@
             chips.innerHTML = FUEL_PRODUCTS.map(p => `
                 <span class="demo-chip" onclick="selectFuelProduct('${p.key}')" style="${p.key === selectedFuelProduct ? 'border-color:var(--primary);background:rgba(0,84,166,0.08);' : ''}">${p.icon} ${p.label}</span>
             `).join('');
-            const regionCards = Object.entries(FUEL_REGIONS).map(([key, r]) => `
-                <div class="fuel-region-card ${key === selectedFuelRegion ? 'active' : ''}" onclick="renderFuelStations('${key}')" style="left:${Math.max(4, r.x - 12)}%;top:${Math.max(4, r.y - 9)}%;">
-                    <strong>${r.label}</strong>
-                    <span>${getVisibleFuelStations(key).length} postos • ${formatCurrency(fuelPiraPayPrice(key, selectedFuelProduct))}/L</span>
-                </div>
-            `).join('');
-            const pins = visibleAll.map((s, i) => {
-                const r = FUEL_REGIONS[s.region];
-                const dx = ((i % 5) - 2) * 2.7;
-                const dy = ((Math.floor(i / 5) % 4) - 1.5) * 2.6;
-                return `<span class="fuel-pin" title="${escapeHtml(s.name)} - ${escapeHtml(s.city)}/${s.uf}" style="left:${r.x + dx}%;top:${r.y + dy}%;"></span>`;
+            const regionCards = Object.entries(FUEL_REGIONS).map(([key, r]) => {
+                const count = getVisibleFuelStations(key).length;
+                const border = key === 'CENTRO OESTE' ? '#0054A6' : key === 'NORDESTE' ? '#FF7A00' : key === 'SUL' ? '#2F855A' : key === 'SUDESTE' ? '#6B46C1' : '#319795';
+                return `
+                    <div class="fuel-region-card ${key === selectedFuelRegion ? 'active' : ''}" onclick="renderFuelStations('${key}')" style="border-left-color:${border};">
+                        <strong>${r.label}</strong>
+                        <span>${count} postos parceiros</span>
+                        <em>${formatCurrency(fuelPiraPayPrice(key, selectedFuelProduct))}/L</em>
+                    </div>
+                `;
             }).join('');
-            map.innerHTML = regionCards + pins;
+            map.innerHTML = `<div class="fuel-map-title">Brasil por regiões • ${visibleAll.length} postos visíveis</div>${regionCards}`;
 
             const region = FUEL_REGIONS[selectedFuelRegion];
             const prices = FUEL_PRODUCTS.map(p => `
@@ -2595,6 +2598,7 @@
                 </div>
             `;
             renderGoogleFuelMarkers(visibleAll);
+            ensureRouteAutocomplete();
         }
 
         function selectFuelProduct(productKey) {
@@ -2602,8 +2606,101 @@
             renderFuelStations(selectedFuelRegion);
         }
 
-        function renderGoogleFuelMarkers() {
-            return;
+        function loadGoogleMapsApi(key) {
+            if (window.google && window.google.maps) return Promise.resolve();
+            if (googleMapsLoadingPromise) return googleMapsLoadingPromise;
+            googleMapsLoadingPromise = new Promise((resolve, reject) => {
+                window.__pirapayGoogleMapsReady = () => resolve();
+                const script = document.createElement('script');
+                script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&libraries=geometry,places&callback=__pirapayGoogleMapsReady`;
+                script.async = true;
+                script.onerror = () => {
+                    googleMapsLoadingPromise = null;
+                    reject(new Error('Google Maps não carregou'));
+                };
+                document.head.appendChild(script);
+            });
+            return googleMapsLoadingPromise;
+        }
+
+        function normalizeRoutePlace(value, fallback) {
+            const text = String(value || '').trim() || fallback;
+            return /brasil|brazil/i.test(text) ? text : `${text}, Brasil`;
+        }
+
+        function initRouteAutocomplete() {
+            if (routeAutocompleteReady || !(window.google && google.maps && google.maps.places)) return;
+            ['routeOrigin', 'routeDestination'].forEach(id => {
+                const input = document.getElementById(id);
+                if (!input) return;
+                const autocomplete = new google.maps.places.Autocomplete(input, {
+                    componentRestrictions: { country: 'br' },
+                    fields: ['formatted_address', 'geometry', 'name'],
+                    types: ['(cities)']
+                });
+                autocomplete.addListener('place_changed', () => {
+                    const place = autocomplete.getPlace();
+                    if (place && (place.formatted_address || place.name)) input.value = place.formatted_address || place.name;
+                });
+            });
+            routeAutocompleteReady = true;
+        }
+
+        function ensureRouteAutocomplete() {
+            const key = document.getElementById('googleMapsKey')?.value.trim() || localStorage.getItem('pirapay_google_maps_key');
+            if (!key || routeAutocompleteReady) return;
+            loadGoogleMapsApi(key).then(initRouteAutocomplete).catch(() => {});
+        }
+
+        function initGoogleFuelMap() {
+            if (!(window.google && window.google.maps)) return false;
+            const mapEl = document.getElementById('googleFuelMap');
+            const fallbackMap = document.getElementById('fuelMap');
+            if (!mapEl) return false;
+            mapEl.style.display = 'block';
+            if (fallbackMap) fallbackMap.style.display = 'none';
+            if (!googleFuelMap) {
+                googleFuelMap = new google.maps.Map(mapEl, {
+                    center: { lat: -14.2, lng: -51.9 },
+                    zoom: 4,
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: false
+                });
+                googleFuelDirections = new google.maps.DirectionsRenderer({
+                    map: googleFuelMap,
+                    suppressMarkers: false,
+                    polylineOptions: { strokeColor: '#0054A6', strokeWeight: 5, strokeOpacity: 0.9 }
+                });
+            }
+            return true;
+        }
+
+        function renderGoogleFuelMarkers(stations = filteredFuelStations || PARTNER_STATIONS) {
+            if (!(window.google && window.google.maps && googleFuelMap)) return;
+            googleFuelMarkers.forEach(marker => marker.setMap(null));
+            googleFuelMarkers = [];
+            const bounds = new google.maps.LatLngBounds();
+            stations.slice(0, 500).forEach((station, index) => {
+                const pos = stationPosition(station, index);
+                const marker = new google.maps.Marker({
+                    position: pos,
+                    map: googleFuelMap,
+                    title: `${station.name} - ${station.city}/${station.uf}`,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: filteredFuelStations ? 5 : 3,
+                        fillColor: filteredFuelStations ? '#0054A6' : '#319795',
+                        fillOpacity: 0.95,
+                        strokeColor: '#ffffff',
+                        strokeWeight: 1
+                    }
+                });
+                marker.addListener('click', () => abrirCompraCombustivel(station.name));
+                googleFuelMarkers.push(marker);
+                bounds.extend(pos);
+            });
+            if (!filteredFuelStations && !bounds.isEmpty()) googleFuelMap.fitBounds(bounds);
         }
 
         function salvarGoogleMapsKey() {
@@ -2622,8 +2719,12 @@
         }
 
         function filtrarPostosRotaDemo() {
-            const originText = document.getElementById('routeOrigin')?.value || 'Goiânia, GO';
-            const destText = document.getElementById('routeDestination')?.value || 'Barreiras, BA';
+            const googleEl = document.getElementById('googleFuelMap');
+            const fallbackMap = document.getElementById('fuelMap');
+            if (googleEl) googleEl.style.display = 'none';
+            if (fallbackMap) fallbackMap.style.display = 'block';
+            const originText = normalizeRoutePlace(document.getElementById('routeOrigin')?.value, 'Goiânia, GO, Brasil');
+            const destText = normalizeRoutePlace(document.getElementById('routeDestination')?.value, 'Barreiras, BA, Brasil');
             const originUf = routeUfFromText(originText) || 'GO';
             const destUf = routeUfFromText(destText) || 'BA';
             const regionSet = new Set([originUf, destUf].map(uf => {
@@ -2633,21 +2734,66 @@
             filteredFuelStations = PARTNER_STATIONS.filter(s => s.uf === originUf || s.uf === destUf || regionSet.has(s.region)).slice(0, 160);
             selectedFuelRegion = filteredFuelStations[0]?.region || selectedFuelRegion;
             const summary = document.getElementById('routeSummary');
-            if (summary) summary.textContent = `Modo demo: ${filteredFuelStations.length} postos exibidos na rota ${originText} → ${destText}. Com uma chave Google Maps, a API pode calcular a rota real.`;
+            if (summary) summary.textContent = `Simulação regional: ${filteredFuelStations.length} postos exibidos entre ${originText} → ${destText}. Quando a API Directions estiver liberada, a rota real aparece no mapa Google.`;
             renderFuelStations(selectedFuelRegion);
         }
 
-        function calcularRotaPostos() {
+        async function calcularRotaPostos() {
+            const origin = normalizeRoutePlace(document.getElementById('routeOrigin')?.value, 'Goiânia, GO, Brasil');
+            const destination = normalizeRoutePlace(document.getElementById('routeDestination')?.value, 'Barreiras, BA, Brasil');
             const key = document.getElementById('googleMapsKey')?.value.trim() || localStorage.getItem('pirapay_google_maps_key');
-            if (key) localStorage.setItem('pirapay_google_maps_key', key);
-            filtrarPostosRotaDemo();
-            showToast(key ? '🗺️ Rota simulada com base cadastrada. API Google pronta para chave real.' : '🗺️ Rota demo aplicada sem chave Google Maps.');
+            if (!key) { showToast('⚠️ Informe a chave Google Maps ou use Demo sem chave.'); return; }
+            localStorage.setItem('pirapay_google_maps_key', key);
+            const summary = document.getElementById('routeSummary');
+            if (summary) summary.textContent = 'Calculando rota no Google Maps...';
+            try {
+                await loadGoogleMapsApi(key);
+                initRouteAutocomplete();
+                initGoogleFuelMap();
+                const directionsService = new google.maps.DirectionsService();
+                directionsService.route({
+                    origin,
+                    destination,
+                    travelMode: google.maps.TravelMode.DRIVING,
+                    provideRouteAlternatives: false
+                }, (result, status) => {
+                    if (status !== 'OK' || !result) {
+                        if (summary) summary.textContent = `Google Maps retornou ${status}. Usando simulação regional para ${origin} → ${destination}.`;
+                        showToast('⚠️ Google Maps não retornou rota. Mostrei a simulação regional.');
+                        filtrarPostosRotaDemo();
+                        return;
+                    }
+                    googleFuelDirections.setDirections(result);
+                    googleFuelRoutePath = result.routes[0].overview_path || [];
+                    filteredFuelStations = PARTNER_STATIONS.filter((station, index) => {
+                        const pos = stationPosition(station, index);
+                        const point = new google.maps.LatLng(pos.lat, pos.lng);
+                        return googleFuelRoutePath.some(routePoint => google.maps.geometry.spherical.computeDistanceBetween(point, routePoint) <= 55000);
+                    });
+                    if (!filteredFuelStations.length) filteredFuelStations = PARTNER_STATIONS.filter(s => ['GO', 'BA', 'DF'].includes(s.uf)).slice(0, 80);
+                    selectedFuelRegion = filteredFuelStations[0]?.region || selectedFuelRegion;
+                    const leg = result.routes[0].legs && result.routes[0].legs[0];
+                    if (summary) summary.textContent = `Rota Google Maps ativa: ${filteredFuelStations.length} postos próximos ao trajeto${leg ? ` • ${leg.distance.text} • ${leg.duration.text}` : ''}.`;
+                    renderFuelStations(selectedFuelRegion);
+                    renderGoogleFuelMarkers(filteredFuelStations);
+                    showToast('🗺️ Rota carregada no mapa');
+                });
+            } catch (err) {
+                showToast('❌ Não foi possível carregar Google Maps. Usando demo.');
+                filtrarPostosRotaDemo();
+            }
         }
 
         function limparRotaPostos() {
             filteredFuelStations = null;
+            const googleEl = document.getElementById('googleFuelMap');
+            const fallbackMap = document.getElementById('fuelMap');
+            if (googleEl) googleEl.style.display = 'none';
+            if (fallbackMap) fallbackMap.style.display = 'block';
             const summary = document.getElementById('routeSummary');
             if (summary) summary.textContent = 'Mostrando todos os postos cadastrados. Informe origem e destino para filtrar pela rota.';
+            if (googleFuelDirections) googleFuelDirections.set('directions', null);
+            googleFuelRoutePath = [];
             renderFuelStations(selectedFuelRegion);
         }
 
@@ -3219,6 +3365,11 @@
             renderRecebimentoHistorico();
             applyColors();
             renderMarketingBanner();
+            const mapsKeyInput = document.getElementById('googleMapsKey');
+            if (mapsKeyInput) {
+                mapsKeyInput.value = localStorage.getItem('pirapay_google_maps_key') || mapsKeyInput.value || 'AIzaSyCNsMZV0MsQtY8YpG2u1TutXdp7xc0rGrA';
+                localStorage.setItem('pirapay_google_maps_key', mapsKeyInput.value);
+            }
         });
     </script>
 </body>
