@@ -1116,7 +1116,10 @@
     </div>
 
     <script>
-        const DATA_VERSION = 28;
+        const DATA_VERSION = 29;
+        const PIRAPAY_LOGO_JPEG_BASE64 = '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';
+        const PIRAPAY_LOGO_JPEG_WIDTH = 217;
+        const PIRAPAY_LOGO_JPEG_HEIGHT = 140;
         const DEMO_SCALE = { produtores: 200, colaboradores: 50, empresas: 80, canais: 40, fornecedores: 20, instituicoes: 15, transacoes: 500, pix: 300, compras: 150, beneficios: 100, investimentos: 80 };
         const firstNames = ['Paulo', 'Ana Paula', 'Carlos', 'Mariana', 'João Victor', 'Fernanda', 'Rafael', 'Camila', 'Bruna', 'Lucas', 'Patricia', 'Gustavo', 'Renata', 'Eduardo', 'Larissa', 'Felipe', 'Juliana', 'Marcelo', 'Bianca', 'Henrique'];
         const lastNames = ['Marques', 'Souza', 'Henrique', 'Albuquerque', 'Lima', 'Costa', 'Nogueira', 'Silveira', 'Rocha', 'Mendes'];
@@ -2669,6 +2672,57 @@
                 .replace(/[\\()]/g, '\\$&');
         }
 
+        function base64ToUint8Array(base64) {
+            const binary = atob(base64);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+            return bytes;
+        }
+
+        function pdfBlobFromObjects(objects) {
+            const parts = [];
+            let offset = 0;
+            const offsets = [0];
+            const add = part => {
+                parts.push(part);
+                offset += typeof part === 'string' ? part.length : part.byteLength;
+            };
+            add('%PDF-1.4\n');
+            objects.forEach(objParts => {
+                offsets.push(offset);
+                (Array.isArray(objParts) ? objParts : [objParts]).forEach(add);
+                add('\n');
+            });
+            const xref = offset;
+            add(`xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`);
+            offsets.slice(1).forEach(itemOffset => add(`${String(itemOffset).padStart(10, '0')} 00000 n \n`));
+            add(`trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+            return new Blob(parts, { type: 'application/pdf' });
+        }
+
+        function pdfGuilloche(x, y, w, h) {
+            let ops = 'q 0.48 0.72 0.56 RG 0.45 w\n';
+            for (let row = 0; row < 7; row++) {
+                const cy = y + row * (h / 6);
+                for (let band = 0; band < 2; band++) {
+                    const amp = (h / 7) + band * 4;
+                    let path = '';
+                    for (let i = 0; i <= 96; i++) {
+                        const t = i / 96;
+                        const px = x + t * w;
+                        const py = cy + Math.sin(t * Math.PI * 8 + row * 0.8 + band) * amp * (0.35 + 0.65 * Math.sin(t * Math.PI));
+                        path += `${i === 0 ? 'm' : 'l'} ${px.toFixed(2)} ${py.toFixed(2)} `;
+                    }
+                    ops += path + 'S\n';
+                }
+            }
+            for (let col = 0; col < 18; col++) {
+                const cx = x + col * (w / 17);
+                ops += `${cx.toFixed(2)} ${y} m ${(cx + 70).toFixed(2)} ${(y + h / 2).toFixed(2)} ${(cx - 70).toFixed(2)} ${(y + h / 2).toFixed(2)} ${cx.toFixed(2)} ${(y + h).toFixed(2)} c S\n`;
+            }
+            return ops + 'Q\n';
+        }
+
         function pdfQrRects(payload, x, y, size) {
             const n = 29;
             const cell = size / n;
@@ -2730,30 +2784,23 @@
             const text = (x, y, value, size = 10, font = 'F1', color = '0 0 0') => `BT /${font} ${size} Tf ${color} rg ${x} ${y} Td (${pdfSafeText(value)}) Tj ET\n`;
             const box = (x, y, w, h, fill = '1 1 1', stroke = '0.82 0.86 0.90') => `q ${fill} rg ${x} ${y} ${w} ${h} re f ${stroke} RG 1 w ${x} ${y} ${w} ${h} re S Q\n`;
             const line = (x1, y1, x2, y2, color = '0.82 0.86 0.90') => `q ${color} RG 1 w ${x1} ${y1} m ${x2} ${y2} l S Q\n`;
-            const logo = (x, y) => {
-                let ops = '';
-                ops += 'q 1.00 0.48 0.00 rg ' + x + ' ' + (y + 14) + ' 34 10 re f Q\n';
-                ops += 'q 1.00 0.78 0.00 rg ' + (x + 8) + ' ' + (y + 25) + ' 28 8 re f Q\n';
-                ops += 'q 0.92 0.04 0.08 rg ' + (x + 18) + ' ' + (y + 36) + ' 24 8 re f Q\n';
-                ops += text(x + 52, y + 18, 'Pira', 28, 'F2', '0.00 0.33 0.65');
-                ops += text(x + 111, y + 18, 'Pay', 28, 'F2', '1.00 0.48 0.00');
-                ops += text(x + 54, y + 4, 'Autorizacao financeira de abastecimento', 7, 'F1', '0.25 0.30 0.36');
-                return ops;
-            };
+            const logoBytes = base64ToUint8Array(PIRAPAY_LOGO_JPEG_BASE64);
             let stream = '';
 
             stream += 'q 0.95 0.98 1 rg 0 0 842 595 re f Q\n';
-            stream += 'q 0.91 0.94 0.97 rg BT /F2 64 Tf 0.707 0.707 -0.707 0.707 250 125 Tm (PIRAPAY) Tj ET Q\n';
-            stream += 'q 0.91 0.94 0.97 rg BT /F2 52 Tf 0.707 0.707 -0.707 0.707 450 260 Tm (AUTORIZADO) Tj ET Q\n';
-            stream += 'q 0.91 0.94 0.97 rg BT /F2 42 Tf 0.707 0.707 -0.707 0.707 55 430 Tm (PIRAPAY) Tj ET Q\n';
+            stream += pdfGuilloche(24, 24, 794, 547);
+            stream += 'q 0.90 0.94 0.97 rg BT /F2 66 Tf 0.707 0.707 -0.707 0.707 250 125 Tm (PIRAPAY) Tj ET Q\n';
+            stream += 'q 0.90 0.94 0.97 rg BT /F2 52 Tf 0.707 0.707 -0.707 0.707 450 260 Tm (AUTORIZADO) Tj ET Q\n';
 
             stream += box(24, 24, 794, 547, '1 1 1', '0.00 0.33 0.65');
+            stream += pdfGuilloche(38, 40, 766, 510);
             stream += box(36, 36, 770, 523, '1 1 1', '0.78 0.84 0.90');
+            stream += pdfGuilloche(48, 52, 746, 488);
             stream += 'q 1.00 0.48 0.00 rg 36 36 10 523 re f Q\n';
             stream += 'q 0.00 0.33 0.65 rg 796 36 10 523 re f Q\n';
             stream += line(54, 492, 788, 492, '0.00 0.33 0.65');
-            stream += logo(64, 510);
-            stream += text(500, 535, 'REQUISICAO DE ABASTECIMENTO', 15, 'F2', '0.00 0.33 0.65');
+            stream += 'q 146 0 0 94 64 498 cm /Logo Do Q\n';
+            stream += text(486, 535, 'REQUISICAO DE ABASTECIMENTO', 15, 'F2', '0.00 0.33 0.65');
             stream += text(612, 514, req.number, 13, 'F2', '1.00 0.48 0.00');
             stream += text(612, 498, 'Formato papel moeda para autorizacao operacional', 8, 'F1', '0.35 0.40 0.45');
 
@@ -2764,7 +2811,7 @@
             stream += text(80, 396, `Carteira PiraPay: ${req.client.walletNumber}`, 10);
 
             stream += box(414, 386, 180, 82, '1 0.97 0.93', '0.78 0.84 0.90');
-            stream += text(430, 448, 'CODIGO ALFANUMERICO', 9, 'F2', '0.00 0.33 0.65');
+            stream += text(430, 448, 'AUTORIZACAO', 10, 'F2', '0.00 0.33 0.65');
             stream += text(430, 422, req.authCode, 16, 'F2', '0.00 0.33 0.65');
             stream += text(430, 398, `Valor: ${formatCurrency(req.total)}`, 11, 'F2', '0 0 0');
 
@@ -2800,22 +2847,17 @@
             const objects = [
                 '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj',
                 '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj',
-                '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >> endobj',
+                '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> /XObject << /Logo 7 0 R >> >> /Contents 6 0 R >> endobj',
                 '4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj',
                 '5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj',
-                `6 0 obj << /Length ${stream.length} >> stream\n${stream}\nendstream endobj`
+                `6 0 obj << /Length ${stream.length} >> stream\n${stream}\nendstream endobj`,
+                [
+                    `7 0 obj << /Type /XObject /Subtype /Image /Width ${PIRAPAY_LOGO_JPEG_WIDTH} /Height ${PIRAPAY_LOGO_JPEG_HEIGHT} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${logoBytes.byteLength} >> stream\n`,
+                    logoBytes,
+                    '\nendstream endobj'
+                ]
             ];
-            let pdf = '%PDF-1.4\n';
-            const offsets = [0];
-            objects.forEach(obj => {
-                offsets.push(pdf.length);
-                pdf += obj + '\n';
-            });
-            const xref = pdf.length;
-            pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-            offsets.slice(1).forEach(offset => { pdf += `${String(offset).padStart(10, '0')} 00000 n \n`; });
-            pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
-            return new Blob([pdf], { type: 'application/pdf' });
+            return pdfBlobFromObjects(objects);
         }
 
         function downloadFuelAuthorizationPdf() {
@@ -2908,7 +2950,7 @@
                             <div class="fuel-auth-line"><span>Total</span><strong>${formatCurrency(req.total)}</strong></div>
                         </div>
                         <div class="fuel-auth-section full">
-                            <div class="fuel-auth-section-title">Código de autorização</div>
+                            <div class="fuel-auth-section-title">Autorização</div>
                             <div class="fuel-auth-codes">
                                 <img class="fuel-auth-qr" src="${escapeHtml(authQr)}" alt="QR Code de autorização">
                                 <div>
