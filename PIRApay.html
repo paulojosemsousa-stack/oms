@@ -377,6 +377,7 @@
         .fuel-auth-footer { margin-top: 10px; display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; font-size: 11px; color: var(--text-secondary); }
         .fuel-auth-footer img { width: 76px; height: 76px; border: 1px solid var(--border-color); border-radius: 10px; padding: 3px; background: #fff; }
         .fuel-auth-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+        .fuel-auth-actions .wide { grid-column: 1 / -1; }
         @media (max-width: 380px) { .fuel-auth-grid, .fuel-auth-codes, .fuel-auth-footer, .fuel-auth-actions { grid-template-columns: 1fr; } .fuel-auth-title { text-align: left; } }
 
         @media (min-width: 900px) {
@@ -1115,7 +1116,7 @@
     </div>
 
     <script>
-        const DATA_VERSION = 25;
+        const DATA_VERSION = 28;
         const DEMO_SCALE = { produtores: 200, colaboradores: 50, empresas: 80, canais: 40, fornecedores: 20, instituicoes: 15, transacoes: 500, pix: 300, compras: 150, beneficios: 100, investimentos: 80 };
         const firstNames = ['Paulo', 'Ana Paula', 'Carlos', 'Mariana', 'João Victor', 'Fernanda', 'Rafael', 'Camila', 'Bruna', 'Lucas', 'Patricia', 'Gustavo', 'Renata', 'Eduardo', 'Larissa', 'Felipe', 'Juliana', 'Marcelo', 'Bianca', 'Henrique'];
         const lastNames = ['Marques', 'Souza', 'Henrique', 'Albuquerque', 'Lima', 'Costa', 'Nogueira', 'Silveira', 'Rocha', 'Mendes'];
@@ -1180,6 +1181,7 @@
         let googleMapsLoadingPromise = null;
         let routeAutocompleteReady = false;
         let activeFuelRouteLabel = '';
+        let lastFuelAuthorization = null;
         let googleFuelGeocoder = null;
         let cityCoordinateCache = {};
         try { cityCoordinateCache = JSON.parse(localStorage.getItem('pirapay_city_coords') || '{}'); } catch (e) { cityCoordinateCache = {}; }
@@ -2660,6 +2662,200 @@
             ].join(' | ');
         }
 
+        function pdfSafeText(value) {
+            return String(value || '')
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^\x20-\x7E]/g, ' ')
+                .replace(/[\\()]/g, '\\$&');
+        }
+
+        function pdfQrRects(payload, x, y, size) {
+            const n = 29;
+            const cell = size / n;
+            const text = String(payload || '');
+            let seed = 0;
+            for (let i = 0; i < text.length; i++) seed = (seed * 31 + text.charCodeAt(i)) >>> 0;
+            const isFinder = (r, c, rr, cc) => r >= rr && r < rr + 7 && c >= cc && c < cc + 7;
+            const finderDark = (r, c, rr, cc) => {
+                const dr = r - rr, dc = c - cc;
+                return dr === 0 || dc === 0 || dr === 6 || dc === 6 || (dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4);
+            };
+            let ops = `q 1 1 1 rg ${x} ${y} ${size} ${size} re f 0 0 0 rg\n`;
+            for (let r = 0; r < n; r++) {
+                for (let c = 0; c < n; c++) {
+                    let dark = false;
+                    if (isFinder(r, c, 1, 1)) dark = finderDark(r, c, 1, 1);
+                    else if (isFinder(r, c, 1, 21)) dark = finderDark(r, c, 1, 21);
+                    else if (isFinder(r, c, 21, 1)) dark = finderDark(r, c, 21, 1);
+                    else {
+                        const v = (seed + r * 17 + c * 29 + ((r * c) % 23)) % 7;
+                        dark = v === 0 || v === 2 || (r + c + seed) % 11 === 0;
+                    }
+                    if (dark) ops += `${(x + c * cell).toFixed(2)} ${(y + size - (r + 1) * cell).toFixed(2)} ${cell.toFixed(2)} ${cell.toFixed(2)} re f\n`;
+                }
+            }
+            return ops + 'Q\n';
+        }
+
+        function pdfCode39Bars(code, x, y, width, height) {
+            const map = {
+                '0': 'nnnwwnwnn', '1': 'wnnwnnnnw', '2': 'nnwwnnnnw', '3': 'wnwwnnnnn', '4': 'nnnwwnnnw',
+                '5': 'wnnwwnnnn', '6': 'nnwwwnnnn', '7': 'nnnwnnwnw', '8': 'wnnwnnwnn', '9': 'nnwwnnwnn',
+                'A': 'wnnnnwnnw', 'B': 'nnwnnwnnw', 'C': 'wnwnnwnnn', 'D': 'nnnnwwnnw', 'E': 'wnnnwwnnn',
+                'F': 'nnwnwwnnn', 'G': 'nnnnnwwnw', 'H': 'wnnnnwwnn', 'I': 'nnwnnwwnn', 'J': 'nnnnwwwnn',
+                'K': 'wnnnnnnww', 'L': 'nnwnnnnww', 'M': 'wnwnnnnwn', 'N': 'nnnnwnnww', 'O': 'wnnnwnnwn',
+                'P': 'nnwnwnnwn', 'Q': 'nnnnnnwww', 'R': 'wnnnnnwwn', 'S': 'nnwnnnwwn', 'T': 'nnnnwnwwn',
+                'U': 'wwnnnnnnw', 'V': 'nwwnnnnnw', 'W': 'wwwnnnnnn', 'X': 'nwnnwnnnw', 'Y': 'wwnnwnnnn',
+                'Z': 'nwwnwnnnn', '-': 'nwnnnnwnw', '.': 'wwnnnnwnn', ' ': 'nwwnnnwnn', '*': 'nwnnwnwnn'
+            };
+            const clean = `*${String(code || '').toUpperCase().replace(/[^0-9A-Z .-]/g, '')}*`;
+            const narrow = width / (clean.length * 16);
+            const wide = narrow * 2.8;
+            let cursor = x;
+            let ops = 'q 0 0 0 rg\n';
+            clean.split('').forEach(ch => {
+                const pattern = map[ch] || map['0'];
+                for (let i = 0; i < pattern.length; i++) {
+                    const w = pattern[i] === 'w' ? wide : narrow;
+                    if (i % 2 === 0) ops += `${cursor.toFixed(2)} ${y} ${w.toFixed(2)} ${height} re f\n`;
+                    cursor += w;
+                }
+                cursor += narrow;
+            });
+            return ops + 'Q\n';
+        }
+
+        function fuelAuthorizationPdfBlob(req) {
+            const authPayload = buildFuelAuthorizationPayload(req);
+            const text = (x, y, value, size = 10, font = 'F1', color = '0 0 0') => `BT /${font} ${size} Tf ${color} rg ${x} ${y} Td (${pdfSafeText(value)}) Tj ET\n`;
+            const box = (x, y, w, h, fill = '1 1 1', stroke = '0.82 0.86 0.90') => `q ${fill} rg ${x} ${y} ${w} ${h} re f ${stroke} RG 1 w ${x} ${y} ${w} ${h} re S Q\n`;
+            const line = (x1, y1, x2, y2, color = '0.82 0.86 0.90') => `q ${color} RG 1 w ${x1} ${y1} m ${x2} ${y2} l S Q\n`;
+            const logo = (x, y) => {
+                let ops = '';
+                ops += 'q 1.00 0.48 0.00 rg ' + x + ' ' + (y + 14) + ' 34 10 re f Q\n';
+                ops += 'q 1.00 0.78 0.00 rg ' + (x + 8) + ' ' + (y + 25) + ' 28 8 re f Q\n';
+                ops += 'q 0.92 0.04 0.08 rg ' + (x + 18) + ' ' + (y + 36) + ' 24 8 re f Q\n';
+                ops += text(x + 52, y + 18, 'Pira', 28, 'F2', '0.00 0.33 0.65');
+                ops += text(x + 111, y + 18, 'Pay', 28, 'F2', '1.00 0.48 0.00');
+                ops += text(x + 54, y + 4, 'Autorizacao financeira de abastecimento', 7, 'F1', '0.25 0.30 0.36');
+                return ops;
+            };
+            let stream = '';
+
+            stream += 'q 0.95 0.98 1 rg 0 0 842 595 re f Q\n';
+            stream += 'q 0.91 0.94 0.97 rg BT /F2 64 Tf 0.707 0.707 -0.707 0.707 250 125 Tm (PIRAPAY) Tj ET Q\n';
+            stream += 'q 0.91 0.94 0.97 rg BT /F2 52 Tf 0.707 0.707 -0.707 0.707 450 260 Tm (AUTORIZADO) Tj ET Q\n';
+            stream += 'q 0.91 0.94 0.97 rg BT /F2 42 Tf 0.707 0.707 -0.707 0.707 55 430 Tm (PIRAPAY) Tj ET Q\n';
+
+            stream += box(24, 24, 794, 547, '1 1 1', '0.00 0.33 0.65');
+            stream += box(36, 36, 770, 523, '1 1 1', '0.78 0.84 0.90');
+            stream += 'q 1.00 0.48 0.00 rg 36 36 10 523 re f Q\n';
+            stream += 'q 0.00 0.33 0.65 rg 796 36 10 523 re f Q\n';
+            stream += line(54, 492, 788, 492, '0.00 0.33 0.65');
+            stream += logo(64, 510);
+            stream += text(500, 535, 'REQUISICAO DE ABASTECIMENTO', 15, 'F2', '0.00 0.33 0.65');
+            stream += text(612, 514, req.number, 13, 'F2', '1.00 0.48 0.00');
+            stream += text(612, 498, 'Formato papel moeda para autorizacao operacional', 8, 'F1', '0.35 0.40 0.45');
+
+            stream += box(64, 386, 330, 82, '0.96 0.98 1', '0.78 0.84 0.90');
+            stream += text(80, 448, 'DADOS DO CLIENTE', 10, 'F2', '0.00 0.33 0.65');
+            stream += text(80, 428, `Nome: ${req.client.name}`, 10);
+            stream += text(80, 412, `Documento: ${req.client.doc}`, 10);
+            stream += text(80, 396, `Carteira PiraPay: ${req.client.walletNumber}`, 10);
+
+            stream += box(414, 386, 180, 82, '1 0.97 0.93', '0.78 0.84 0.90');
+            stream += text(430, 448, 'CODIGO ALFANUMERICO', 9, 'F2', '0.00 0.33 0.65');
+            stream += text(430, 422, req.authCode, 16, 'F2', '0.00 0.33 0.65');
+            stream += text(430, 398, `Valor: ${formatCurrency(req.total)}`, 11, 'F2', '0 0 0');
+
+            stream += box(612, 386, 154, 82, '0.96 0.98 1', '0.78 0.84 0.90');
+            stream += text(628, 448, 'PIRAPAY', 10, 'F2', '0.00 0.33 0.65');
+            stream += text(628, 428, 'Carteira: 900000000', 9);
+            stream += text(628, 412, 'Operacao: Combustivel', 9);
+            stream += text(628, 396, 'Status: Autorizado', 9, 'F2', '0.00 0.33 0.65');
+
+            stream += box(64, 282, 702, 76, '1 1 1', '0.78 0.84 0.90');
+            stream += text(80, 338, 'POSTO PARCEIRO', 10, 'F2', '0.00 0.33 0.65');
+            stream += text(80, 318, `Posto: ${req.station.name}`, 10);
+            stream += text(80, 302, `Cidade: ${req.station.city}/${req.station.uf}`, 10);
+            stream += text(430, 318, `Telefone: ${req.station.phone || 'Cadastro PiraPay'}`, 10);
+
+            stream += box(64, 190, 702, 64, '0.96 0.98 1', '0.78 0.84 0.90');
+            stream += text(80, 234, 'COMBUSTIVEL E LITRAGEM', 10, 'F2', '0.00 0.33 0.65');
+            stream += text(80, 214, `Produto: ${req.productLabel}`, 12, 'F2');
+            stream += text(250, 214, `Litragem: ${req.liters} L`, 12, 'F2');
+            stream += text(410, 214, `Preco/L: ${formatCurrency(req.pricePerLiter)}`, 12);
+            stream += text(590, 214, `Total: ${formatCurrency(req.total)}`, 13, 'F2', '0.00 0.33 0.65');
+
+            stream += box(64, 72, 702, 92, '1 1 1', '0.78 0.84 0.90');
+            stream += text(80, 144, 'VALIDACAO PARA O CAIXA', 10, 'F2', '0.00 0.33 0.65');
+            stream += pdfQrRects(authPayload, 82, 82, 66);
+            stream += text(160, 140, 'QR Autorizacao', 8, 'F2');
+            stream += pdfCode39Bars(req.authCode, 236, 114, 318, 36);
+            stream += text(302, 94, req.authCode, 12, 'F2', '0.00 0.33 0.65');
+            stream += pdfQrRects(req.mapLink, 642, 86, 58);
+            stream += text(622, 78, 'QR localizacao posto', 8, 'F2');
+            stream += text(80, 58, 'Conferir codigo, QR e liberar somente a litragem autorizada. Enviar ao motorista via WhatsApp.', 8, 'F1', '0.35 0.40 0.45');
+
+            const objects = [
+                '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj',
+                '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj',
+                '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >> endobj',
+                '4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj',
+                '5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj',
+                `6 0 obj << /Length ${stream.length} >> stream\n${stream}\nendstream endobj`
+            ];
+            let pdf = '%PDF-1.4\n';
+            const offsets = [0];
+            objects.forEach(obj => {
+                offsets.push(pdf.length);
+                pdf += obj + '\n';
+            });
+            const xref = pdf.length;
+            pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+            offsets.slice(1).forEach(offset => { pdf += `${String(offset).padStart(10, '0')} 00000 n \n`; });
+            pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+            return new Blob([pdf], { type: 'application/pdf' });
+        }
+
+        function downloadFuelAuthorizationPdf() {
+            if (!lastFuelAuthorization) { showToast('⚠️ Nenhuma requisição disponível.'); return; }
+            const blob = fuelAuthorizationPdfBlob(lastFuelAuthorization);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${lastFuelAuthorization.number}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast('📄 PDF da requisição gerado');
+        }
+
+        async function compartilharFuelAuthorizationPdf() {
+            if (!lastFuelAuthorization) { showToast('⚠️ Nenhuma requisição disponível.'); return; }
+            const blob = fuelAuthorizationPdfBlob(lastFuelAuthorization);
+            const file = new File([blob], `${lastFuelAuthorization.number}.pdf`, { type: 'application/pdf' });
+            const shareData = {
+                title: `Requisição ${lastFuelAuthorization.number}`,
+                text: lastFuelAuthorization.whatsappText || `Autorização PiraPay ${lastFuelAuthorization.number}`,
+                files: [file]
+            };
+            try {
+                if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+                    await navigator.share(shareData);
+                    showToast('📤 PDF pronto para envio');
+                } else {
+                    downloadFuelAuthorizationPdf();
+                    window.open(lastFuelAuthorization.whatsappUrl, '_blank');
+                    showToast('📄 PDF baixado. Anexe no WhatsApp aberto.');
+                }
+            } catch (err) {
+                downloadFuelAuthorizationPdf();
+                showToast('📄 PDF baixado para envio manual');
+            }
+        }
+
         function openFuelAuthorization(req) {
             const authPayload = buildFuelAuthorizationPayload(req);
             const authQr = qrCodeUrl(authPayload, 132);
@@ -2675,6 +2871,7 @@
                 `Localização: ${req.mapLink}`
             ].join('\n');
             const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
+            lastFuelAuthorization = { ...req, whatsappText, whatsappUrl };
             openQuickModal(`
                 <div class="fuel-auth-card">
                     <div class="fuel-auth-header">
@@ -2730,7 +2927,9 @@
                         </div>
                     </div>
                     <div class="fuel-auth-actions">
-                        <button class="btn btn-success" onclick="window.open('${escapeHtml(whatsappUrl)}','_blank')">Enviar WhatsApp</button>
+                        <button class="btn btn-success wide" onclick="compartilharFuelAuthorizationPdf()">Enviar PDF pelo WhatsApp</button>
+                        <button class="btn btn-primary" onclick="downloadFuelAuthorizationPdf()">Baixar PDF</button>
+                        <button class="btn btn-outline" onclick="window.open('${escapeHtml(whatsappUrl)}','_blank')">Enviar texto</button>
                         <button class="btn btn-outline" onclick="closeQuickModal()">Fechar</button>
                     </div>
                 </div>
