@@ -285,6 +285,12 @@
         .google-map-box { min-height: 360px; border-radius: var(--radius); border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-card); background: #EAF5FF; }
         .google-map-close { position: absolute; top: 10px; right: 10px; z-index: 5; width: 34px; height: 34px; border: none; border-radius: 50%; background: rgba(255,255,255,0.94); color: var(--text-primary); font-size: 20px; font-weight: 900; line-height: 1; box-shadow: 0 10px 24px rgba(16,24,40,0.18); cursor: pointer; }
         .google-map-close:hover { background: #fff; color: var(--primary); }
+        .google-map-legend { position: absolute; left: 12px; bottom: 12px; z-index: 5; display: flex; gap: 8px; flex-wrap: wrap; background: rgba(255,255,255,0.94); border: 1px solid rgba(0,84,166,0.12); border-radius: 999px; padding: 8px 10px; box-shadow: 0 10px 24px rgba(16,24,40,0.14); }
+        .google-map-legend span { display: inline-flex; align-items: center; gap: 5px; color: var(--text-secondary); font-size: 10.5px; font-weight: 800; white-space: nowrap; }
+        .price-dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 0 2px rgba(255,255,255,0.9); }
+        .price-dot.green { background: #16A34A; }
+        .price-dot.yellow { background: #FBBF24; }
+        .price-dot.red { background: #DC2626; }
         .route-summary { background: rgba(0,84,166,0.08); border: 1px solid rgba(0,84,166,0.12); border-radius: 14px; padding: 10px; font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
 
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--bg-card); color: var(--text-primary); padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 600; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); }
@@ -684,6 +690,11 @@
                     <div class="route-summary" id="routeSummary">Informe origem e destino para ver os postos parceiros do corredor. O modo demo já mostra Goiânia → Barreiras com rota regional; quando o Google Maps responder, a rota real aparece no mapa.</div>
                     <div class="google-map-shell" id="googleFuelMapShell">
                         <button class="google-map-close" onclick="fecharGoogleFuelMap()" aria-label="Fechar mapa Google">×</button>
+                        <div class="google-map-legend">
+                            <span><i class="price-dot green"></i> Melhor preço</span>
+                            <span><i class="price-dot yellow"></i> Abaixo da média</span>
+                            <span><i class="price-dot red"></i> Acima da média</span>
+                        </div>
                         <div id="googleFuelMap" class="google-map-box"></div>
                     </div>
                     <div class="fuel-map" id="fuelMap"></div>
@@ -1083,7 +1094,7 @@
     </div>
 
     <script>
-        const DATA_VERSION = 23;
+        const DATA_VERSION = 24;
         const DEMO_SCALE = { produtores: 200, colaboradores: 50, empresas: 80, canais: 40, fornecedores: 20, instituicoes: 15, transacoes: 500, pix: 300, compras: 150, beneficios: 100, investimentos: 80 };
         const firstNames = ['Paulo', 'Ana Paula', 'Carlos', 'Mariana', 'João Victor', 'Fernanda', 'Rafael', 'Camila', 'Bruna', 'Lucas', 'Patricia', 'Gustavo', 'Renata', 'Eduardo', 'Larissa', 'Felipe', 'Juliana', 'Marcelo', 'Bianca', 'Henrique'];
         const lastNames = ['Marques', 'Souza', 'Henrique', 'Albuquerque', 'Lima', 'Costa', 'Nogueira', 'Silveira', 'Rocha', 'Mendes'];
@@ -2575,6 +2586,17 @@
             return +(base * (1 - discount)).toFixed(2);
         }
 
+        function stationFuelOpportunity(station, productKey = selectedFuelProduct) {
+            const region = FUEL_REGIONS[station.region] || FUEL_REGIONS['CENTRO OESTE'];
+            const average = region[productKey] || region.dieselS10;
+            const hash = Array.from(`${station.name || ''}${station.city || ''}${station.phone || ''}${productKey}`).reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+            const factor = 0.92 + (hash % 17) * 0.008;
+            const price = +(average * factor).toFixed(2);
+            if (price <= average * 0.955) return { color: '#16A34A', label: 'Melhor preço', price, average };
+            if (price <= average) return { color: '#FBBF24', label: 'Abaixo da média', price, average };
+            return { color: '#DC2626', label: 'Acima da média', price, average };
+        }
+
         function escapeHtml(value) {
             return String(value || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
@@ -2676,15 +2698,19 @@
                     <div class="fuel-pirapay">${formatCurrency(fuelPiraPayPrice(selectedFuelRegion, p.key))}</div>
                 </div>
             `).join('');
-            const stations = visibleRegion.slice(0, 18).map((s, idx) => `
-                <div class="fuel-station-row">
-                    <div>
-                        <div style="font-weight:900;color:var(--text-primary);">${escapeHtml(s.name)}</div>
-                        <div style="font-size:12px;color:var(--text-secondary);">${escapeHtml(s.city)}/${s.uf} • ${escapeHtml(s.phone || 'telefone em cadastro')}</div>
+            const stations = visibleRegion.slice(0, 18).map((s, idx) => {
+                const opportunity = stationFuelOpportunity(s, selectedFuelProduct);
+                return `
+                    <div class="fuel-station-row">
+                        <div>
+                            <div style="font-weight:900;color:var(--text-primary);">${escapeHtml(s.name)}</div>
+                            <div style="font-size:12px;color:var(--text-secondary);">${escapeHtml(s.city)}/${s.uf} • ${escapeHtml(s.phone || 'telefone em cadastro')}</div>
+                            <div style="font-size:12px;font-weight:900;color:${opportunity.color};margin-top:3px;">● ${opportunity.label} • ${formatCurrency(opportunity.price)}/L</div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick='abrirCompraCombustivel(${JSON.stringify(s.name)})'>Comprar</button>
                     </div>
-                    <button class="btn btn-primary btn-sm" onclick='abrirCompraCombustivel(${JSON.stringify(s.name)})'>Comprar</button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
             const routeMode = filteredFuelStations ? ` • rota ativa: ${visibleAll.length} postos filtrados` : '';
             panel.innerHTML = `
                 <div class="card" style="padding:14px;">
@@ -2822,17 +2848,18 @@
             const visibleStations = stations.slice(0, 500);
             visibleStations.forEach((station, index) => {
                 const pos = stationPosition(station, index);
+                const opportunity = stationFuelOpportunity(station, selectedFuelProduct);
                 const marker = new google.maps.Marker({
                     position: pos,
                     map: googleFuelMap,
-                    title: `${station.name} - ${station.city}/${station.uf}`,
+                    title: `${station.name} - ${station.city}/${station.uf} • ${opportunity.label} • ${formatCurrency(opportunity.price)}/L (média ${formatCurrency(opportunity.average)}/L)`,
                     icon: {
                         path: google.maps.SymbolPath.CIRCLE,
-                        scale: filteredFuelStations ? 5 : 3,
-                        fillColor: filteredFuelStations ? '#0054A6' : '#319795',
+                        scale: filteredFuelStations ? 6 : 4,
+                        fillColor: opportunity.color,
                         fillOpacity: 0.95,
                         strokeColor: '#ffffff',
-                        strokeWeight: 1
+                        strokeWeight: 2
                     }
                 });
                 marker.addListener('click', () => abrirCompraCombustivel(station.name));
