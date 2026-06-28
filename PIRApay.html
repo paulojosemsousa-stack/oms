@@ -253,6 +253,9 @@
         .fuel-route-stop { position: absolute; z-index: 3; transform: translate(-50%, -50%); background: #fff; border: 1px solid rgba(0,84,166,0.20); color: var(--primary); border-radius: 999px; padding: 5px 8px; font-size: 10px; font-weight: 900; box-shadow: 0 8px 18px rgba(16,24,40,0.10); white-space: nowrap; }
         .fuel-route-stop::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #0054A6; margin-right: 5px; }
         .brazil-map-wrap { position: relative; z-index: 2; min-height: 330px; border: 1px solid rgba(0,84,166,0.10); border-radius: 18px; background: rgba(255,255,255,0.72); overflow: hidden; }
+        .brazil-map-caption { position: absolute; left: 14px; bottom: 12px; z-index: 3; background: rgba(255,255,255,0.90); border: 1px solid rgba(0,84,166,0.10); border-radius: 12px; padding: 8px 10px; box-shadow: 0 8px 18px rgba(16,24,40,0.08); }
+        .brazil-map-caption strong { display: block; color: var(--text-primary); font-size: 12px; }
+        .brazil-map-caption span { display: block; color: var(--text-secondary); font-size: 10.5px; margin-top: 2px; }
         .brazil-region-map { width: 100%; height: 330px; display: block; }
         .brazil-region { cursor: pointer; outline: none; }
         .brazil-region path { stroke: #ffffff; stroke-width: 4; transition: var(--transition); filter: drop-shadow(0 8px 18px rgba(16,24,40,0.08)); }
@@ -1080,7 +1083,7 @@
     </div>
 
     <script>
-        const DATA_VERSION = 21;
+        const DATA_VERSION = 23;
         const DEMO_SCALE = { produtores: 200, colaboradores: 50, empresas: 80, canais: 40, fornecedores: 20, instituicoes: 15, transacoes: 500, pix: 300, compras: 150, beneficios: 100, investimentos: 80 };
         const firstNames = ['Paulo', 'Ana Paula', 'Carlos', 'Mariana', 'João Victor', 'Fernanda', 'Rafael', 'Camila', 'Bruna', 'Lucas', 'Patricia', 'Gustavo', 'Renata', 'Eduardo', 'Larissa', 'Felipe', 'Juliana', 'Marcelo', 'Bianca', 'Henrique'];
         const lastNames = ['Marques', 'Souza', 'Henrique', 'Albuquerque', 'Lima', 'Costa', 'Nogueira', 'Silveira', 'Rocha', 'Mendes'];
@@ -1145,6 +1148,9 @@
         let googleMapsLoadingPromise = null;
         let routeAutocompleteReady = false;
         let activeFuelRouteLabel = '';
+        let googleFuelGeocoder = null;
+        let cityCoordinateCache = {};
+        try { cityCoordinateCache = JSON.parse(localStorage.getItem('pirapay_city_coords') || '{}'); } catch (e) { cityCoordinateCache = {}; }
         const UF_COORDS = {
             AC: [-9.02, -70.81], AL: [-9.62, -36.82], AM: [-3.47, -65.10], AP: [1.41, -51.77], BA: [-12.58, -41.70],
             CE: [-5.20, -39.53], DF: [-15.78, -47.93], ES: [-19.19, -40.34], GO: [-15.98, -49.86], MA: [-5.42, -45.44],
@@ -1152,6 +1158,26 @@
             PE: [-8.38, -37.86], PI: [-6.60, -42.28], PR: [-24.89, -51.55], RJ: [-22.25, -42.66], RN: [-5.81, -36.59],
             RO: [-10.83, -63.34], RR: [2.05, -61.39], RS: [-30.17, -53.50], SC: [-27.45, -50.95], SE: [-10.57, -37.45],
             SP: [-22.19, -48.79], TO: [-10.25, -48.25]
+        };
+        const CITY_COORDS = {
+            'GOIANIA|GO': [-16.6869, -49.2648], 'APARECIDA DE GOIANIA|GO': [-16.8233, -49.2439], 'ANAPOLIS|GO': [-16.3281, -48.9530],
+            'BRASILIA|DF': [-15.7939, -47.8828], 'FORMOSA|GO': [-15.5394, -47.3375], 'LUZIANIA|GO': [-16.2525, -47.9500],
+            'CRISTALINA|GO': [-16.7676, -47.6131], 'CATALAO|GO': [-18.1656, -47.9440], 'RIO VERDE|GO': [-17.7923, -50.9192],
+            'JATAI|GO': [-17.8794, -51.7217], 'ITUMBIARA|GO': [-18.4192, -49.2153], 'MINEIROS|GO': [-17.5698, -52.5511],
+            'MORRINHOS|GO': [-17.7312, -49.0997], 'POSSE|GO': [-14.0931, -46.3690], 'BARREIRAS|BA': [-12.1477, -44.9956],
+            'LUIS ED MAGALHAES|BA': [-12.0956, -45.7866], 'LUIS EDUARDO MAGALHAES|BA': [-12.0956, -45.7866], 'SAO DESIDERIO|BA': [-12.3633, -44.9733],
+            'CRISTOPOLIS|BA': [-12.2242, -44.4211], 'IBOTIRAMA|BA': [-12.1853, -43.2206], 'BOM JESUS DA LAPA|BA': [-13.2506, -43.4108],
+            'CORRENTINA|BA': [-13.3436, -44.6369], 'FORMOSA DO RIO PRETO|BA': [-11.0483, -45.1931], 'SEABRA|BA': [-12.4186, -41.7703],
+            'FEIRA DE SANTANA|BA': [-12.2664, -38.9663], 'VITORIA DA CONQUISTA|BA': [-14.8619, -40.8442], 'JEQUIE|BA': [-13.8588, -40.0851],
+            'ITABERABA|BA': [-12.5275, -40.3069], 'BRUMADO|BA': [-14.2036, -41.6653], 'CAETITE|BA': [-14.0697, -42.4750],
+            'ALAGOINHAS|BA': [-12.1356, -38.4192], 'SANTO ESTEVAO|BA': [-12.4303, -39.2514], 'SANTO ANTONIO DE JESUS|BA': [-12.9699, -39.2614],
+            'MACEIO|AL': [-9.6498, -35.7089], 'FORTALEZA|CE': [-3.7319, -38.5267], 'SAO LUIS|MA': [-2.5307, -44.3068],
+            'PALMAS|TO': [-10.1840, -48.3336], 'ARAGUAINA|TO': [-7.1911, -48.2078], 'GURUPI|TO': [-11.7292, -49.0680],
+            'RONDONOPOLIS|MT': [-16.4673, -54.6372], 'CUIABA|MT': [-15.6010, -56.0974], 'CAMPO GRANDE|MS': [-20.4697, -54.6201],
+            'SAO PAULO|SP': [-23.5505, -46.6333], 'RIBEIRAO PRETO|SP': [-21.1775, -47.8103], 'SAO JOSE DO RIO PRETO|SP': [-20.8113, -49.3758],
+            'PRESIDENTE PRUDENTE|SP': [-22.1211, -51.3925], 'MARILIA|SP': [-22.2171, -49.9501], 'OURINHOS|SP': [-22.9797, -49.8697],
+            'CURITIBA|PR': [-25.4284, -49.2733], 'LONDRINA|PR': [-23.3045, -51.1696], 'MARINGA|PR': [-23.4205, -51.9331],
+            'PORTO ALEGRE|RS': [-30.0346, -51.2177], 'FLORIANOPOLIS|SC': [-27.5949, -48.5482], 'BELO HORIZONTE|MG': [-19.9167, -43.9345]
         };
 
         const ROLES = {
@@ -2553,11 +2579,29 @@
             return String(value || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
 
+        function stationCityKey(station) {
+            return `${normalizeSearchText(station.city)}|${station.uf}`;
+        }
+
+        function jitterCityPosition(base, station, index = 0) {
+            const hash = Array.from((station.name || '') + (station.phone || '')).reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+            const ring = (hash % 9) + 1;
+            const angle = ((hash % 360) * Math.PI) / 180;
+            const distance = Math.min(0.038, 0.006 + ring * 0.003);
+            return {
+                lat: base[0] + Math.sin(angle) * distance + ((index % 3) - 1) * 0.002,
+                lng: base[1] + Math.cos(angle) * distance + ((index % 4) - 1.5) * 0.002
+            };
+        }
+
         function stationPosition(station, index = 0) {
+            const key = stationCityKey(station);
+            const cityBase = CITY_COORDS[key] || cityCoordinateCache[key];
+            if (cityBase) return jitterCityPosition(Array.isArray(cityBase) ? cityBase : [cityBase.lat, cityBase.lng], station, index);
             const base = UF_COORDS[station.uf] || [-14.2, -51.9];
-            const hash = Array.from((station.name || '') + station.city).reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
-            const latOffset = ((hash % 17) - 8) * 0.11 + ((index % 5) - 2) * 0.035;
-            const lngOffset = (((hash >> 3) % 17) - 8) * 0.11 + ((index % 7) - 3) * 0.035;
+            const hash = Array.from((station.city || '') + station.uf).reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
+            const latOffset = ((hash % 11) - 5) * 0.035;
+            const lngOffset = (((hash >> 2) % 11) - 5) * 0.035;
             return { lat: base[0] + latOffset, lng: base[1] + lngOffset };
         }
 
@@ -2614,10 +2658,12 @@
             const brazilMap = `
                 <div class="brazil-map-wrap">
                     <svg class="brazil-region-map" viewBox="0 0 360 320" role="img" aria-label="Mapa do Brasil por regiões com preço médio de ${productLabel}">
-                        <text x="18" y="28" class="brazil-map-label">Preço médio por região</text>
-                        <text x="18" y="46" class="brazil-map-count">Produto: ${productLabel}</text>
                         ${regionMap}
                     </svg>
+                    <div class="brazil-map-caption">
+                        <strong>Preço médio por região</strong>
+                        <span>Produto: ${productLabel}</span>
+                    </div>
                 </div>
             `;
             map.innerHTML = `<div class="fuel-map-title">${activeFuelRouteLabel ? `Rota demo ativa • ${visibleAll.length} postos no corredor` : `Mapa Brasil • ${visibleAll.length} postos visíveis`}</div>${routeOverlay}${brazilMap}`;
@@ -2738,12 +2784,43 @@
             if (shell) shell.classList.remove('open');
         }
 
+        function geocodeMissingStationCities(stations, markerGroups) {
+            if (!(window.google && google.maps && google.maps.Geocoder)) return;
+            if (!googleFuelGeocoder) googleFuelGeocoder = new google.maps.Geocoder();
+            const missing = [];
+            const seen = new Set();
+            stations.forEach(station => {
+                const key = stationCityKey(station);
+                if (seen.has(key) || CITY_COORDS[key] || cityCoordinateCache[key]) return;
+                seen.add(key);
+                missing.push({ key, station });
+            });
+            missing.slice(0, 30).forEach(({ key, station }, queueIndex) => {
+                setTimeout(() => {
+                    googleFuelGeocoder.geocode({
+                        address: `${station.city}, ${station.uf}, Brasil`,
+                        componentRestrictions: { country: 'BR' }
+                    }, (results, status) => {
+                        if (status !== 'OK' || !results || !results[0]) return;
+                        const location = results[0].geometry.location;
+                        cityCoordinateCache[key] = [location.lat(), location.lng()];
+                        localStorage.setItem('pirapay_city_coords', JSON.stringify(cityCoordinateCache));
+                        (markerGroups[key] || []).forEach((marker, idx) => {
+                            marker.setPosition(jitterCityPosition(cityCoordinateCache[key], station, idx));
+                        });
+                    });
+                }, queueIndex * 120);
+            });
+        }
+
         function renderGoogleFuelMarkers(stations = filteredFuelStations || PARTNER_STATIONS) {
             if (!(window.google && window.google.maps && googleFuelMap)) return;
             googleFuelMarkers.forEach(marker => marker.setMap(null));
             googleFuelMarkers = [];
             const bounds = new google.maps.LatLngBounds();
-            stations.slice(0, 500).forEach((station, index) => {
+            const markerGroups = {};
+            const visibleStations = stations.slice(0, 500);
+            visibleStations.forEach((station, index) => {
                 const pos = stationPosition(station, index);
                 const marker = new google.maps.Marker({
                     position: pos,
@@ -2760,9 +2837,13 @@
                 });
                 marker.addListener('click', () => abrirCompraCombustivel(station.name));
                 googleFuelMarkers.push(marker);
+                const key = stationCityKey(station);
+                if (!markerGroups[key]) markerGroups[key] = [];
+                markerGroups[key].push(marker);
                 bounds.extend(pos);
             });
             if (!filteredFuelStations && !bounds.isEmpty()) googleFuelMap.fitBounds(bounds);
+            geocodeMissingStationCities(visibleStations, markerGroups);
         }
 
         function salvarGoogleMapsKey() {
