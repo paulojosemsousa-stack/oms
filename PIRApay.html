@@ -241,17 +241,26 @@
         .estab-menu-item .item-price { color: var(--secondary); font-weight: 700; }
         .estab-menu-item .item-desc { font-size: 11px; color: var(--text-tertiary); }
 
-        .fuel-map { position: relative; min-height: 360px; border-radius: var(--radius); border: 1px solid var(--border-color); overflow: hidden; background: linear-gradient(145deg, #F8FBFF, #FFFFFF); box-shadow: var(--shadow-card); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: center; gap: 10px; padding: 56px 14px 14px; }
+        .fuel-map { position: relative; min-height: 430px; border-radius: var(--radius); border: 1px solid var(--border-color); overflow: hidden; background: linear-gradient(145deg, #F8FBFF, #FFFFFF); box-shadow: var(--shadow-card); padding: 56px 14px 14px; }
         .fuel-map::before { content: ''; position: absolute; left: 50%; top: 51%; width: 58%; height: 72%; transform: translate(-50%, -50%); background: linear-gradient(145deg, rgba(0,84,166,0.10), rgba(49,151,149,0.09)); clip-path: polygon(45% 0, 63% 7%, 70% 19%, 84% 27%, 79% 42%, 91% 55%, 77% 64%, 72% 78%, 58% 84%, 51% 100%, 40% 88%, 29% 91%, 22% 75%, 9% 68%, 17% 54%, 6% 38%, 22% 28%, 27% 12%); opacity: 0.9; }
         .fuel-map-title { position: absolute; left: 16px; top: 14px; z-index: 1; font-size: 13px; font-weight: 900; color: var(--primary); }
-        .fuel-map.route-active { align-content: start; padding-top: 52px; }
-        .fuel-demo-route { position: relative; grid-column: 1 / -1; height: 132px; z-index: 2; pointer-events: none; border: 1px solid rgba(0,84,166,0.12); border-radius: 16px; background: linear-gradient(145deg, rgba(0,84,166,0.06), rgba(49,151,149,0.05)); overflow: hidden; }
+        .fuel-map.route-active { padding-top: 52px; }
+        .fuel-demo-route { position: relative; height: 118px; z-index: 2; pointer-events: none; border: 1px solid rgba(0,84,166,0.12); border-radius: 16px; background: linear-gradient(145deg, rgba(0,84,166,0.06), rgba(49,151,149,0.05)); overflow: hidden; margin-bottom: 12px; }
         .fuel-demo-route-label { position: absolute; left: 12px; top: 10px; z-index: 3; color: var(--text-primary); font-size: 12px; font-weight: 900; }
         .fuel-demo-route-label span { display: block; color: var(--text-secondary); font-size: 10.5px; font-weight: 600; margin-top: 2px; }
         .fuel-demo-route svg { width: 100%; height: 100%; overflow: visible; }
         .fuel-demo-route path { fill: none; stroke: #0054A6; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 8 8; filter: drop-shadow(0 6px 10px rgba(0,84,166,0.22)); }
         .fuel-route-stop { position: absolute; z-index: 3; transform: translate(-50%, -50%); background: #fff; border: 1px solid rgba(0,84,166,0.20); color: var(--primary); border-radius: 999px; padding: 5px 8px; font-size: 10px; font-weight: 900; box-shadow: 0 8px 18px rgba(16,24,40,0.10); white-space: nowrap; }
         .fuel-route-stop::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #0054A6; margin-right: 5px; }
+        .brazil-map-wrap { position: relative; z-index: 2; min-height: 330px; border: 1px solid rgba(0,84,166,0.10); border-radius: 18px; background: rgba(255,255,255,0.72); overflow: hidden; }
+        .brazil-region-map { width: 100%; height: 330px; display: block; }
+        .brazil-region { cursor: pointer; outline: none; }
+        .brazil-region path { stroke: #ffffff; stroke-width: 4; transition: var(--transition); filter: drop-shadow(0 8px 18px rgba(16,24,40,0.08)); }
+        .brazil-region:hover path, .brazil-region.active path { stroke: var(--primary); stroke-width: 5; filter: drop-shadow(0 14px 24px rgba(0,84,166,0.18)); }
+        .brazil-region text { pointer-events: none; font-family: inherit; paint-order: stroke; stroke: rgba(255,255,255,0.82); stroke-width: 3px; stroke-linejoin: round; }
+        .brazil-map-label { fill: var(--text-primary); font-size: 13px; font-weight: 900; }
+        .brazil-map-count { fill: var(--text-secondary); font-size: 10.5px; font-weight: 700; }
+        .brazil-map-price { fill: var(--primary); font-size: 12px; font-weight: 900; }
         .fuel-region-card { position: relative; z-index: 2; min-width: 0; background: rgba(255,255,255,0.94); border: 1px solid var(--border-color); border-left: 4px solid var(--primary); border-radius: 14px; padding: 10px; box-shadow: 0 10px 24px rgba(16,24,40,0.08); cursor: pointer; transition: var(--transition); }
         .fuel-region-card:hover, .fuel-region-card.active { transform: translateY(-2px); border-color: rgba(0,84,166,0.30); box-shadow: 0 14px 30px rgba(0,84,166,0.14); }
         .fuel-region-card strong { display: block; color: var(--primary); font-size: 13px; }
@@ -268,7 +277,11 @@
         .fuel-source-note { font-size: 10.5px; color: var(--text-tertiary); line-height: 1.35; margin-top: 10px; }
         .route-planner { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         .route-planner .field-input { margin-bottom: 0; }
-        .google-map-box { min-height: 360px; border-radius: var(--radius); border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-card); background: #EAF5FF; display: none; }
+        .google-map-shell { position: relative; display: none; margin-bottom: 12px; }
+        .google-map-shell.open { display: block; }
+        .google-map-box { min-height: 360px; border-radius: var(--radius); border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-card); background: #EAF5FF; }
+        .google-map-close { position: absolute; top: 10px; right: 10px; z-index: 5; width: 34px; height: 34px; border: none; border-radius: 50%; background: rgba(255,255,255,0.94); color: var(--text-primary); font-size: 20px; font-weight: 900; line-height: 1; box-shadow: 0 10px 24px rgba(16,24,40,0.18); cursor: pointer; }
+        .google-map-close:hover { background: #fff; color: var(--primary); }
         .route-summary { background: rgba(0,84,166,0.08); border: 1px solid rgba(0,84,166,0.12); border-radius: 14px; padding: 10px; font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
 
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--bg-card); color: var(--text-primary); padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 600; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; border: 1px solid var(--border-color); box-shadow: var(--shadow-lg); }
@@ -666,7 +679,10 @@
                     </div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="fuelProductChips"></div>
                     <div class="route-summary" id="routeSummary">Informe origem e destino para ver os postos parceiros do corredor. O modo demo já mostra Goiânia → Barreiras com rota regional; quando o Google Maps responder, a rota real aparece no mapa.</div>
-                    <div id="googleFuelMap" class="google-map-box"></div>
+                    <div class="google-map-shell" id="googleFuelMapShell">
+                        <button class="google-map-close" onclick="fecharGoogleFuelMap()" aria-label="Fechar mapa Google">×</button>
+                        <div id="googleFuelMap" class="google-map-box"></div>
+                    </div>
                     <div class="fuel-map" id="fuelMap"></div>
                     <div id="fuelRegionPanel" style="margin-top:12px;"></div>
                     <div class="fuel-source-note">Fonte dos preços médios: ANP, Levantamento de Preços de Combustíveis, resumo semanal 21/06/2026 a 27/06/2026. Óleo diesel corresponde ao Diesel B S500 comum conforme observação da ANP. ARLA 32 e etanol aditivado são estimativas comerciais PiraPay para simulação, pois não aparecem na tabela semanal de revenda da ANP.</div>
@@ -1064,7 +1080,7 @@
     </div>
 
     <script>
-        const DATA_VERSION = 20;
+        const DATA_VERSION = 21;
         const DEMO_SCALE = { produtores: 200, colaboradores: 50, empresas: 80, canais: 40, fornecedores: 20, instituicoes: 15, transacoes: 500, pix: 300, compras: 150, beneficios: 100, investimentos: 80 };
         const firstNames = ['Paulo', 'Ana Paula', 'Carlos', 'Mariana', 'João Victor', 'Fernanda', 'Rafael', 'Camila', 'Bruna', 'Lucas', 'Patricia', 'Gustavo', 'Renata', 'Eduardo', 'Larissa', 'Felipe', 'Juliana', 'Marcelo', 'Bianca', 'Henrique'];
         const lastNames = ['Marques', 'Souza', 'Henrique', 'Albuquerque', 'Lima', 'Costa', 'Nogueira', 'Silveira', 'Rocha', 'Mendes'];
@@ -2574,18 +2590,37 @@
                     <span class="fuel-route-stop" style="left:86%;top:34%;">Barreiras</span>
                 </div>
             ` : '';
-            const regionCards = Object.entries(FUEL_REGIONS).map(([key, r]) => {
+            const regionShapes = {
+                'NORTE': { path: 'M92 24 L178 27 L202 58 L190 105 L150 122 L88 113 L52 76 Z', x: 104, y: 72, color: '#56B5A9' },
+                'NORDESTE': { path: 'M202 55 L285 63 L325 118 L299 172 L235 154 L190 108 Z', x: 257, y: 111, color: '#F2A541' },
+                'CENTRO OESTE': { path: 'M90 116 L155 124 L202 109 L234 156 L209 209 L132 208 L82 165 Z', x: 142, y: 164, color: '#6CA7D8' },
+                'SUDESTE': { path: 'M208 210 L236 160 L298 176 L276 235 L224 252 Z', x: 248, y: 207, color: '#8E7BE8' },
+                'SUL': { path: 'M132 213 L208 214 L221 256 L185 303 L143 277 Z', x: 173, y: 253, color: '#5DBB83' }
+            };
+            const regionMap = Object.entries(FUEL_REGIONS).map(([key, r]) => {
+                const shape = regionShapes[key];
                 const count = getVisibleFuelStations(key).length;
-                const border = key === 'CENTRO OESTE' ? '#0054A6' : key === 'NORDESTE' ? '#FF7A00' : key === 'SUL' ? '#2F855A' : key === 'SUDESTE' ? '#6B46C1' : '#319795';
+                const price = formatCurrency(r[selectedFuelProduct]);
                 return `
-                    <div class="fuel-region-card ${key === selectedFuelRegion ? 'active' : ''}" onclick="renderFuelStations('${key}')" style="border-left-color:${border};">
-                        <strong>${r.label}</strong>
-                        <span>${count} postos parceiros</span>
-                        <em>${formatCurrency(fuelPiraPayPrice(key, selectedFuelProduct))}/L</em>
-                    </div>
+                    <g class="brazil-region ${key === selectedFuelRegion ? 'active' : ''}" onclick="renderFuelStations('${key}')" tabindex="0" role="button" aria-label="${r.label} ${count} postos, média ${price} por litro">
+                        <path d="${shape.path}" fill="${shape.color}"></path>
+                        <text class="brazil-map-label" x="${shape.x}" y="${shape.y - 10}" text-anchor="middle">${r.label}</text>
+                        <text class="brazil-map-count" x="${shape.x}" y="${shape.y + 7}" text-anchor="middle">${count} postos</text>
+                        <text class="brazil-map-price" x="${shape.x}" y="${shape.y + 24}" text-anchor="middle">${price}/L</text>
+                    </g>
                 `;
             }).join('');
-            map.innerHTML = `<div class="fuel-map-title">${activeFuelRouteLabel ? `Rota demo ativa • ${visibleAll.length} postos no corredor` : `Brasil por regiões • ${visibleAll.length} postos visíveis`}</div>${routeOverlay}${regionCards}`;
+            const productLabel = FUEL_PRODUCTS.find(p => p.key === selectedFuelProduct)?.label || 'combustível';
+            const brazilMap = `
+                <div class="brazil-map-wrap">
+                    <svg class="brazil-region-map" viewBox="0 0 360 320" role="img" aria-label="Mapa do Brasil por regiões com preço médio de ${productLabel}">
+                        <text x="18" y="28" class="brazil-map-label">Preço médio por região</text>
+                        <text x="18" y="46" class="brazil-map-count">Produto: ${productLabel}</text>
+                        ${regionMap}
+                    </svg>
+                </div>
+            `;
+            map.innerHTML = `<div class="fuel-map-title">${activeFuelRouteLabel ? `Rota demo ativa • ${visibleAll.length} postos no corredor` : `Mapa Brasil • ${visibleAll.length} postos visíveis`}</div>${routeOverlay}${brazilMap}`;
 
             const region = FUEL_REGIONS[selectedFuelRegion];
             const prices = FUEL_PRODUCTS.map(p => `
@@ -2677,10 +2712,9 @@
         function initGoogleFuelMap() {
             if (!(window.google && window.google.maps)) return false;
             const mapEl = document.getElementById('googleFuelMap');
-            const fallbackMap = document.getElementById('fuelMap');
+            const shell = document.getElementById('googleFuelMapShell');
             if (!mapEl) return false;
-            mapEl.style.display = 'block';
-            if (fallbackMap) fallbackMap.style.display = 'none';
+            if (shell) shell.classList.add('open');
             if (!googleFuelMap) {
                 googleFuelMap = new google.maps.Map(mapEl, {
                     center: { lat: -14.2, lng: -51.9 },
@@ -2695,7 +2729,13 @@
                     polylineOptions: { strokeColor: '#0054A6', strokeWeight: 5, strokeOpacity: 0.9 }
                 });
             }
+            setTimeout(() => google.maps.event.trigger(googleFuelMap, 'resize'), 50);
             return true;
+        }
+
+        function fecharGoogleFuelMap() {
+            const shell = document.getElementById('googleFuelMapShell');
+            if (shell) shell.classList.remove('open');
         }
 
         function renderGoogleFuelMarkers(stations = filteredFuelStations || PARTNER_STATIONS) {
@@ -2745,10 +2785,6 @@
         }
 
         function filtrarPostosRotaDemo() {
-            const googleEl = document.getElementById('googleFuelMap');
-            const fallbackMap = document.getElementById('fuelMap');
-            if (googleEl) googleEl.style.display = 'none';
-            if (fallbackMap) fallbackMap.style.display = 'block';
             const originText = normalizeRoutePlace(document.getElementById('routeOrigin')?.value, 'Goiânia, GO, Brasil');
             const destText = normalizeRoutePlace(document.getElementById('routeDestination')?.value, 'Barreiras, BA, Brasil');
             const originUf = routeUfFromText(originText) || 'GO';
@@ -2815,10 +2851,6 @@
 
         function limparRotaPostos() {
             filteredFuelStations = null;
-            const googleEl = document.getElementById('googleFuelMap');
-            const fallbackMap = document.getElementById('fuelMap');
-            if (googleEl) googleEl.style.display = 'none';
-            if (fallbackMap) fallbackMap.style.display = 'block';
             const summary = document.getElementById('routeSummary');
             if (summary) summary.textContent = 'Mostrando todos os postos cadastrados. Informe origem e destino para filtrar pela rota.';
             if (googleFuelDirections) googleFuelDirections.set('directions', null);
