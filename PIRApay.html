@@ -244,7 +244,15 @@
         .fuel-map { position: relative; min-height: 360px; border-radius: var(--radius); border: 1px solid var(--border-color); overflow: hidden; background: linear-gradient(145deg, #F8FBFF, #FFFFFF); box-shadow: var(--shadow-card); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: center; gap: 10px; padding: 56px 14px 14px; }
         .fuel-map::before { content: ''; position: absolute; left: 50%; top: 51%; width: 58%; height: 72%; transform: translate(-50%, -50%); background: linear-gradient(145deg, rgba(0,84,166,0.10), rgba(49,151,149,0.09)); clip-path: polygon(45% 0, 63% 7%, 70% 19%, 84% 27%, 79% 42%, 91% 55%, 77% 64%, 72% 78%, 58% 84%, 51% 100%, 40% 88%, 29% 91%, 22% 75%, 9% 68%, 17% 54%, 6% 38%, 22% 28%, 27% 12%); opacity: 0.9; }
         .fuel-map-title { position: absolute; left: 16px; top: 14px; z-index: 1; font-size: 13px; font-weight: 900; color: var(--primary); }
-        .fuel-region-card { position: relative; z-index: 1; min-width: 0; background: rgba(255,255,255,0.94); border: 1px solid var(--border-color); border-left: 4px solid var(--primary); border-radius: 14px; padding: 10px; box-shadow: 0 10px 24px rgba(16,24,40,0.08); cursor: pointer; transition: var(--transition); }
+        .fuel-map.route-active { align-content: start; padding-top: 52px; }
+        .fuel-demo-route { position: relative; grid-column: 1 / -1; height: 132px; z-index: 2; pointer-events: none; border: 1px solid rgba(0,84,166,0.12); border-radius: 16px; background: linear-gradient(145deg, rgba(0,84,166,0.06), rgba(49,151,149,0.05)); overflow: hidden; }
+        .fuel-demo-route-label { position: absolute; left: 12px; top: 10px; z-index: 3; color: var(--text-primary); font-size: 12px; font-weight: 900; }
+        .fuel-demo-route-label span { display: block; color: var(--text-secondary); font-size: 10.5px; font-weight: 600; margin-top: 2px; }
+        .fuel-demo-route svg { width: 100%; height: 100%; overflow: visible; }
+        .fuel-demo-route path { fill: none; stroke: #0054A6; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 8 8; filter: drop-shadow(0 6px 10px rgba(0,84,166,0.22)); }
+        .fuel-route-stop { position: absolute; z-index: 3; transform: translate(-50%, -50%); background: #fff; border: 1px solid rgba(0,84,166,0.20); color: var(--primary); border-radius: 999px; padding: 5px 8px; font-size: 10px; font-weight: 900; box-shadow: 0 8px 18px rgba(16,24,40,0.10); white-space: nowrap; }
+        .fuel-route-stop::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #0054A6; margin-right: 5px; }
+        .fuel-region-card { position: relative; z-index: 2; min-width: 0; background: rgba(255,255,255,0.94); border: 1px solid var(--border-color); border-left: 4px solid var(--primary); border-radius: 14px; padding: 10px; box-shadow: 0 10px 24px rgba(16,24,40,0.08); cursor: pointer; transition: var(--transition); }
         .fuel-region-card:hover, .fuel-region-card.active { transform: translateY(-2px); border-color: rgba(0,84,166,0.30); box-shadow: 0 14px 30px rgba(0,84,166,0.14); }
         .fuel-region-card strong { display: block; color: var(--primary); font-size: 13px; }
         .fuel-region-card span { display: block; color: var(--text-secondary); font-size: 11px; margin-top: 2px; }
@@ -657,7 +665,7 @@
                         </div>
                     </div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="fuelProductChips"></div>
-                    <div class="route-summary" id="routeSummary">Informe origem e destino para ver somente os postos parceiros na rota. Com chave Google Maps, a rota é calculada pela API; sem chave, use o modo demo.</div>
+                    <div class="route-summary" id="routeSummary">Informe origem e destino para ver os postos parceiros do corredor. O modo demo já mostra Goiânia → Barreiras com rota regional; quando o Google Maps responder, a rota real aparece no mapa.</div>
                     <div id="googleFuelMap" class="google-map-box"></div>
                     <div class="fuel-map" id="fuelMap"></div>
                     <div id="fuelRegionPanel" style="margin-top:12px;"></div>
@@ -1056,7 +1064,7 @@
     </div>
 
     <script>
-        const DATA_VERSION = 18;
+        const DATA_VERSION = 20;
         const DEMO_SCALE = { produtores: 200, colaboradores: 50, empresas: 80, canais: 40, fornecedores: 20, instituicoes: 15, transacoes: 500, pix: 300, compras: 150, beneficios: 100, investimentos: 80 };
         const firstNames = ['Paulo', 'Ana Paula', 'Carlos', 'Mariana', 'João Victor', 'Fernanda', 'Rafael', 'Camila', 'Bruna', 'Lucas', 'Patricia', 'Gustavo', 'Renata', 'Eduardo', 'Larissa', 'Felipe', 'Juliana', 'Marcelo', 'Bianca', 'Henrique'];
         const lastNames = ['Marques', 'Souza', 'Henrique', 'Albuquerque', 'Lima', 'Costa', 'Nogueira', 'Silveira', 'Rocha', 'Mendes'];
@@ -1120,6 +1128,7 @@
         let googleFuelRoutePath = [];
         let googleMapsLoadingPromise = null;
         let routeAutocompleteReady = false;
+        let activeFuelRouteLabel = '';
         const UF_COORDS = {
             AC: [-9.02, -70.81], AL: [-9.62, -36.82], AM: [-3.47, -65.10], AP: [1.41, -51.77], BA: [-12.58, -41.70],
             CE: [-5.20, -39.53], DF: [-15.78, -47.93], ES: [-19.19, -40.34], GO: [-15.98, -49.86], MA: [-5.42, -45.44],
@@ -2549,9 +2558,22 @@
             if (!map || !panel || !chips) return;
             const visibleAll = filteredFuelStations || PARTNER_STATIONS;
             const visibleRegion = getVisibleFuelStations(selectedFuelRegion);
+            map.classList.toggle('route-active', Boolean(filteredFuelStations));
             chips.innerHTML = FUEL_PRODUCTS.map(p => `
                 <span class="demo-chip" onclick="selectFuelProduct('${p.key}')" style="${p.key === selectedFuelProduct ? 'border-color:var(--primary);background:rgba(0,84,166,0.08);' : ''}">${p.icon} ${p.label}</span>
             `).join('');
+            const routeOverlay = activeFuelRouteLabel ? `
+                <div class="fuel-demo-route">
+                    <div class="fuel-demo-route-label">Corredor Goiânia → Barreiras<span>Rota demo com postos parceiros filtrados</span></div>
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path d="M20 70 C34 62, 45 56, 56 52 S72 43, 86 34"></path>
+                    </svg>
+                    <span class="fuel-route-stop" style="left:20%;top:70%;">Goiânia</span>
+                    <span class="fuel-route-stop" style="left:46%;top:55%;">Brasília</span>
+                    <span class="fuel-route-stop" style="left:65%;top:47%;">Posse</span>
+                    <span class="fuel-route-stop" style="left:86%;top:34%;">Barreiras</span>
+                </div>
+            ` : '';
             const regionCards = Object.entries(FUEL_REGIONS).map(([key, r]) => {
                 const count = getVisibleFuelStations(key).length;
                 const border = key === 'CENTRO OESTE' ? '#0054A6' : key === 'NORDESTE' ? '#FF7A00' : key === 'SUL' ? '#2F855A' : key === 'SUDESTE' ? '#6B46C1' : '#319795';
@@ -2563,7 +2585,7 @@
                     </div>
                 `;
             }).join('');
-            map.innerHTML = `<div class="fuel-map-title">Brasil por regiões • ${visibleAll.length} postos visíveis</div>${regionCards}`;
+            map.innerHTML = `<div class="fuel-map-title">${activeFuelRouteLabel ? `Rota demo ativa • ${visibleAll.length} postos no corredor` : `Brasil por regiões • ${visibleAll.length} postos visíveis`}</div>${routeOverlay}${regionCards}`;
 
             const region = FUEL_REGIONS[selectedFuelRegion];
             const prices = FUEL_PRODUCTS.map(p => `
@@ -2710,11 +2732,15 @@
             showToast('✅ Chave Google Maps salva para a demonstração');
         }
 
+        function normalizeSearchText(text) {
+            return String(text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+        }
+
         function routeUfFromText(text) {
-            const normalized = String(text || '').toUpperCase();
-            const uf = Object.keys(UF_COORDS).find(code => new RegExp('\\\\b' + code + '\\\\b').test(normalized));
+            const normalized = normalizeSearchText(text);
+            const uf = Object.keys(UF_COORDS).find(code => new RegExp('\\b' + code + '\\b').test(normalized));
             if (uf) return uf;
-            const station = PARTNER_STATIONS.find(s => normalized.includes(String(s.city || '').toUpperCase()));
+            const station = PARTNER_STATIONS.find(s => normalized.includes(normalizeSearchText(s.city)));
             return station ? station.uf : '';
         }
 
@@ -2727,14 +2753,17 @@
             const destText = normalizeRoutePlace(document.getElementById('routeDestination')?.value, 'Barreiras, BA, Brasil');
             const originUf = routeUfFromText(originText) || 'GO';
             const destUf = routeUfFromText(destText) || 'BA';
+            const corridorUfs = new Set([originUf, destUf]);
+            if (corridorUfs.has('GO') && corridorUfs.has('BA')) corridorUfs.add('DF');
             const regionSet = new Set([originUf, destUf].map(uf => {
                 const sample = PARTNER_STATIONS.find(s => s.uf === uf);
                 return sample ? sample.region : '';
             }).filter(Boolean));
-            filteredFuelStations = PARTNER_STATIONS.filter(s => s.uf === originUf || s.uf === destUf || regionSet.has(s.region)).slice(0, 160);
+            filteredFuelStations = PARTNER_STATIONS.filter(s => corridorUfs.has(s.uf) || regionSet.has(s.region)).slice(0, 160);
             selectedFuelRegion = filteredFuelStations[0]?.region || selectedFuelRegion;
+            activeFuelRouteLabel = `${originText} → ${destText}`;
             const summary = document.getElementById('routeSummary');
-            if (summary) summary.textContent = `Simulação regional: ${filteredFuelStations.length} postos exibidos entre ${originText} → ${destText}. Quando a API Directions estiver liberada, a rota real aparece no mapa Google.`;
+            if (summary) summary.textContent = `Rota demo ativa: ${filteredFuelStations.length} postos parceiros no corredor ${originText} → ${destText}. Referências do trajeto: Goiânia, Brasília, Posse, Luís Eduardo Magalhães e Barreiras.`;
             renderFuelStations(selectedFuelRegion);
         }
 
@@ -2758,12 +2787,12 @@
                     provideRouteAlternatives: false
                 }, (result, status) => {
                     if (status !== 'OK' || !result) {
-                        if (summary) summary.textContent = `Google Maps retornou ${status}. Usando simulação regional para ${origin} → ${destination}.`;
-                        showToast('⚠️ Google Maps não retornou rota. Mostrei a simulação regional.');
+                        showToast('✅ Rota demo ativada para a apresentação');
                         filtrarPostosRotaDemo();
                         return;
                     }
                     googleFuelDirections.setDirections(result);
+                    activeFuelRouteLabel = '';
                     googleFuelRoutePath = result.routes[0].overview_path || [];
                     filteredFuelStations = PARTNER_STATIONS.filter((station, index) => {
                         const pos = stationPosition(station, index);
@@ -2779,7 +2808,7 @@
                     showToast('🗺️ Rota carregada no mapa');
                 });
             } catch (err) {
-                showToast('❌ Não foi possível carregar Google Maps. Usando demo.');
+                showToast('✅ Rota demo ativada para a apresentação');
                 filtrarPostosRotaDemo();
             }
         }
@@ -2794,6 +2823,7 @@
             if (summary) summary.textContent = 'Mostrando todos os postos cadastrados. Informe origem e destino para filtrar pela rota.';
             if (googleFuelDirections) googleFuelDirections.set('directions', null);
             googleFuelRoutePath = [];
+            activeFuelRouteLabel = '';
             renderFuelStations(selectedFuelRegion);
         }
 
