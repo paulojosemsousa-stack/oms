@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="220" viewBox="0 0 640 220">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF1B8"/>
+      <stop offset="0.45" stop-color="#D6A84A"/>
+      <stop offset="1" stop-color="#8A5A18"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#161616"/>
+      <stop offset="1" stop-color="#3A2A16"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="220" rx="34" fill="#fff"/>
+  <g transform="translate(34 27)">
+    <rect width="164" height="164" rx="34" fill="url(#dark)"/>
+    <path d="M38 106c22-38 49-58 82-60 20-1 37 5 51 18-18-4-33-3-45 2 14 7 23 19 25 36-12-15-28-22-49-20-22 2-43 10-64 24z" fill="url(#gold)"/>
+    <path d="M65 112c-2-32 10-55 36-69 14 12 23 24 27 37-12-7-25-7-39-1-13 6-21 17-24 33z" fill="#fff" opacity=".92"/>
+    <path d="M77 111c12-21 29-29 51-23 1 23-9 39-31 48-8-5-15-13-20-25z" fill="url(#gold)"/>
+    <circle cx="109" cy="86" r="5" fill="#161616"/>
+    <path d="M47 139c33 16 70 17 111 3" fill="none" stroke="#D6A84A" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <text x="226" y="101" font-family="Inter, Arial, sans-serif" font-size="64" font-weight="900" fill="#1B1B1B">Nelore<tspan fill="#B77A1C">Pay</tspan></text>
+  <text x="230" y="138" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" fill="#6B5A3A">Infraestrutura financeira da pecuaria Nova Piratininga</text>
+  <path d="M231 166c94 16 199 15 315-3" fill="none" stroke="#D6A84A" stroke-width="8" stroke-linecap="round"/>
+</svg>
