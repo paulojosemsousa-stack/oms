@@ -293,8 +293,37 @@
         .matrix-financeira{border-top:4px solid #10b981}.matrix-clientes{border-top:4px solid #3b82f6}.matrix-processos{border-top:4px solid #f59e0b}.matrix-pessoas{border-top:4px solid #8b5cf6}
         .kanban-col { background:#f8fafc; border:1px solid var(--border-color); border-radius:14px; min-height:230px; padding:.8rem; }
         .kanban-item { background:white; border:1px solid var(--border-color); border-radius:10px; padding:.75rem; margin-bottom:.6rem; box-shadow:0 1px 2px rgba(0,0,0,.03); }
-        @media(max-width:768px){.strategy-hero{padding:1.3rem}.gantt-grid{min-width:900px}}
+        .bsc-stack { display:flex; flex-direction:column; gap:14px; }
+        .bsc-layer { border:1px solid var(--border-color); border-radius:16px; background:#fff; overflow:hidden; }
+        .bsc-layer-header { padding:.8rem 1rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; font-weight:800; }
+        .bsc-layer-body { padding:1rem; display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+        .bsc-objective { border:1px solid var(--border-color); border-radius:12px; padding:.9rem; background:#f8fafc; position:relative; }
+        .bsc-objective[draggable="true"] { cursor:grab; }
+        .bsc-objective.dragging { opacity:.45; }
+        .bsc-objective .edit-tools { position:absolute; top:8px; right:8px; display:flex; gap:4px; }
+        .bsc-financeira .bsc-layer-header{background:#ecfdf5;color:#047857}.bsc-clientes .bsc-layer-header{background:#eff6ff;color:#1d4ed8}
+        .bsc-processos .bsc-layer-header{background:#fffbeb;color:#b45309}.bsc-pessoas .bsc-layer-header{background:#f5f3ff;color:#6d28d9}
+        .drop-highlight { outline:3px dashed #4f46e5; outline-offset:-6px; }
+        .share-toolbar { display:flex; flex-wrap:wrap; gap:.5rem; }
+        @media(max-width:768px){.strategy-hero{padding:1.3rem}.gantt-grid{min-width:900px}.bsc-layer-body{grid-template-columns:1fr}}
 
+
+        /* Relatórios e mapa BSC em 3 níveis */
+        .bsc-level-grid{display:grid;grid-template-columns:repeat(3,minmax(240px,1fr));gap:12px;align-items:start}
+        .bsc-level-column{background:rgba(255,255,255,.72);border:1px dashed rgba(15,23,42,.15);border-radius:12px;padding:10px;min-height:110px}
+        .bsc-level-title{font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#64748b;margin-bottom:8px;display:flex;justify-content:space-between}
+        .level-badge{font-size:.68rem;padding:.2rem .45rem;border-radius:999px;background:#eef2ff;color:#4338ca}
+        .report-selector{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+        .report-option{border:1px solid var(--border-color);border-radius:12px;padding:12px;background:#fff;cursor:pointer;transition:.2s}
+        .report-option:hover,.report-option.active{border-color:var(--primary);background:var(--primary-light);transform:translateY(-1px)}
+        .report-option strong{display:block}.report-option small{color:var(--text-muted)}
+        .report-kpi{border:1px solid var(--border-color);border-radius:12px;padding:14px;background:#fff;height:100%}
+        .report-kpi .value{font-size:1.7rem;font-weight:800;color:var(--primary)}
+        .heat-cell{padding:8px;border-radius:8px;text-align:center;font-weight:700;font-size:.8rem}
+        .report-print-area{background:#fff;border:1px solid var(--border-color);border-radius:14px;padding:20px}
+        .report-chart{height:300px;position:relative}
+        @media(max-width:900px){.bsc-level-grid{grid-template-columns:1fr}}
+        @media print{#strategyTabs,.report-controls,.app-header,.strategy-hero{display:none!important}.report-print-area{border:0;padding:0}}
     </style>
 </head>
 <body>
@@ -610,7 +639,8 @@
                     </div>
                     <div class="col-lg-4 mt-3 mt-lg-0">
                         <label class="form-label small opacity-75">Organização ativa</label>
-                        <select id="strategyCompany" class="form-select form-select-lg"></select>
+                        <select id="strategyCompany" class="form-select form-select-lg mb-2"></select>
+                        <div class="d-grid gap-2"><button class="btn btn-success justify-content-center" id="btnShareWhatsApp"><i class="bi bi-whatsapp"></i> Compartilhar resumo no WhatsApp Web</button><button class="btn btn-light border justify-content-center" id="btnPackageWhatsApp"><i class="bi bi-file-earmark-arrow-down"></i> Baixar sistema completo para envio</button></div>
                     </div>
                 </div>
             </div>
@@ -621,9 +651,14 @@
                 <li class="nav-item"><button class="nav-link" data-strategy-view="actions"><i class="bi bi-list-check"></i> Planos de Ação</button></li>
                 <li class="nav-item"><button class="nav-link" data-strategy-view="gantt"><i class="bi bi-calendar3-range"></i> Cronograma & Dependências</button></li>
                 <li class="nav-item"><button class="nav-link" data-strategy-view="kanban"><i class="bi bi-kanban"></i> Kanban</button></li>
+                <li class="nav-item"><button class="nav-link" data-strategy-view="reports"><i class="bi bi-file-earmark-bar-graph"></i> Relatórios & Dashboards</button></li>
             </ul>
 
             <div id="strategyDashboardView">
+                <div class="d-flex justify-content-end gap-2 mb-3">
+                    <button class="btn btn-danger btn-sm" data-tab-pdf="dashboard"><i class="bi bi-file-earmark-pdf"></i> PDF do Cockpit</button>
+                    <button class="btn btn-success btn-sm" data-tab-xlsx="dashboard"><i class="bi bi-file-earmark-excel"></i> Excel do Cockpit</button>
+                </div>
                 <div class="row g-3 mb-4" id="strategyKpis"></div>
                 <div class="row g-4">
                     <div class="col-lg-7"><div class="card"><div class="card-header"><i class="bi bi-graph-up-arrow text-primary"></i> Saúde da execução</div><div class="card-body"><canvas id="strategyStatusChart" height="125"></canvas></div></div></div>
@@ -633,22 +668,46 @@
             </div>
 
             <div id="strategyMapView" class="hidden">
-                <div class="card"><div class="card-header"><i class="bi bi-bezier2 text-primary"></i> Mapa Estratégico BSC</div><div class="card-body"><div class="row g-3" id="strategyMap"></div></div></div>
+                <div class="card">
+                    <div class="card-header d-flex flex-column flex-md-row justify-content-between gap-2">
+                        <span><i class="bi bi-bezier2 text-primary"></i> Mapa Estratégico BSC editável por camadas</span>
+                        <div class="share-toolbar"><button class="btn btn-primary btn-sm" id="btnMapNewObjective"><i class="bi bi-plus-lg"></i> Novo objetivo</button><button class="btn btn-danger btn-sm" data-tab-pdf="map"><i class="bi bi-file-earmark-pdf"></i> PDF</button><button class="btn btn-success btn-sm" data-tab-xlsx="map"><i class="bi bi-file-earmark-excel"></i> Excel</button><button class="btn btn-outline-success btn-sm" id="btnShareMapWhatsApp"><i class="bi bi-whatsapp"></i> Compartilhar mapa</button></div>
+                    </div>
+                    <div class="card-body"><p class="small text-muted">Edite e mova objetivos entre as perspectivas do BSC e entre três níveis de desdobramento: Estratégico, Tático e Operacional. A leitura causa-efeito segue Pessoas → Processos → Clientes → Financeira.</p><div class="bsc-stack" id="strategyMap"></div></div>
+                </div>
             </div>
 
             <div id="strategyActionsView" class="hidden">
                 <div class="card">
-                    <div class="card-header d-flex flex-column flex-md-row justify-content-between gap-2"><span><i class="bi bi-list-check text-primary"></i> Portfólio de ações 5W2H</span><div class="d-flex gap-2"><select id="filterActionStatus" class="form-select form-select-sm"><option value="">Todos os status</option><option>Não iniciado</option><option>Em andamento</option><option>Concluído</option><option>Bloqueado</option></select><button class="btn btn-primary btn-sm" id="btnNewAction"><i class="bi bi-plus-lg"></i> Nova ação</button></div></div>
+                    <div class="card-header d-flex flex-column gap-2">
+                        <div class="d-flex flex-column flex-xl-row justify-content-between gap-2"><span><i class="bi bi-list-check text-primary"></i> Portfólio de ações 5W2H</span><div class="share-toolbar"><select id="filterActionStatus" class="form-select form-select-sm" style="min-width:170px"><option value="">Todos os status</option><option>Não iniciado</option><option>Em andamento</option><option>Concluído</option><option>Bloqueado</option></select><button class="btn btn-primary btn-sm" id="btnNewAction"><i class="bi bi-plus-lg"></i> Nova ação</button></div></div>
+                        <div class="share-toolbar"><button class="btn btn-danger btn-sm" data-tab-pdf="actions"><i class="bi bi-file-earmark-pdf"></i> Relatório PDF</button><button class="btn btn-success btn-sm" data-tab-xlsx="actions"><i class="bi bi-file-earmark-excel"></i> Relatório Excel</button><button class="btn btn-outline-primary btn-sm" id="btnDownloadActionTemplate"><i class="bi bi-file-earmark-excel"></i> Baixar modelo Excel</button><button class="btn btn-outline-primary btn-sm" id="btnExportActionsXlsx"><i class="bi bi-download"></i> Exportar ações XLSX</button><button class="btn btn-outline-secondary btn-sm" id="btnImportActionsXlsx"><i class="bi bi-upload"></i> Importar XLSX</button><input type="file" id="actionXlsxFile" accept=".xlsx,.xls" class="hidden"><button class="btn btn-outline-success btn-sm" id="btnShareActionsWhatsApp"><i class="bi bi-whatsapp"></i> Compartilhar plano</button></div>
+                    </div>
                     <div class="card-body p-0"><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Ação / Objetivo</th><th>Responsável</th><th>Prazo</th><th>Progresso</th><th>Status</th><th>Dependência</th><th></th></tr></thead><tbody id="strategyActionsBody"></tbody></table></div></div>
                 </div>
             </div>
 
             <div id="strategyGanttView" class="hidden">
-                <div class="card"><div class="card-header d-flex justify-content-between"><span><i class="bi bi-calendar3-range text-primary"></i> Cronograma integrado</span><span class="small text-muted">Ações críticas e atrasadas destacadas</span></div><div class="card-body"><div id="ganttContainer"></div></div></div>
+                <div class="card"><div class="card-header d-flex flex-column flex-md-row justify-content-between gap-2"><span><i class="bi bi-calendar3-range text-primary"></i> Cronograma integrado</span><div class="share-toolbar"><span class="small text-muted align-self-center">Ações críticas e atrasadas destacadas</span><button class="btn btn-danger btn-sm" data-tab-pdf="gantt"><i class="bi bi-file-earmark-pdf"></i> PDF</button><button class="btn btn-success btn-sm" data-tab-xlsx="gantt"><i class="bi bi-file-earmark-excel"></i> Excel</button></div></div><div class="card-body"><div id="ganttContainer"></div></div></div>
             </div>
 
             <div id="strategyKanbanView" class="hidden">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="fw-semibold"><i class="bi bi-kanban text-primary"></i> Quadro Kanban</span>
+                    <div class="share-toolbar"><button class="btn btn-danger btn-sm" data-tab-pdf="kanban"><i class="bi bi-file-earmark-pdf"></i> PDF</button><button class="btn btn-success btn-sm" data-tab-xlsx="kanban"><i class="bi bi-file-earmark-excel"></i> Excel</button></div>
+                </div>
                 <div class="row g-3" id="kanbanBoard"></div>
+            </div>
+
+            <div id="strategyReportsView" class="hidden">
+                <div class="card report-controls">
+                    <div class="card-header d-flex flex-column flex-xl-row justify-content-between gap-2">
+                        <span><i class="bi bi-file-earmark-bar-graph text-primary"></i> Central de Relatórios e Dashboards</span>
+                        <div class="share-toolbar"><button class="btn btn-danger btn-sm" id="btnExportReportPdf"><i class="bi bi-file-earmark-pdf"></i> Exportar PDF</button><button class="btn btn-success btn-sm" id="btnExportReportXlsx"><i class="bi bi-file-earmark-excel"></i> Exportar XLSX</button><button class="btn btn-outline-secondary btn-sm" id="btnPrintReport"><i class="bi bi-printer"></i> Imprimir</button></div>
+                    </div>
+                    <div class="card-body"><div class="report-selector" id="reportSelector"></div></div>
+                </div>
+                <div class="report-print-area" id="reportOutput"></div>
             </div>
         </div>
 
@@ -671,6 +730,11 @@
         </div>
     </div>
 
+    <!-- PDF executivo (jsPDF + AutoTable) -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+    <!-- Excel XLSX (SheetJS) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -1661,6 +1725,8 @@ let strategyStore = JSON.parse(localStorage.getItem('strategyExecutionV2')) || {
 let strategyCompanyId = null;
 let strategyChart = null;
 const STRATEGY_PERSPECTIVES = ['Financeira','Clientes e Mercado','Processos Internos','Pessoas e Inovação'];
+const STRATEGY_LEVELS=['Estratégico','Tático','Operacional'];
+let activeReport='executive'; let reportChartInstance=null;
 
 function saveStrategy(){ localStorage.setItem('strategyExecutionV2', JSON.stringify(strategyStore)); }
 function dateISO(d){ return new Date(d).toISOString().slice(0,10); }
@@ -1676,10 +1742,10 @@ function seedStrategy(companyId){
   const today=dateISO(new Date());
   strategyStore[companyId]={
     objectives:[
-      {id:gerarId(),title:'Aumentar rentabilidade sustentável',perspective:'Financeira',owner:'Diretoria Financeira',kpi:'Margem EBITDA',current:12,target:18,unit:'%',deadline:addDays(today,180)},
-      {id:gerarId(),title:'Elevar retenção e valor percebido',perspective:'Clientes e Mercado',owner:'Diretoria Comercial',kpi:'NPS',current:55,target:75,unit:' pts',deadline:addDays(today,150)},
-      {id:gerarId(),title:'Reduzir tempo de ciclo operacional',perspective:'Processos Internos',owner:'Operações',kpi:'Lead time',current:12,target:7,unit:' dias',deadline:addDays(today,120)},
-      {id:gerarId(),title:'Fortalecer liderança orientada a dados',perspective:'Pessoas e Inovação',owner:'RH',kpi:'Gestores capacitados',current:30,target:90,unit:'%',deadline:addDays(today,200)}
+      {id:gerarId(),title:'Aumentar rentabilidade sustentável',level:'Estratégico',perspective:'Financeira',owner:'Diretoria Financeira',kpi:'Margem EBITDA',current:12,target:18,unit:'%',deadline:addDays(today,180)},
+      {id:gerarId(),title:'Elevar retenção e valor percebido',level:'Estratégico',perspective:'Clientes e Mercado',owner:'Diretoria Comercial',kpi:'NPS',current:55,target:75,unit:' pts',deadline:addDays(today,150)},
+      {id:gerarId(),title:'Reduzir tempo de ciclo operacional',level:'Tático',perspective:'Processos Internos',owner:'Operações',kpi:'Lead time',current:12,target:7,unit:' dias',deadline:addDays(today,120)},
+      {id:gerarId(),title:'Fortalecer liderança orientada a dados',level:'Operacional',perspective:'Pessoas e Inovação',owner:'RH',kpi:'Gestores capacitados',current:30,target:90,unit:'%',deadline:addDays(today,200)}
     ],actions:[]
   };
   const o=strategyStore[companyId].objectives;
@@ -1704,7 +1770,7 @@ function actionHealth(a){
 function renderStrategyAll(){
   if(!strategyCompanyId) return;
   seedStrategy(strategyCompanyId);
-  renderStrategyDashboard(); renderStrategyMap(); renderStrategyActions(); renderGantt(); renderKanban();
+  renderStrategyDashboard(); renderStrategyMap(); renderStrategyActions(); renderGantt(); renderKanban(); renderReports();
 }
 function objectiveProgress(o){
   if(o.target===o.current) return 100;
@@ -1730,12 +1796,33 @@ function renderStrategyDashboard(){
   document.getElementById('strategyAlerts').innerHTML=alerts.length?alerts.join(''):'<div class="text-center text-muted py-4"><i class="bi bi-shield-check display-6 d-block mb-2"></i>Nenhum alerta crítico no momento.</div>';
   document.getElementById('objectivesSummary').innerHTML=data.objectives.length?data.objectives.map(o=>{
     const linked=actions.filter(a=>a.objectiveId===o.id); const ap=linked.length?Math.round(linked.reduce((s,a)=>s+Number(a.progress||0),0)/linked.length):0;
-    return `<div class="objective-card border rounded-3 p-3 mb-3"><div class="d-flex flex-column flex-md-row justify-content-between gap-2"><div><span class="badge bg-light text-primary border mb-1">${esc(o.perspective)}</span><h6 class="fw-bold mb-1">${esc(o.title)}</h6><div class="small text-muted">${esc(o.owner)} · KPI: ${esc(o.kpi)} · Meta: ${esc(o.target)}${esc(o.unit)}</div></div><div class="text-md-end"><strong>${ap}%</strong><div class="small text-muted">execução das ações</div></div></div><div class="progress mt-2" style="height:8px"><div class="progress-bar" style="width:${ap}%"></div></div></div>`;
+    return `<div class="objective-card border rounded-3 p-3 mb-3"><div class="d-flex flex-column flex-md-row justify-content-between gap-2"><div><span class="badge bg-light text-primary border mb-1">${esc(o.perspective)} · ${esc(o.level||'Estratégico')}</span><h6 class="fw-bold mb-1">${esc(o.title)}</h6><div class="small text-muted">${esc(o.owner)} · KPI: ${esc(o.kpi)} · Meta: ${esc(o.target)}${esc(o.unit)}</div></div><div class="text-md-end"><strong>${ap}%</strong><div class="small text-muted">execução das ações</div></div></div><div class="progress mt-2" style="height:8px"><div class="progress-bar" style="width:${ap}%"></div></div></div>`;
   }).join(''):'<p class="text-muted">Cadastre o primeiro objetivo estratégico.</p>';
 }
 function renderStrategyMap(){
   const data=getCompanyStrategy();
-  document.getElementById('strategyMap').innerHTML=STRATEGY_PERSPECTIVES.map((p,i)=>`<div class="col-lg-3"><div class="matrix-cell matrix-${['financeira','clientes','processos','pessoas'][i]}"><div class="small fw-bold text-uppercase text-muted mb-2">${p}</div>${data.objectives.filter(o=>o.perspective===p).map(o=>`<div class="p-2 bg-light border rounded mb-2"><strong class="small">${esc(o.title)}</strong><div class="progress mt-2" style="height:5px"><div class="progress-bar" style="width:${objectiveProgress(o)}%"></div></div></div>`).join('')||'<span class="small text-muted">Sem objetivos</span>'}</div></div>`).join('');
+  data.objectives.forEach(o=>{if(!STRATEGY_LEVELS.includes(o.level))o.level='Estratégico';});
+  const layerKeys=['financeira','clientes','processos','pessoas'];
+  const causalOrder=['Pessoas e Inovação','Processos Internos','Clientes e Mercado','Financeira'];
+  document.getElementById('strategyMap').innerHTML=causalOrder.map(p=>{
+    const idx=STRATEGY_PERSPECTIVES.indexOf(p), cls=layerKeys[idx];
+    const levels=STRATEGY_LEVELS.map(level=>{
+      const cards=data.objectives.filter(o=>o.perspective===p&&o.level===level).map(o=>`<div class="bsc-objective" draggable="true" data-objective-id="${o.id}"><div class="edit-tools"><button class="btn btn-light border btn-sm" onclick="editStrategicObjective('${o.id}')" title="Editar"><i class="bi bi-pencil"></i></button><button class="btn btn-light border btn-sm text-danger" onclick="deleteStrategicObjective('${o.id}')" title="Excluir"><i class="bi bi-trash"></i></button></div><div class="pe-5"><span class="level-badge">${esc(level)}</span><strong class="d-block mt-1">${esc(o.title)}</strong><div class="small text-muted mt-1">${esc(o.owner)} · ${esc(o.kpi)}</div><div class="d-flex justify-content-between small mt-2"><span>Atual: ${esc(o.current)}${esc(o.unit)}</span><span>Meta: ${esc(o.target)}${esc(o.unit)}</span></div><div class="progress mt-1" style="height:6px"><div class="progress-bar" style="width:${objectiveProgress(o)}%"></div></div></div></div>`).join('')||'<span class="small text-muted">Sem objetivos.</span>';
+      return `<div class="bsc-level-column" data-perspective="${p}" data-level="${level}"><div class="bsc-level-title"><span>${level}</span><button class="btn btn-sm btn-light border" onclick="promptObjective(null,'${p}','${level}')"><i class="bi bi-plus"></i></button></div>${cards}</div>`;
+    }).join('');
+    return `<section class="bsc-layer bsc-${cls}" data-perspective="${p}"><div class="bsc-layer-header"><span>${p}</span><span class="small opacity-75">3 níveis de desdobramento</span></div><div class="bsc-layer-body"><div class="bsc-level-grid">${levels}</div></div></section>`;
+  }).join(''); bindBscDragDrop();
+}
+function bindBscDragDrop(){
+  document.querySelectorAll('.bsc-objective').forEach(card=>{
+    card.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',card.dataset.objectiveId);card.classList.add('dragging');});
+    card.addEventListener('dragend',()=>card.classList.remove('dragging'));
+  });
+  document.querySelectorAll('.bsc-level-column').forEach(layer=>{
+    layer.addEventListener('dragover',e=>{e.preventDefault();layer.classList.add('drop-highlight');});
+    layer.addEventListener('dragleave',()=>layer.classList.remove('drop-highlight'));
+    layer.addEventListener('drop',e=>{e.preventDefault();layer.classList.remove('drop-highlight');const id=e.dataTransfer.getData('text/plain');const o=getCompanyStrategy().objectives.find(x=>x.id===id);if(o){o.perspective=layer.dataset.perspective;o.level=layer.dataset.level;saveStrategy();renderStrategyAll();}});
+  });
 }
 function renderStrategyActions(){
   const data=getCompanyStrategy(); const filter=document.getElementById('filterActionStatus')?.value||'';
@@ -1760,17 +1847,23 @@ function renderKanban(){
   document.getElementById('kanbanBoard').innerHTML=cols.map(st=>`<div class="col-md-6 col-xl-3"><div class="kanban-col"><div class="d-flex justify-content-between mb-2"><strong>${st}</strong><span class="badge bg-white text-dark border">${data.actions.filter(a=>a.status===st).length}</span></div>${data.actions.filter(a=>a.status===st).map(a=>`<div class="kanban-item"><div class="small text-muted mb-1">${esc(a.owner)}</div><strong class="small">${esc(a.title)}</strong><div class="progress mt-2" style="height:5px"><div class="progress-bar" style="width:${a.progress}%"></div></div><div class="small text-end mt-1">${a.progress}%</div></div>`).join('')}</div></div>`).join('');
 }
 function switchStrategyView(view){
-  ['Dashboard','Map','Actions','Gantt','Kanban'].forEach(v=>document.getElementById('strategy'+v+'View').classList.add('hidden'));
+  ['Dashboard','Map','Actions','Gantt','Kanban','Reports'].forEach(v=>document.getElementById('strategy'+v+'View').classList.add('hidden'));
   document.getElementById('strategy'+view.charAt(0).toUpperCase()+view.slice(1)+'View').classList.remove('hidden');
   document.querySelectorAll('[data-strategy-view]').forEach(b=>b.classList.toggle('active',b.dataset.strategyView===view));
-  if(view==='gantt') renderGantt();
+  if(view==='gantt') renderGantt(); if(view==='reports') renderReports();
 }
-function promptObjective(){
-  const title=prompt('Nome do objetivo estratégico:'); if(!title) return;
-  const perspective=prompt('Perspectiva: Financeira, Clientes e Mercado, Processos Internos ou Pessoas e Inovação','Financeira');
-  const owner=prompt('Responsável pelo objetivo:','Diretoria'); const kpi=prompt('Indicador principal:','Indicador'); const target=parseFloat(prompt('Meta numérica:','100'))||100;
-  getCompanyStrategy().objectives.push({id:gerarId(),title,perspective:STRATEGY_PERSPECTIVES.includes(perspective)?perspective:'Financeira',owner,kpi,current:0,target,unit:'%',deadline:addDays(dateISO(new Date()),180)}); saveStrategy(); renderStrategyAll();
+function promptObjective(existingId=null,forcedPerspective=null,forcedLevel=null){
+  const data=getCompanyStrategy(); const o=existingId?data.objectives.find(x=>x.id===existingId):null;
+  const title=prompt('Nome do objetivo estratégico:',o?.title||''); if(!title) return;
+  const perspective=forcedPerspective||prompt('Perspectiva: Financeira, Clientes e Mercado, Processos Internos ou Pessoas e Inovação',o?.perspective||'Financeira');
+  const level=forcedLevel||prompt('Nível: Estratégico, Tático ou Operacional',o?.level||'Estratégico');
+  const owner=prompt('Responsável pelo objetivo:',o?.owner||'Diretoria'); const kpi=prompt('Indicador principal:',o?.kpi||'Indicador');
+  const current=parseFloat(prompt('Valor atual:',o?.current??0))||0; const target=parseFloat(prompt('Meta numérica:',o?.target??100))||100; const unit=prompt('Unidade (%, R$, dias, pontos etc.):',o?.unit||'%');
+  const payload={id:o?.id||gerarId(),title,level:STRATEGY_LEVELS.includes(level)?level:'Estratégico',perspective:STRATEGY_PERSPECTIVES.includes(perspective)?perspective:'Financeira',owner,kpi,current,target,unit,deadline:o?.deadline||addDays(dateISO(new Date()),180)};
+  if(o) Object.assign(o,payload); else data.objectives.push(payload); saveStrategy(); renderStrategyAll();
 }
+window.editStrategicObjective=id=>promptObjective(id);
+window.deleteStrategicObjective=id=>{if(confirm('Excluir este objetivo? As ações vinculadas ficarão sem objetivo.')){const d=getCompanyStrategy();d.objectives=d.objectives.filter(o=>o.id!==id);d.actions.forEach(a=>{if(a.objectiveId===id)a.objectiveId=null});saveStrategy();renderStrategyAll();}};
 function promptAction(existingId=null){
   const data=getCompanyStrategy(); const a=existingId?data.actions.find(x=>x.id===existingId):null;
   const title=prompt('O que será feito?',a?.title||''); if(!title)return;
@@ -1787,15 +1880,131 @@ function promptAction(existingId=null){
 window.editStrategicAction=id=>promptAction(id);
 window.deleteStrategicAction=id=>{if(confirm('Excluir esta ação?')){const d=getCompanyStrategy();d.actions=d.actions.filter(a=>a.id!==id);d.actions.forEach(a=>{if(a.dependencyId===id)a.dependencyId=null});saveStrategy();renderStrategyAll();}};
 
+const ACTION_XLSX_HEADERS=['ID','Objetivo','Nível do objetivo','Perspectiva BSC','O que será feito','Por que','Onde','Como','Responsável','Data início','Data fim','Status','Progresso (%)','Prioridade','Dependência','Custo','Caminho crítico'];
+function actionRowsForExcel(includeExample=false){
+  const data=getCompanyStrategy(), obj=Object.fromEntries(data.objectives.map(o=>[o.id,o])), act=Object.fromEntries(data.actions.map(a=>[a.id,a]));
+  const rows=data.actions.map(a=>({'ID':a.id,'Objetivo':obj[a.objectiveId]?.title||'','Nível do objetivo':obj[a.objectiveId]?.level||'Estratégico','Perspectiva BSC':obj[a.objectiveId]?.perspective||'','O que será feito':a.what||a.title||'','Por que':a.why||'','Onde':a.where||'','Como':a.how||'','Responsável':a.owner||'','Data início':a.start||'','Data fim':a.end||'','Status':a.status||'Não iniciado','Progresso (%)':Number(a.progress||0),'Prioridade':a.priority||'Média','Dependência':act[a.dependencyId]?.title||'','Custo':Number(a.cost||0),'Caminho crítico':a.critical?'Sim':'Não'}));
+  if(!rows.length&&includeExample) rows.push({'ID':'','Objetivo':'Aumentar rentabilidade sustentável','Nível do objetivo':'Estratégico','Perspectiva BSC':'Financeira','O que será feito':'Revisar rentabilidade por cliente','Por que':'Identificar perdas de margem','Onde':'Área Comercial','Como':'Analisar receita, custos e descontos','Responsável':'Controladoria','Data início':dateISO(new Date()),'Data fim':addDays(dateISO(new Date()),30),'Status':'Não iniciado','Progresso (%)':0,'Prioridade':'Alta','Dependência':'','Custo':0,'Caminho crítico':'Sim'});
+  return rows;
+}
+function buildActionWorkbook(rows){
+  if(typeof XLSX==='undefined'){alert('Biblioteca Excel não carregada. Verifique sua conexão e abra novamente o arquivo.');return null;}
+  const ws=XLSX.utils.json_to_sheet(rows,{header:ACTION_XLSX_HEADERS});
+  ws['!cols']=[{wch:18},{wch:32},{wch:18},{wch:22},{wch:38},{wch:34},{wch:22},{wch:38},{wch:24},{wch:14},{wch:14},{wch:18},{wch:14},{wch:12},{wch:34},{wch:14},{wch:16}];
+  ws['!autofilter']={ref:`A1:Q${Math.max(2,rows.length+1)}`};
+  const instructions=[['MODELO PADRÃO DE IMPORTAÇÃO DO PLANO DE AÇÃO'],['Preencha a aba Plano_de_Acao sem alterar os nomes das colunas.'],['Status aceitos: Não iniciado | Em andamento | Bloqueado | Concluído'],['Níveis: Estratégico | Tático | Operacional'],['Perspectivas BSC: Financeira | Clientes e Mercado | Processos Internos | Pessoas e Inovação'],['Datas devem estar em AAAA-MM-DD ou formato de data reconhecido pelo Excel.'],['Progresso deve variar de 0 a 100. Dependência deve conter o nome exato da ação predecessora.'],['Na importação, uma linha com ID existente atualiza a ação; sem ID, cria uma nova ação.']];
+  const wi=XLSX.utils.aoa_to_sheet(instructions); wi['!cols']=[{wch:110}];
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Plano_de_Acao');XLSX.utils.book_append_sheet(wb,wi,'Instrucoes');return wb;
+}
+function downloadActionTemplate(){const wb=buildActionWorkbook(actionRowsForExcel(true));if(wb)XLSX.writeFile(wb,'Modelo_Padrao_Plano_de_Acao.xlsx');}
+function exportActionsXlsx(){const wb=buildActionWorkbook(actionRowsForExcel(false));if(wb){const company=empresas.find(e=>e.id===strategyCompanyId)?.nome||'Empresa';XLSX.writeFile(wb,`Plano_de_Acao_${company.replace(/[^a-z0-9]/gi,'_')}.xlsx`);}}
+function normalizeExcelDate(v){if(!v)return '';if(typeof v==='number'){const d=XLSX.SSF.parse_date_code(v);return d?`${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`:'';}const dt=new Date(v);if(!isNaN(dt))return dateISO(dt);return String(v).slice(0,10);}
+function importActionsXlsx(file){
+  const reader=new FileReader();reader.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets['Plano_de_Acao']||wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{defval:''});const data=getCompanyStrategy();let created=0,updated=0;const pendingDeps=[];
+    rows.forEach(r=>{const title=String(r['O que será feito']||'').trim();if(!title)return;let objective=data.objectives.find(o=>o.title.trim().toLowerCase()===String(r['Objetivo']||'').trim().toLowerCase());if(!objective&&r['Objetivo']){objective={id:gerarId(),title:String(r['Objetivo']),level:STRATEGY_LEVELS.includes(r['Nível do objetivo'])?r['Nível do objetivo']:'Estratégico',perspective:STRATEGY_PERSPECTIVES.includes(r['Perspectiva BSC'])?r['Perspectiva BSC']:'Financeira',owner:'A definir',kpi:'A definir',current:0,target:100,unit:'%',deadline:normalizeExcelDate(r['Data fim'])||addDays(dateISO(new Date()),180)};data.objectives.push(objective);}
+      let a=r['ID']?data.actions.find(x=>x.id===String(r['ID'])):null;const payload={id:a?.id||gerarId(),title,what:title,objectiveId:objective?.id||null,owner:String(r['Responsável']||'A definir'),start:normalizeExcelDate(r['Data início'])||dateISO(new Date()),end:normalizeExcelDate(r['Data fim'])||addDays(dateISO(new Date()),30),status:['Não iniciado','Em andamento','Bloqueado','Concluído'].includes(r['Status'])?r['Status']:'Não iniciado',progress:Math.min(100,Math.max(0,Number(r['Progresso (%)']||0))),why:String(r['Por que']||''),where:String(r['Onde']||'Organização'),how:String(r['Como']||''),cost:Number(r['Custo']||0),priority:['Alta','Média','Baixa'].includes(r['Prioridade'])?r['Prioridade']:'Média',critical:String(r['Caminho crítico']).toLowerCase().startsWith('s'),dependencyId:null};if(a){Object.assign(a,payload);updated++;}else{a=payload;data.actions.push(a);created++;}pendingDeps.push([a,String(r['Dependência']||'').trim()]);});
+    pendingDeps.forEach(([a,name])=>{if(name){a.dependencyId=data.actions.find(x=>x.title.trim().toLowerCase()===name.toLowerCase()&&x.id!==a.id)?.id||null;}});saveStrategy();renderStrategyAll();alert(`Importação concluída: ${created} ação(ões) criada(s) e ${updated} atualizada(s).`);
+  }catch(err){console.error(err);alert('Não foi possível importar. Confirme se o arquivo segue o modelo padrão.');}};reader.readAsArrayBuffer(file);
+}
+
+const REPORTS=[
+ {id:'executive',title:'Resumo Executivo',desc:'Visão geral, semáforos e prioridades.'},
+ {id:'bsc',title:'Desempenho BSC',desc:'Objetivos por perspectiva e nível.'},
+ {id:'kpi',title:'Painel de Indicadores',desc:'Atual x meta, progresso e responsáveis.'},
+ {id:'actions',title:'Saúde dos Planos',desc:'Status, atrasos, bloqueios e responsáveis.'},
+ {id:'portfolio',title:'Portfólio Estratégico',desc:'Objetivos, iniciativas, custos e impacto.'},
+ {id:'timeline',title:'Cronograma e Caminho Crítico',desc:'Prazos, dependências e ações críticas.'},
+ {id:'accountability',title:'Responsáveis e Carga',desc:'Distribuição de ações e desempenho por dono.'},
+ {id:'meeting',title:'Reunião de Resultados',desc:'Pauta automática, desvios e decisões.'}
+];
+function reportMetrics(){const d=getCompanyStrategy(),a=d.actions||[],o=d.objectives||[];return{d,a,o,done:a.filter(x=>actionHealth(x)==='done').length,late:a.filter(x=>actionHealth(x)==='late').length,blocked:a.filter(x=>actionHealth(x)==='blocked').length,avg:a.length?Math.round(a.reduce((s,x)=>s+Number(x.progress||0),0)/a.length):0,cost:a.reduce((s,x)=>s+Number(x.cost||0),0)};}
+function renderReports(){
+ const sel=document.getElementById('reportSelector');if(!sel)return;
+ sel.innerHTML=REPORTS.map(r=>`<div class="report-option ${activeReport===r.id?'active':''}" data-report="${r.id}"><strong>${r.title}</strong><small>${r.desc}</small></div>`).join('');
+ sel.querySelectorAll('[data-report]').forEach(x=>x.onclick=()=>{activeReport=x.dataset.report;renderReports();});
+ const m=reportMetrics(), out=document.getElementById('reportOutput');
+ const title=REPORTS.find(r=>r.id===activeReport)?.title||'Relatório';
+ let html=`<div class="d-flex justify-content-between align-items-start mb-3"><div><div class="small text-muted">${companyName()}</div><h3 class="fw-bold mb-0">${title}</h3><div class="small text-muted">Gerado em ${new Date().toLocaleDateString('pt-BR')}</div></div><span class="badge bg-primary">Gestão Estratégica</span></div>`;
+ if(activeReport==='executive') html+=reportExecutive(m);
+ if(activeReport==='bsc') html+=reportBsc(m);
+ if(activeReport==='kpi') html+=reportKpi(m);
+ if(activeReport==='actions') html+=reportActions(m);
+ if(activeReport==='portfolio') html+=reportPortfolio(m);
+ if(activeReport==='timeline') html+=reportTimeline(m);
+ if(activeReport==='accountability') html+=reportAccountability(m);
+ if(activeReport==='meeting') html+=reportMeeting(m);
+ out.innerHTML=html; setTimeout(()=>renderReportChart(m),30);
+}
+function kpiCards(m){return `<div class="row g-3 mb-4">${[['Objetivos',m.o.length],['Execução média',m.avg+'%'],['Concluídas',m.done+'/'+m.a.length],['Atrasadas',m.late],['Bloqueadas',m.blocked],['Custo previsto',m.cost.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})]].map(x=>`<div class="col-6 col-lg-2"><div class="report-kpi"><div class="small text-muted">${x[0]}</div><div class="value">${x[1]}</div></div></div>`).join('')}</div>`;}
+function reportExecutive(m){const priorities=m.a.filter(a=>actionHealth(a)==='late'||a.status==='Bloqueado'||a.priority==='Alta').slice(0,8);return kpiCards(m)+`<div class="row g-4"><div class="col-lg-7"><h5>Distribuição da execução</h5><div class="report-chart"><canvas id="activeReportChart"></canvas></div></div><div class="col-lg-5"><h5>Prioridades executivas</h5>${priorities.map(a=>`<div class="border rounded p-2 mb-2"><strong>${esc(a.title)}</strong><div class="small text-muted">${esc(a.owner)} · ${esc(a.status)} · ${a.progress}%</div></div>`).join('')||'<p class="text-muted">Sem prioridades críticas.</p>'}</div></div>`;}
+function reportBsc(m){return STRATEGY_PERSPECTIVES.map(p=>`<div class="mb-4"><h5>${p}</h5><div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Nível</th><th>Objetivo</th><th>Responsável</th><th>Indicador</th><th>Atual</th><th>Meta</th><th>Progresso</th></tr></thead><tbody>${STRATEGY_LEVELS.flatMap(l=>m.o.filter(o=>o.perspective===p&&(o.level||'Estratégico')===l).map(o=>`<tr><td>${l}</td><td>${esc(o.title)}</td><td>${esc(o.owner)}</td><td>${esc(o.kpi)}</td><td>${o.current}${esc(o.unit)}</td><td>${o.target}${esc(o.unit)}</td><td>${objectiveProgress(o)}%</td></tr>`)).join('')||'<tr><td colspan="7" class="text-muted">Sem objetivos.</td></tr>'}</tbody></table></div></div>`).join('');}
+function reportKpi(m){return `<div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>Perspectiva</th><th>Nível</th><th>Objetivo</th><th>KPI</th><th>Atual</th><th>Meta</th><th>Índice</th><th>Responsável</th></tr></thead><tbody>${m.o.map(o=>{const p=objectiveProgress(o);return `<tr><td>${esc(o.perspective)}</td><td>${esc(o.level||'Estratégico')}</td><td>${esc(o.title)}</td><td>${esc(o.kpi)}</td><td>${o.current}${esc(o.unit)}</td><td>${o.target}${esc(o.unit)}</td><td><span class="badge ${p>=80?'bg-success':p>=60?'bg-warning text-dark':'bg-danger'}">${p}%</span></td><td>${esc(o.owner)}</td></tr>`}).join('')}</tbody></table></div>`;}
+function reportActions(m){return kpiCards(m)+`<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Ação</th><th>Responsável</th><th>Status</th><th>Progresso</th><th>Prazo</th><th>Saúde</th></tr></thead><tbody>${m.a.map(a=>`<tr><td>${esc(a.title)}</td><td>${esc(a.owner)}</td><td>${esc(a.status)}</td><td>${a.progress}%</td><td>${new Date(a.end+'T12:00:00').toLocaleDateString('pt-BR')}</td><td>${actionHealth(a)}</td></tr>`).join('')}</tbody></table></div>`;}
+function reportPortfolio(m){const obj=Object.fromEntries(m.o.map(o=>[o.id,o]));return `<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Iniciativa</th><th>Objetivo</th><th>Perspectiva</th><th>Nível</th><th>Prioridade</th><th>Custo</th><th>Progresso</th></tr></thead><tbody>${m.a.map(a=>{const o=obj[a.objectiveId]||{};return `<tr><td>${esc(a.title)}</td><td>${esc(o.title||'Sem vínculo')}</td><td>${esc(o.perspective||'')}</td><td>${esc(o.level||'')}</td><td>${esc(a.priority)}</td><td>${Number(a.cost||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</td><td>${a.progress}%</td></tr>`}).join('')}</tbody></table></div>`;}
+function reportTimeline(m){const act=Object.fromEntries(m.a.map(a=>[a.id,a]));return `<div class="table-responsive"><table class="table table-sm table-bordered"><thead><tr><th>Ação</th><th>Início</th><th>Fim</th><th>Dias</th><th>Dependência</th><th>Crítica</th><th>Status</th></tr></thead><tbody>${m.a.map(a=>`<tr><td>${esc(a.title)}</td><td>${a.start}</td><td>${a.end}</td><td>${Math.max(1,Math.round((new Date(a.end)-new Date(a.start))/86400000)+1)}</td><td>${esc(act[a.dependencyId]?.title||'')}</td><td>${a.critical?'Sim':'Não'}</td><td>${esc(a.status)}</td></tr>`).join('')}</tbody></table></div>`;}
+function reportAccountability(m){const owners={};m.a.forEach(a=>{const k=a.owner||'Sem responsável';owners[k]??={total:0,done:0,late:0,progress:0};owners[k].total++;owners[k].done+=actionHealth(a)==='done';owners[k].late+=actionHealth(a)==='late';owners[k].progress+=Number(a.progress||0)});return `<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Responsável</th><th>Ações</th><th>Concluídas</th><th>Atrasadas</th><th>Progresso médio</th></tr></thead><tbody>${Object.entries(owners).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v.total}</td><td>${v.done}</td><td>${v.late}</td><td>${Math.round(v.progress/v.total)}%</td></tr>`).join('')}</tbody></table></div>`;}
+function reportMeeting(m){const deviations=m.a.filter(a=>actionHealth(a)==='late'||a.status==='Bloqueado');return `<h5>Pauta sugerida</h5><ol><li>Revisão dos objetivos e indicadores abaixo de 80%.</li><li>Análise de ações atrasadas e bloqueadas.</li><li>Decisões sobre dependências, recursos e prazos.</li><li>Confirmação dos responsáveis e próximos checkpoints.</li></ol><h5 class="mt-4">Desvios para decisão</h5>${deviations.map(a=>`<div class="border-start border-danger border-4 p-3 mb-2 bg-light"><strong>${esc(a.title)}</strong><div class="small">Responsável: ${esc(a.owner)} | Status: ${esc(a.status)} | Prazo: ${a.end}</div><div class="small text-muted">Decisão requerida: remover impedimento, redefinir prazo ou reforçar recursos.</div></div>`).join('')||'<p class="text-muted">Nenhum desvio crítico.</p>'}<h5 class="mt-4">Registro de decisões</h5><div class="border rounded p-4 text-muted">Espaço para registrar decisões, responsáveis e prazos da reunião.</div>`;}
+function renderReportChart(m){const c=document.getElementById('activeReportChart');if(!c)return;if(reportChartInstance)reportChartInstance.destroy();const counts=['done','active','late','blocked'].map(h=>m.a.filter(a=>actionHealth(a)===h).length);reportChartInstance=new Chart(c,{type:'doughnut',data:{labels:['Concluídas','Em curso','Atrasadas','Bloqueadas'],datasets:[{data:counts,backgroundColor:['#10b981','#4f46e5','#ef4444','#f59e0b']}]},options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom'}}}});}
+function reportRows(){const m=reportMetrics(),obj=Object.fromEntries(m.o.map(o=>[o.id,o])),act=Object.fromEntries(m.a.map(a=>[a.id,a]));return m.a.map(a=>({'Empresa':companyName(),'Ação':a.title,'Objetivo':obj[a.objectiveId]?.title||'','Nível':obj[a.objectiveId]?.level||'','Perspectiva':obj[a.objectiveId]?.perspective||'','Responsável':a.owner,'Status':a.status,'Progresso (%)':Number(a.progress||0),'Início':a.start,'Fim':a.end,'Prioridade':a.priority,'Dependência':act[a.dependencyId]?.title||'','Custo':Number(a.cost||0),'Caminho crítico':a.critical?'Sim':'Não'}));}
+function exportCurrentReportXlsx(){if(typeof XLSX==='undefined'){alert('Biblioteca Excel não carregada.');return;}const m=reportMetrics(),wb=XLSX.utils.book_new();const summary=[['RELATÓRIO',REPORTS.find(r=>r.id===activeReport)?.title],['EMPRESA',companyName()],['DATA',new Date().toLocaleDateString('pt-BR')],['OBJETIVOS',m.o.length],['EXECUÇÃO MÉDIA',m.avg/100],['AÇÕES CONCLUÍDAS',m.done],['AÇÕES ATRASADAS',m.late],['AÇÕES BLOQUEADAS',m.blocked],['CUSTO PREVISTO',m.cost]];const ws1=XLSX.utils.aoa_to_sheet(summary);ws1['!cols']=[{wch:26},{wch:46}];XLSX.utils.book_append_sheet(wb,ws1,'Resumo');const ws2=XLSX.utils.json_to_sheet(m.o.map(o=>({'Perspectiva':o.perspective,'Nível':o.level||'Estratégico','Objetivo':o.title,'Responsável':o.owner,'Indicador':o.kpi,'Atual':o.current,'Meta':o.target,'Unidade':o.unit,'Progresso (%)':objectiveProgress(o)})));ws2['!cols']=[{wch:22},{wch:14},{wch:40},{wch:24},{wch:26},{wch:12},{wch:12},{wch:12},{wch:16}];XLSX.utils.book_append_sheet(wb,ws2,'Objetivos_KPIs');const ws3=XLSX.utils.json_to_sheet(reportRows());ws3['!cols']=Array(14).fill({wch:20});XLSX.utils.book_append_sheet(wb,ws3,'Planos_Acoes');XLSX.writeFile(wb,`Relatorio_${activeReport}_${companyName().replace(/[^a-z0-9]/gi,'_')}.xlsx`);}
+function exportCurrentReportPdf(){if(!window.jspdf?.jsPDF){alert('Biblioteca PDF não carregada.');return;}const {jsPDF}=window.jspdf,doc=new jsPDF({orientation:'landscape'}),m=reportMetrics();doc.setFontSize(18);doc.text(REPORTS.find(r=>r.id===activeReport)?.title||'Relatório',14,16);doc.setFontSize(10);doc.text(`${companyName()} | ${new Date().toLocaleDateString('pt-BR')}`,14,23);doc.autoTable({startY:29,head:[['Objetivos','Execução média','Concluídas','Atrasadas','Bloqueadas','Custo']],body:[[m.o.length,m.avg+'%',`${m.done}/${m.a.length}`,m.late,m.blocked,m.cost.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})]],theme:'grid',headStyles:{fillColor:[79,70,229]}});let y=doc.lastAutoTable.finalY+8;if(['bsc','kpi'].includes(activeReport)){doc.autoTable({startY:y,head:[['Perspectiva','Nível','Objetivo','KPI','Atual','Meta','Responsável']],body:m.o.map(o=>[o.perspective,o.level||'Estratégico',o.title,o.kpi,`${o.current}${o.unit}`,`${o.target}${o.unit}`,o.owner]),styles:{fontSize:8},headStyles:{fillColor:[79,70,229]}});}else{doc.autoTable({startY:y,head:[['Ação','Objetivo','Responsável','Status','Progresso','Prazo','Prioridade']],body:m.a.map(a=>[a.title,m.o.find(o=>o.id===a.objectiveId)?.title||'',a.owner,a.status,a.progress+'%',a.end,a.priority]),styles:{fontSize:8},headStyles:{fillColor:[79,70,229]}});}doc.save(`Relatorio_${activeReport}_${companyName().replace(/[^a-z0-9]/gi,'_')}.pdf`);}
+
+function reportForStrategyView(view){
+  return ({dashboard:'executive',map:'bsc',actions:'actions',gantt:'timeline',kanban:'actions',reports:activeReport})[view]||'executive';
+}
+function exportStrategyViewPdf(view){
+  const previous=activeReport;
+  activeReport=reportForStrategyView(view);
+  exportCurrentReportPdf();
+  activeReport=previous;
+}
+function exportStrategyViewXlsx(view){
+  const previous=activeReport;
+  activeReport=reportForStrategyView(view);
+  exportCurrentReportXlsx();
+  activeReport=previous;
+}
+
+function exportShareableSystem(){
+  const clone=document.documentElement.cloneNode(true);
+  const seed=document.createElement('script');
+  seed.textContent=`try{localStorage.setItem('diagnosticos',${JSON.stringify(JSON.stringify(empresas))});localStorage.setItem('strategyExecutionV2',${JSON.stringify(JSON.stringify(strategyStore))});}catch(e){console.error(e);}`;
+  clone.querySelector('body').appendChild(seed);
+  const html='<!DOCTYPE html>\n'+clone.outerHTML;
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=`Hub_Gestao_${companyName().replace(/[^a-z0-9]/gi,'_')}.html`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+  whatsappOpen(`*Hub de Gestão Estratégica - ${companyName()}*\n\nO arquivo completo do sistema foi baixado. Anexe o arquivo HTML nesta conversa para compartilhar diagnóstico, mapa BSC, indicadores, ações e cronograma.`);
+}
+function companyName(){return empresas.find(e=>e.id===strategyCompanyId)?.nome||'Organização';}
+function whatsappOpen(text){const url='https://web.whatsapp.com/send?text='+encodeURIComponent(text);window.open(url,'_blank','noopener');}
+function shareExecutiveWhatsApp(){const d=getCompanyStrategy(),a=d.actions,done=a.filter(x=>actionHealth(x)==='done').length,late=a.filter(x=>actionHealth(x)==='late').length,blocked=a.filter(x=>x.status==='Bloqueado').length,avg=a.length?Math.round(a.reduce((s,x)=>s+Number(x.progress||0),0)/a.length):0;whatsappOpen(`*Resumo Executivo - ${companyName()}*\n\n🎯 Objetivos: ${d.objectives.length}\n📈 Execução média: ${avg}%\n✅ Concluídas: ${done}/${a.length}\n🔴 Atrasadas: ${late}\n🟡 Bloqueadas: ${blocked}\n\nGerado pelo Hub de Gestão Estratégica.`);}
+function shareMapWhatsApp(){const d=getCompanyStrategy();let text=`*Mapa Estratégico BSC - ${companyName()}*\n`;['Financeira','Clientes e Mercado','Processos Internos','Pessoas e Inovação'].forEach(p=>{text+=`\n*${p}*\n`;const os=d.objectives.filter(o=>o.perspective===p);text+=os.length?os.map(o=>`• ${o.title} | ${o.kpi}: ${o.current}${o.unit} → ${o.target}${o.unit}`).join('\n'):'• Sem objetivos';text+='\n';});whatsappOpen(text);}
+function shareActionsWhatsApp(){const d=getCompanyStrategy();let text=`*Plano de Ação - ${companyName()}*\n\n`;text+=d.actions.slice(0,30).map((a,i)=>`${i+1}. *${a.title}*\nResponsável: ${a.owner} | Prazo: ${new Date(a.end+'T12:00:00').toLocaleDateString('pt-BR')}\nStatus: ${a.status} | Progresso: ${a.progress}%`).join('\n\n');if(d.actions.length>30)text+=`\n\n... e mais ${d.actions.length-30} ações.`;whatsappOpen(text);}
+
 document.addEventListener('DOMContentLoaded',()=>{
   const sel=document.getElementById('strategyCompany');
   const refreshCompanies=()=>{sel.innerHTML=empresas.map(e=>`<option value="${e.id}">${esc(e.nome)}</option>`).join('');strategyCompanyId=sel.value||empresas[0]?.id||null;if(strategyCompanyId){sel.value=strategyCompanyId;renderStrategyAll();}};
   document.getElementById('btnExecucao').addEventListener('click',()=>{mostrarSecao('sectionExecucao');refreshCompanies();});
   sel.addEventListener('change',()=>{strategyCompanyId=sel.value;renderStrategyAll();});
   document.querySelectorAll('[data-strategy-view]').forEach(b=>b.addEventListener('click',()=>switchStrategyView(b.dataset.strategyView)));
-  document.getElementById('btnNewObjective').addEventListener('click',promptObjective);
+  document.getElementById('btnNewObjective').addEventListener('click',()=>promptObjective());
+  document.getElementById('btnMapNewObjective').addEventListener('click',()=>promptObjective());
   document.getElementById('btnNewAction').addEventListener('click',()=>promptAction());
   document.getElementById('filterActionStatus').addEventListener('change',renderStrategyActions);
+  document.getElementById('btnDownloadActionTemplate').addEventListener('click',downloadActionTemplate);
+  document.getElementById('btnExportActionsXlsx').addEventListener('click',exportActionsXlsx);
+  document.getElementById('btnImportActionsXlsx').addEventListener('click',()=>document.getElementById('actionXlsxFile').click());
+  document.getElementById('actionXlsxFile').addEventListener('change',e=>{if(e.target.files[0])importActionsXlsx(e.target.files[0]);e.target.value='';});
+  document.getElementById('btnShareWhatsApp').addEventListener('click',shareExecutiveWhatsApp);
+  document.getElementById('btnPackageWhatsApp').addEventListener('click',exportShareableSystem);
+  document.getElementById('btnShareMapWhatsApp').addEventListener('click',shareMapWhatsApp);
+  document.getElementById('btnShareActionsWhatsApp').addEventListener('click',shareActionsWhatsApp);
+  document.getElementById('btnExportReportPdf').addEventListener('click',exportCurrentReportPdf);
+  document.getElementById('btnExportReportXlsx').addEventListener('click',exportCurrentReportXlsx);
+  document.getElementById('btnPrintReport').addEventListener('click',()=>window.print());
+  document.querySelectorAll('[data-tab-pdf]').forEach(btn=>btn.addEventListener('click',()=>exportStrategyViewPdf(btn.dataset.tabPdf)));
+  document.querySelectorAll('[data-tab-xlsx]').forEach(btn=>btn.addEventListener('click',()=>exportStrategyViewXlsx(btn.dataset.tabXlsx)));
+
 });
 </script>
 
