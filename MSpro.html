@@ -1,0 +1,1803 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diagnóstico de Maturidade da Gestão Pro</title>
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --panel-bg: #ffffff;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-light: #eef2ff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            letter-spacing: -0.01em;
+        }
+
+        .container {
+            max-width: 1400px;
+        }
+
+        /* Navbar & Header Customizations */
+        .app-header {
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 2rem;
+            margin-bottom: 2rem;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Cards Estilizados */
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+            background: var(--panel-bg);
+            margin-bottom: 24px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card-header {
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            padding: 1.25rem 1.5rem;
+            color: var(--text-dark);
+        }
+
+        /* Botões Arredondados Modernos */
+        .btn {
+            border-radius: 10px;
+            padding: 0.55rem 1.4rem;
+            font-weight: 500;
+            font-size: 0.925rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        /* Navegação por Abas (Pills) */
+        .nav-pills {
+            background: #f1f5f9;
+            padding: 6px;
+            border-radius: 12px;
+            gap: 4px;
+        }
+
+        .nav-pills .nav-link {
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-weight: 500;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .nav-pills .nav-link.active {
+            background: var(--panel-bg);
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Renderização Avançada de Perguntas */
+        .question-item {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 16px;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .question-item:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 0.975rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        /* Matrix Selector de Notas Customizado */
+        .scale-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .scale-options label {
+            border: 1px solid var(--border-color);
+            background: var(--panel-bg);
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .scale-options input[type="radio"] {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
+        }
+
+        .scale-options label:has(input[type="radio"]:checked) {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Badges e Mapeamento de Status */
+        .badge-status {
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.775rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        /* Estatísticas Executivas */
+        .stat-card {
+            text-align: left;
+            padding: 1.5rem;
+            border-radius: 14px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .radar-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+
+        .company-row {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .company-row:hover {
+            background: #f8fafc;
+        }
+
+        .consolidado-chart {
+            height: 320px;
+            position: relative;
+        }
+
+        .progress-sticky {
+            position: sticky;
+            top: 0;
+            z-index: 1020;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Configurações para modo impressão limpa */
+        @media print {
+            body { background: white; color: black; font-size: 12pt; }
+            .app-header, .btn, .nav-pills, #btnCancelarDiagnostico, .d-flex button, #btnImprimirResultado, #btnVoltarHome { display: none !important; }
+            .card { border: none !important; box-shadow: none !important; margin-bottom: 30px; page-break-inside: avoid; }
+            .hidden { display: none !important; }
+            .radar-container { max-height: 300px; }
+        }
+
+        /* ===== Módulo de Execução Estratégica ===== */
+        .strategy-hero { background: linear-gradient(135deg,#312e81,#4f46e5 55%,#7c3aed); color:white; border-radius:20px; padding:2rem; overflow:hidden; position:relative; }
+        .strategy-hero:after { content:""; position:absolute; width:260px; height:260px; border-radius:50%; background:rgba(255,255,255,.08); right:-80px; top:-100px; }
+        .strategy-kpi { border:1px solid var(--border-color); border-radius:14px; padding:1rem; background:white; height:100%; }
+        .strategy-kpi .value { font-size:1.75rem; font-weight:800; }
+        .strategy-kpi .caption { color:var(--text-muted); font-size:.78rem; text-transform:uppercase; font-weight:700; letter-spacing:.04em; }
+        .status-dot { width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; }
+        .dot-green{background:#10b981}.dot-yellow{background:#f59e0b}.dot-red{background:#ef4444}.dot-gray{background:#94a3b8}
+        .objective-card { border-left:5px solid var(--primary); }
+        .action-row.overdue { background:#fff1f2; }
+        .action-row.critical { box-shadow:inset 4px 0 #ef4444; }
+        .gantt-shell { overflow:auto; border:1px solid var(--border-color); border-radius:14px; background:white; }
+        .gantt-grid { display:grid; min-width:1100px; align-items:stretch; }
+        .gantt-head,.gantt-name,.gantt-cell { border-bottom:1px solid #e2e8f0; border-right:1px solid #eef2f7; min-height:42px; }
+        .gantt-head { background:#f8fafc; font-size:.72rem; font-weight:700; color:#64748b; padding:.65rem .35rem; text-align:center; position:sticky; top:0; z-index:3; }
+        .gantt-name { padding:.55rem .75rem; font-size:.82rem; position:sticky; left:0; background:white; z-index:2; }
+        .gantt-row-bg { display:contents; }
+        .gantt-bar-wrap { position:relative; display:grid; grid-column:2 / -1; grid-row:auto; }
+        .gantt-bar { height:22px; align-self:center; border-radius:6px; background:linear-gradient(90deg,#4f46e5,#7c3aed); color:white; font-size:.68rem; padding:3px 7px; white-space:nowrap; overflow:hidden; z-index:2; box-shadow:0 2px 5px rgba(79,70,229,.25); }
+        .gantt-bar.done { background:linear-gradient(90deg,#059669,#10b981); }
+        .gantt-bar.late { background:linear-gradient(90deg,#dc2626,#ef4444); }
+        .dependency-chip { font-size:.7rem; border:1px solid #cbd5e1; background:#f8fafc; border-radius:99px; padding:2px 7px; display:inline-block; }
+        .matrix-cell { border-radius:10px; padding:.75rem; min-height:82px; border:1px solid var(--border-color); background:#fff; }
+        .matrix-financeira{border-top:4px solid #10b981}.matrix-clientes{border-top:4px solid #3b82f6}.matrix-processos{border-top:4px solid #f59e0b}.matrix-pessoas{border-top:4px solid #8b5cf6}
+        .kanban-col { background:#f8fafc; border:1px solid var(--border-color); border-radius:14px; min-height:230px; padding:.8rem; }
+        .kanban-item { background:white; border:1px solid var(--border-color); border-radius:10px; padding:.75rem; margin-bottom:.6rem; box-shadow:0 1px 2px rgba(0,0,0,.03); }
+        @media(max-width:768px){.strategy-hero{padding:1.3rem}.gantt-grid{min-width:900px}}
+
+    </style>
+</head>
+<body>
+
+    <!-- Cabeçalho Principal -->
+    <header class="app-header">
+        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h1 class="section-title"><i class="bi bi-shield-check text-primary"></i> Hub de Maturidade de Gestão</h1>
+                <p class="text-muted mb-0 sm-text">Mapeamento analítico e evolução de subsistemas corporativos</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary" id="btnHome"><i class="bi bi-house"></i> Início</button>
+                <button class="btn btn-outline-secondary" id="btnConsolidado"><i class="bi bi-pie-chart"></i> Painel Consolidado</button>
+                <button class="btn btn-primary" id="btnExecucao"><i class="bi bi-diagram-3"></i> Execução Estratégica</button>
+                <button class="btn btn-light border" id="btnExportarDados" title="Exportar JSON para Backup"><i class="bi bi-download"></i> Backup</button>
+                <button class="btn btn-light border" id="btnImportarDados" title="Restaurar dados via JSON"><i class="bi bi-upload"></i> Restaurar</button>
+                <input type="file" id="fileImport" class="hidden" accept=".json" />
+            </div>
+        </div>
+    </header>
+
+    <div class="container mb-5" id="app">
+
+        <!-- Seção Início -->
+        <div id="sectionHome">
+            <div class="row">
+                <!-- Cadastro de Nova Empresa -->
+                <div class="col-xl-4 col-lg-5">
+                    <div class="card">
+                        <div class="card-header">
+                            <i class="bi bi-building-plus me-1 text-primary"></i> Nova Avaliação Corporativa
+                        </div>
+                        <div class="card-body">
+                            <form id="formCadastro" class="row g-3">
+                                <div class="col-12">
+                                    <label for="empresaNome" class="form-label font-weight-bold">Nome da Empresa</label>
+                                    <input type="text" class="form-control" id="empresaNome" placeholder="Ex: TechSolutions S.A." required />
+                                </div>
+                                <div class="col-12">
+                                    <label for="responsavel" class="form-label">Consultor / Responsável</label>
+                                    <input type="text" class="form-control" id="responsavel" placeholder="Ex: Carlos Silva" required />
+                                </div>
+                                <div class="col-12">
+                                    <label for="dataAplicacao" class="form-label">Data da Aplicação</label>
+                                    <input type="date" class="form-control" id="dataAplicacao" required />
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary w-100 justify-content-center">
+                                        <i class="bi bi-play-circle"></i> Iniciar Novo Diagnóstico
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Empresas Cadastradas -->
+                <div class="col-xl-8 col-lg-7">
+                    <div class="card">
+                        <div class="card-header d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                            <span><i class="bi bi-list-stars me-1 text-primary"></i> Organizações Avaliadas</span>
+                            <div class="d-flex gap-2">
+                                <input type="text" id="inputBusca" class="form-control form-control-sm" placeholder="🔍 Buscar empresa ou responsável..." style="max-width: 250px;" />
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" id="tabelaEmpresas">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Empresa</th>
+                                            <th>Responsável</th>
+                                            <th>Data</th>
+                                            <th>Progresso Geral</th>
+                                            <th>Classificação</th>
+                                            <th class="text-end px-4">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyEmpresas"></tbody>
+                                </table>
+                            </div>
+                            <div class="p-4 text-center text-muted" id="msgSemEmpresas">
+                                <i class="bi bi-folder-x display-6 block mb-2 text-secondary"></i>
+                                <p class="mb-0">Nenhum registro encontrado.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção Diagnóstico (Sticky Progress Bar Acoplada) -->
+        <div id="sectionDiagnostico" class="hidden">
+            <div class="progress-sticky">
+                <div class="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+                    <span class="fw-bold text-secondary"><i class="bi bi-activity text-primary"></i> Conclusão Geral da Ficha:</span>
+                    <div class="progress w-100 mx-sm-3" style="height: 12px; border-radius: 50px;">
+                        <div id="diagnosticoProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%">0%</div>
+                    </div>
+                    <span id="progressContador" class="badge bg-light text-dark border">0 / 0</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fs-5 fw-bold" id="diagnosticoTitulo"><i class="bi bi-pencil-square text-primary"></i> Questionário de Avaliação: <span id="empresaNomeDisplay" class="text-primary"></span></span>
+                    <button class="btn btn-outline-danger btn-sm" id="btnCancelarDiagnostico"><i class="bi bi-x-circle"></i> Sair</button>
+                </div>
+                <div class="card-body">
+                    <!-- Abas de Subsistemas Orientadas por Ícones -->
+                    <ul class="nav nav-pills mb-4 flex-nowrap overflow-x-auto" id="pillsTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="pills-estrategia-tab" data-bs-toggle="pill" data-bs-target="#pills-estrategia" type="button" role="tab"><i class="bi bi-compass me-1"></i> Estratégia</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pills-tatico-tab" data-bs-toggle="pill" data-bs-target="#pills-tatico" type="button" role="tab"><i class="bi bi-layers me-1"></i> Tático</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pills-comercial-tab" data-bs-toggle="pill" data-bs-target="#pills-comercial" type="button" role="tab"><i class="bi bi-cart3 me-1"></i> Comercial</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pills-orcamentario-tab" data-bs-toggle="pill" data-bs-target="#pills-orcamentario" type="button" role="tab"><i class="bi bi-cash-coin fusion-icon"></i> Orçamentário</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pills-rotina-tab" data-bs-toggle="pill" data-bs-target="#pills-rotina" type="button" role="tab"><i class="bi bi-calendar-check me-1"></i> Rotina</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pills-pessoas-tab" data-bs-toggle="pill" data-bs-target="#pills-pessoas" type="button" role="tab"><i class="bi bi-people me-1"></i> Pessoas</button>
+                        </li>
+                    </ul>
+
+                    <!-- Conteúdo das perguntas -->
+                    <div class="tab-content" id="pillsTabContent">
+                        <div class="tab-pane fade show active" id="pills-estrategia" role="tabpanel">
+                            <div id="questions-estrategia"></div>
+                        </div>
+                        <div class="tab-pane fade" id="pills-tatico" role="tabpanel">
+                            <div id="questions-tatico"></div>
+                        </div>
+                        <div class="tab-pane fade" id="pills-comercial" role="tabpanel">
+                            <div id="questions-comercial"></div>
+                        </div>
+                        <div class="tab-pane fade" id="pills-orcamentario" role="tabpanel">
+                            <div id="questions-orcamentario"></div>
+                        </div>
+                        <div class="tab-pane fade" id="pills-rotina" role="tabpanel">
+                            <div id="questions-rotina"></div>
+                        </div>
+                        <div class="tab-pane fade" id="pills-pessoas" role="tabpanel">
+                            <div id="questions-pessoas"></div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                        <button class="btn btn-outline-secondary" id="btnSalvarRascunho"><i class="bi bi-bookmark"></i> Preservar Rascunho</button>
+                        <button class="btn btn-success" id="btnFinalizarDiagnostico"><i class="bi bi-check-all"></i> Concluir e Gerar Dashboard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção Resultado Individual (Dashboard Executivo) -->
+        <div id="sectionResultado" class="hidden">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fs-5 fw-bold"><i class="bi bi-file-earmark-bar-graph text-primary"></i> Sumário Analítico de Desempenho: <span id="resultadoEmpresaNome" class="text-primary"></span></span>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary btn-sm" id="btnImprimirResultado"><i class="bi bi-printer"></i> Imprimir Relatório</button>
+                        <button class="btn btn-outline-secondary btn-sm" id="btnVoltarHome"><i class="bi bi-arrow-left"></i> Voltar</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Cards Executivos de Performance -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="stat-card">
+                                <span class="number" id="resultPctGeral">--</span>
+                                <span class="label">Média Geral de Maturidade</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card">
+                                <span class="number" id="resultClassificacao">--</span>
+                                <span class="label">Classificação da Empresa</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card" style="background-color: var(--primary-light);">
+                                <span class="number text-dark" style="font-size: 1.5rem; font-weight:700;" id="radarSubLabel">Mapeamento Geométrico</span>
+                                <span class="label text-primary">6 Subsistemas Avaliados</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfico de Radar e Tabela Sintética -->
+                    <div class="row align-items-center g-4">
+                        <div class="col-xl-6 col-lg-5">
+                            <div class="p-3 border rounded-3 bg-light">
+                                <div class="radar-container"><canvas id="radarChartIndividual"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-lg-7">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-grid-3x3-gap text-secondary"></i> Maturidade por Subsistemas</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover border align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Subsistema Auditado</th>
+                                            <th>% de Atendimento</th>
+                                            <th>Enquadramento</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultSubsistemas"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detalhamento por Atividade Interna -->
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-list-check text-secondary"></i> Detalhamento por Linha de Atividade</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered align-middle" id="tabelaDetalheResultado">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Subsistema</th>
+                                            <th>Atividade Especificada</th>
+                                            <th>Pontos Obtidos (Média)</th>
+                                            <th>Índice de Maturidade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bloco Avançado de Recomendações Críticas -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="border rounded-3 p-4 bg-light">
+                                <h5 class="fw-bold text-danger mb-3"><i class="bi bi-exclamation-triangle-fill"></i> Recomendações e Plano de Ação Imediato (Top 5 Gaps)</h5>
+                                <div id="recomendacoesContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção Consolidado de Múltiplas Empresas -->
+        <div id="sectionConsolidado" class="hidden">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fs-5 fw-bold"><i class="bi bi-columns-gap text-primary"></i> Painel Consolidado de Organizações</span>
+                    <button class="btn btn-outline-secondary btn-sm" id="btnVoltarConsolidado"><i class="bi bi-arrow-left"></i> Voltar ao Início</button>
+                </div>
+                <div class="card-body">
+                    <!-- Gráficos de Benchmarking -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-lg-6">
+                            <div class="p-3 border rounded bg-light">
+                                <h5 class="fw-bold mb-3 text-secondary text-center">Performance Média Global por Subsistema</h5>
+                                <div class="consolidado-chart"><canvas id="chartConsolidadoSubsistemas"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="p-3 border rounded bg-light">
+                                <h5 class="fw-bold mb-3 text-secondary text-center">Ranking Geral de Maturidade (%)</h5>
+                                <div class="consolidado-chart"><canvas id="chartRankingEmpresas"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Matriz Comparativa Geral -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-matrix text-secondary"></i> Matriz Comparativa de Resultados</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle text-center" id="tabelaConsolidado">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="text-start">Empresa Avaliada</th>
+                                            <th>Estratégia</th>
+                                            <th>Tático</th>
+                                            <th>Comercial</th>
+                                            <th>Orçamentário</th>
+                                            <th>Rotina</th>
+                                            <th>Pessoas</th>
+                                            <th>% Geral</th>
+                                            <th>Classificação</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyConsolidado"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção Execução Estratégica -->
+        <div id="sectionExecucao" class="hidden">
+            <div class="strategy-hero mb-4">
+                <div class="row align-items-center position-relative" style="z-index:1">
+                    <div class="col-lg-8">
+                        <span class="badge bg-white text-primary mb-2">Estratégia → Projetos → Ações → Resultados</span>
+                        <h2 class="fw-bold mb-2">Central de Execução Estratégica</h2>
+                        <p class="mb-0 opacity-75">Desdobre objetivos, acompanhe indicadores, organize planos 5W2H e visualize dependências em cronograma estilo Project.</p>
+                    </div>
+                    <div class="col-lg-4 mt-3 mt-lg-0">
+                        <label class="form-label small opacity-75">Organização ativa</label>
+                        <select id="strategyCompany" class="form-select form-select-lg"></select>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="nav nav-pills mb-4" id="strategyTabs">
+                <li class="nav-item"><button class="nav-link active" data-strategy-view="dashboard"><i class="bi bi-speedometer2"></i> Cockpit</button></li>
+                <li class="nav-item"><button class="nav-link" data-strategy-view="map"><i class="bi bi-bezier2"></i> Mapa Estratégico</button></li>
+                <li class="nav-item"><button class="nav-link" data-strategy-view="actions"><i class="bi bi-list-check"></i> Planos de Ação</button></li>
+                <li class="nav-item"><button class="nav-link" data-strategy-view="gantt"><i class="bi bi-calendar3-range"></i> Cronograma & Dependências</button></li>
+                <li class="nav-item"><button class="nav-link" data-strategy-view="kanban"><i class="bi bi-kanban"></i> Kanban</button></li>
+            </ul>
+
+            <div id="strategyDashboardView">
+                <div class="row g-3 mb-4" id="strategyKpis"></div>
+                <div class="row g-4">
+                    <div class="col-lg-7"><div class="card"><div class="card-header"><i class="bi bi-graph-up-arrow text-primary"></i> Saúde da execução</div><div class="card-body"><canvas id="strategyStatusChart" height="125"></canvas></div></div></div>
+                    <div class="col-lg-5"><div class="card"><div class="card-header"><i class="bi bi-exclamation-diamond text-danger"></i> Pontos de atenção</div><div class="card-body" id="strategyAlerts"></div></div></div>
+                </div>
+                <div class="card"><div class="card-header d-flex justify-content-between"><span><i class="bi bi-bullseye text-primary"></i> Objetivos e indicadores</span><button class="btn btn-primary btn-sm" id="btnNewObjective"><i class="bi bi-plus-lg"></i> Novo objetivo</button></div><div class="card-body" id="objectivesSummary"></div></div>
+            </div>
+
+            <div id="strategyMapView" class="hidden">
+                <div class="card"><div class="card-header"><i class="bi bi-bezier2 text-primary"></i> Mapa Estratégico BSC</div><div class="card-body"><div class="row g-3" id="strategyMap"></div></div></div>
+            </div>
+
+            <div id="strategyActionsView" class="hidden">
+                <div class="card">
+                    <div class="card-header d-flex flex-column flex-md-row justify-content-between gap-2"><span><i class="bi bi-list-check text-primary"></i> Portfólio de ações 5W2H</span><div class="d-flex gap-2"><select id="filterActionStatus" class="form-select form-select-sm"><option value="">Todos os status</option><option>Não iniciado</option><option>Em andamento</option><option>Concluído</option><option>Bloqueado</option></select><button class="btn btn-primary btn-sm" id="btnNewAction"><i class="bi bi-plus-lg"></i> Nova ação</button></div></div>
+                    <div class="card-body p-0"><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead class="table-light"><tr><th>Ação / Objetivo</th><th>Responsável</th><th>Prazo</th><th>Progresso</th><th>Status</th><th>Dependência</th><th></th></tr></thead><tbody id="strategyActionsBody"></tbody></table></div></div>
+                </div>
+            </div>
+
+            <div id="strategyGanttView" class="hidden">
+                <div class="card"><div class="card-header d-flex justify-content-between"><span><i class="bi bi-calendar3-range text-primary"></i> Cronograma integrado</span><span class="small text-muted">Ações críticas e atrasadas destacadas</span></div><div class="card-body"><div id="ganttContainer"></div></div></div>
+            </div>
+
+            <div id="strategyKanbanView" class="hidden">
+                <div class="row g-3" id="kanbanBoard"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modais Customizados Dinâmicos (Para evitar Alertas feios do Navegador) -->
+    <div class="modal fade" id="appModalConfirmation" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:14px;">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="modalConfirmTitle">Confirmação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalConfirmBody">...</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Não</button>
+                    <button type="button" class="btn btn-primary" id="modalConfirmBtnExecute">Sim, prosseguir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // -------------------------------------------------------------
+        // Matriz de Dados Estruturais das Perguntas (Inalterada)[cite: 2]
+        // -------------------------------------------------------------
+        const SUBSYSTEMS = {
+            estrategia: {
+                label: 'Gestão da Estratégia',
+                atividades: [
+                    { nome: 'Identidade Organizacional', perguntas: [
+                            'Existe uma definição clara / formalizada da Identidade Organizacional (Negócio, Missão, Visão) da empresa?',
+                            'Esta Identidade Organizacional está divulgada e disseminada por toda a organização?',
+                            'Existe um entendimento por parte de todos os colaboradores em relação a Identidade Organizacional?'
+                        ] },
+                    { nome: 'Análise do Ambiente Externo', perguntas: [
+                            'Existe conhecimento e/ou análises competitivas dos principais concorrentes do setor?',
+                            'É feita uma análise da posição competitiva da organização em relação à seus principais concorrentes?',
+                            'É realizada uma análise para possíveis cenários de evolução da competição nas regiões de atuação?',
+                            'Existe conhecimento na organização das principais variáveis externas que impactam no negócio?',
+                            'Estão (informal ou formalmente) mapeadas as principais variáveis que impactam nestes cenários descritos?'
+                        ] },
+                    { nome: 'Análise do Ambiente Interno', perguntas: [
+                            'Existem metas globais na organização? These metas estão desdobradas?',
+                            'Existe orientação para todas partes interessadas da organização?',
+                            'Estas metas globais estão acompanhadas dos seus devidos indicadores?',
+                            'É feito um levantamento de Forças e Fraquezas da organização?'
+                        ] },
+                    { nome: 'Monitoramento', perguntas: [
+                            'São feitas reuniões periódicas de análise dos sinalizadores?'
+                        ] },
+                    { nome: 'Ação Corretiva', perguntas: [
+                            'Caso surjam mudanças de cenários são reavaliadas as ações estratégicas?',
+                            'As ações estratégicas são acompanhadas na sua execução e implementação?'
+                        ] }
+                ]
+            },
+            tatico: {
+                label: 'Desdobramento Tático-Operacional',
+                atividades: [
+                    { nome: 'Planejamento Tático-Operacional', perguntas: [
+                            'Uma vez definido o Plano ou a Meta anual, de alguma maneira, esta meta ou plano é desdobrado ao longo da organização?',
+                            'As metas desdobradas possuem qualquer relação de causa e efeito em relação à meta estratégica?',
+                            'Estas metas desdobradas representam metas ligadas a resultados ou ligadas a meios?',
+                            'Estas metas desdobradas representam metas de melhoria ou metas de manutenção?',
+                            'Existe Gestão à Vista para a Diretriz principal da organização?'
+                        ] },
+                    { nome: 'Análise do Fenômeno', perguntas: [
+                            'São realizadas análises baseadas em fatos e dados para a realização do desdobramento das Diretrizes?',
+                            'São analisadas informações e resultados referentes ao plano anterior, quando da discussão das metas?'
+                        ] },
+                    { nome: 'Análise do Processo', perguntas: [
+                            'São realizados levantamentos das causas que impediram o atingimento das metas dos anos anteriores?',
+                            'São realizadas análises e levantamentos das causas que impactam no problema atual?',
+                            'Ainda que de maneira informal, são realizadas reuniões de Brainstorming para levantamento das causas?',
+                            'São priorizadas as causas mais importantes ou que mais impactam no problema atual?',
+                            'O processo de desdobramento pode ser visualizado através de um desenho de causa e efeito?'
+                        ] },
+                    { nome: 'Planos de Ação', perguntas: [
+                            'Existem planos de ação elaborados para cada uma das causas priorizadas?',
+                            'Os planos de ação se encontram no formato 5W2H?',
+                            'Os planos de ação possuem consistência para o atingimento de metas?'
+                        ] },
+                    { nome: 'Monitoramento', perguntas: [
+                            'Existem gráficos de gestão à vista para cada uma das metas desdobradas?',
+                            'Os gráficos das metas estão atualizados?',
+                            'São feitas reuniões para acompanhamento dos resultados relacionados a cada uma das metas?'
+                        ] },
+                    { nome: 'Ação Corretiva', perguntas: [
+                            'Os resultados positivos, após o monitoramento e avaliação são mantidos e padronizados, ainda que de maneira informal?',
+                            'São utilizados instrumentos para reavaliação dos resultados como por exemplo Relatório das 3 Gerações etc?'
+                        ] },
+                    { nome: 'Reflexão', perguntas: [
+                            'É realizada uma revisão geral dos resultados ao final do exercício fiscal?',
+                            'As informações levantadas no processo de reflexão estão formalizadas em algum tipo de relatório? São utilizadas para iniciar a discussão do estabelecimento da próxima diretriz anual?'
+                        ] }
+                ]
+            },
+            comercial: {
+                label: 'Gestão Comercial',
+                atividades: [
+                    { nome: 'Planejamento Comercial', perguntas: [
+                            'São realizadas análises com o objetivo de identificar oportunidades de melhoria nos processos comerciais?',
+                            'Existe qualquer tipo de desdobramento de metas comerciais (ex: de atendimento, satisfação de clientes e/ou captação)?',
+                            'Existem e o Gestor conhece indicadores de volume?',
+                            'Existem metas de melhoria de indicadores de volume de negócios (ex: Captação)?',
+                            'Existem e o Gestor conhece indicadores de preço (ex: Ticket médio por peça / cliente)?',
+                            'O Gestor analisa e toma decisões de descontos (baseada em fatos e dados e ferramentas)?',
+                            'O Gestor conhece / estima sua participação de mercado, na sua determinada região de atuação?'
+                        ] },
+                    { nome: 'Análise do Fenômeno', perguntas: [
+                            'Há um desdobramento da Margem por cliente, produto?',
+                            'Existe uma área Comercial (captação / retenção) formalmente estruturada?',
+                            'São realizadas análises baseadas em fatos e dados para realização do desdobramento das diretrizes / identificação de lacunas?',
+                            'Existem comparações internas de desempenho entre as diferentes áreas Comerciais do grupo?'
+                        ] },
+                    { nome: 'Análise do Processo', perguntas: [
+                            'São realizados levantamentos das causas que impediram o atingimento das metas dos anos anteriores?',
+                            'São realizadas análises e levantamentos das causas que impactam no problema atual?',
+                            'Ainda que de maneira informal, são realizadas reuniões de Brainstorming para levantamento das causas?',
+                            'São priorizadas as causas mais importantes ou que mais impactam no problema atual?',
+                            'O processo de desdobramento pode ser visualizado através de um desenho de causa e efeito?'
+                        ] },
+                    { nome: 'Planos de Ação', perguntas: [
+                            'Existem planos de ação elaborados para cada uma das causas priorizadas?',
+                            'Os planos de ação se encontram no formato 5W2H?',
+                            'Os planos de ação possuem consistência para o atingimento de metas?'
+                        ] },
+                    { nome: 'Monitoramento', perguntas: [
+                            'Existem gráficos de gestão à vista para cada uma das metas desdobradas?',
+                            'Os gráficos das metas estão atualizados?',
+                            'São feitas reuniões para acompanhamento dos resultados relacionados a cada uma das metas?'
+                        ] },
+                    { nome: 'Ação Corretiva', perguntas: [
+                            'Os resultados positivos, após o monitoramento e avaliação são mantidos e padronizados, ainda que de maneira informal?',
+                            'São utilizados instrumentos para reavaliação dos resultados como por exemplo Relatório das 3 Gerações etc?'
+                        ] },
+                    { nome: 'Reflexão', perguntas: [
+                            'É realizada uma revisão geral dos resultados ao final do exercício fiscal?',
+                            'As informações levantadas no processo de reflexão está formalizada em algum tipo de relatório? São utilizadas para iniciar a discussão do estabelecimento da próxima diretriz anual?'
+                        ] }
+                ]
+            },
+            orcamentario: {
+                label: 'Gestão Orçamentária',
+                atividades: [
+                    { nome: 'Planejamento Orçamentário', perguntas: [
+                            'São realizadas análises com o objetivo de identificar oportunidades de melhoria nos processos orçamentários?',
+                            'Existe qualquer tipo de desdobramento de metas orçamentárias (ex: de custos, despesas)?',
+                            'Existem e o Gestor conhece indicadores orçamentários (ex: CSP / ROL, SG&A / ROL)?',
+                            'Existem metas de melhoria dos indicadores de custos e despesas?',
+                            'O Gestor analisa e toma decisões orçamentárias baseado em fatos e dados e ferramentas?',
+                            'O Gestor conhece / estima seu desempenho orçamentário, em relação às outras unidades do Grupo?'
+                        ] },
+                    { nome: 'Análise do Fenômeno', perguntas: [
+                            'Existe um sistema informatizado de apuração de resultados orçamentários e contabilidade única?',
+                            'Existem Centros de Custos e Despesas específicos?',
+                            'Existe algum comparativo interno ou externo dos valores orçados?',
+                            'São analisadas as informações referentes às metas e planos do ano anterior?'
+                        ] },
+                    { nome: 'Análise do Processo', perguntas: [
+                            'São realizados levantamentos das causas que impediram o atingimento das metas dos anos anteriores?',
+                            'São realizadas análises e levantamentos das causas que impactam no problema atual?',
+                            'Ainda que de maneira informal, são realizadas reuniões de Brainstorming para levantamento das causas?',
+                            'São priorizadas as causas mais importantes ou que mais impactam no problema atual?',
+                            'O processo de desdobramento pode ser visualizado através de um desenho de causa e efeito?'
+                        ] },
+                    { nome: 'Planos de Ação', perguntas: [
+                            'Existem planos de ação elaborados para cada uma das causas priorizadas?',
+                            'Os planos de ação se encontram no formato 5W2H?',
+                            'Os planos de ação possuem consistência para o atingimento de metas?'
+                        ] },
+                    { nome: 'Monitoramento', perguntas: [
+                            'Existem gráficos de gestão à vista para cada uma das metas desdobradas?',
+                            'Os gráficos das metas estão atualizados?',
+                            'São feitas reuniões para acompanhamento dos resultados relacionados a cada uma das metas?'
+                        ] },
+                    { nome: 'Ação Corretiva', perguntas: [
+                            'Os resultados positivos, após o monitoramento e avaliação são mantidos e padronizados, ainda que de maneira informal?',
+                            'São utilizados instrumentos para reavaliação dos resultados como por exemplo Relatório das 3 Gerações etc?'
+                        ] },
+                    { nome: 'Reflexão', perguntas: [
+                            'É realizada uma revisão geral dos resultados ao final do exercício fiscal?',
+                            'As informações levantadas no processo de reflexão esta formalizada em algum tipo de relatório? São utilizadas para iniciar a discussão do estabelecimento da próxima diretriz anual?'
+                        ] }
+                ]
+            },
+            rotina: {
+                label: 'Gestão da Rotina',
+                atividades: [
+                    { nome: 'Organização da Unidade de Gestão', perguntas: [
+                            'A Estrutura organizacional abrange as funções: operação, supervisão e gerencial?',
+                            'As pessoas que ocupam os cargos compreendem a sua função?',
+                            'Os principais produtos da empresa estão estabelecidos, bem como os clientes?',
+                            'Os principais Insumos/Matérias Primas estão estabelecidos, bem como os fornecedores?'
+                        ] },
+                    { nome: 'Estabelecimento dos itens de controle', perguntas: [
+                            'Os indicadores existentes abrangem todas as dimensões (qualidade, entrega, custo e segurança)?',
+                            'Os indicadores estabelecidos referem-se aos fins (resultados) e não aos meios?',
+                            'Os Indicadores estão claramente estabelecidos e são compreendidos pelos responsáveis?',
+                            'As Metas estão formalizadas em alguma documentação disponível na área?',
+                            'Há valores de Benchmarking disponíveis para todas as Metas estabelecidas?'
+                        ] },
+                    { nome: 'Identificação do Problema', perguntas: [
+                            'Existe uma agenda / programação do Diretor (reuniões sistemáticas)?',
+                            'Os gestores conseguem entender a diferença entre fins e meios e entendem o conceito de problema?',
+                            'O gestor desdobra as responsabilidades e autoridades ao longo da estrutura organizacional? Os escopos e autoridades de função estão bem definidos?',
+                            'Existe uma sistemática formal para levantamento dos problemas (resultados ruins) dentro da gerência?',
+                            'Há histórico disponível mostrando a evolução do problema e a avaliação de ganhos e perdas passados ou futuros?',
+                            'Existe uma equipe de funcionários estabelecida para conduzir a solução do problema priorizado?'
+                        ] },
+                    { nome: 'Análise do Fenômeno', perguntas: [
+                            'Os problemas priorizados são observados sob vários pontos de vista?',
+                            'Existem ferramentas de coleta de dados que permitam embasar as estratificações dos problemas?',
+                            'Existem dados dos problemas coletados a partir de observações feita no local da ocorrência dos problemas?',
+                            'A condução da solução dos problemas é baseado em um cronograma de trabalho para as equipes?'
+                        ] },
+                    { nome: 'Análise do Processo', perguntas: [
+                            'São realizados levantamentos das causas que impediram o atingimento das metas dos anos anteriores?',
+                            'São realizadas análises e levantamentos das causas que impactam no problema atual?',
+                            'São priorizadas as causas mais importantes ou que mais impactam no problema atual?'
+                        ] },
+                    { nome: 'Planos de Ação', perguntas: [
+                            'Existem planos de ação elaborados para cada uma das causas priorizadas?',
+                            'Os planos de ação se encontram no formato 5W2H?',
+                            'Os planos de ação possuem consistência para o atingimento de metas?'
+                        ] },
+                    { nome: 'Monitoramento', perguntas: [
+                            'Existem gráficos de gestão à vista para cada uma das metas desdobradas?',
+                            'Os gráficos das metas estão atualizados?',
+                            'São feitas reuniões para acompanhamento dos resultados relacionados a cada uma das metas?'
+                        ] },
+                    { nome: 'Ação Corretiva', perguntas: [
+                            'Os resultados positivos, após o monitoramento e avaliação são mantidos e padronizados, ainda que de maneira informal?',
+                            'São utilizados instrumentos para reavaliação dos resultados como por exemplo Relatório das 3 Gerações etc?'
+                        ] },
+                    { nome: 'Reflexão', perguntas: [
+                            'É realizada uma revisão geral dos resultados ao final do exercício fiscal?',
+                            'As informações levantadas no processo de reflexão esta formalizada em algum tipo de relatório? São utilizadas para iniciar a discussão do estabelecimento da próxima diretriz anual?'
+                        ] }
+                ]
+            },
+            pessoas: {
+                label: 'Gestão de Pessoas',
+                atividades: [
+                    { nome: 'Planejamento e Gestão das Pessoas', perguntas: [
+                            'O Planejamento de Gente é derivado e integrado ao processo global do negócio?',
+                            'O processo de recrutamento e seleção está estruturado e contempla o atingimento de Metas de cada Área da Empresa?',
+                            'O planejamento da área de Gente leva em consideração ações no sentido de criar/manter: participação das pessoas, crescimento, reconhecimento ao alto desempenho.',
+                            'O plano de treinamento leva em conta todos os níveis da empresa?',
+                            'O planejamento de treinamento leva em conta os gaps de competências, inclusive comportamentais, em todas as áreas e níveis da organização?',
+                            'A área de Gente possui indicadores de performance ligados ao negócio?',
+                            'Há alguma premiação/punição em função dos resultados desses parâmetros?',
+                            'O planejamento de Gente leva em consideração o incentivo à meritocracia?'
+                        ] },
+                    { nome: 'Comunicação/Engajamento', perguntas: [
+                            'Há reconhecimento pela melhoria de desempenho? Esse reconhecimento tende a valorizar os comportamentos alinhados aos valores da empresa?',
+                            'O processo de comunicação é eficaz entre as áreas funcionais e as áreas de trabalho?',
+                            'Existe programa de integração para novos funcionários? É eficaz?',
+                            'Há histórico disponível mostrando a evolução do colaborador, com ações realizadas no passado e para o futuro?'
+                        ] },
+                    { nome: 'Treinamento e educação', perguntas: [
+                            'O treinamento e educação abrangem os conhecimentos e habilidades que os funcionários necessitam para atingir as Metas?',
+                            'Existe um processo sistemático de avaliação do que foi realmente aprendido no treinamento e está sendo aplicado no trabalho?',
+                            'A empresa auxilia na formação educacional de seus colaboradores?',
+                            'A empresa possui equipe própria para gestão dos treinamentos e verificação in-loco das necessidades operacionais?'
+                        ] },
+                    { nome: 'Satisfação dos funcionários', perguntas: [
+                            'Realizam pesquisas de satisfação e motivação do pessoal periodicamente?',
+                            'Existem Indicadores para avaliar o grau de satisfação? A rotatividade está compatível com o negócio?',
+                            'Há credibilidade da Empresa, por parte dos funcionários, quanto a sua capacidade em competir com sucesso? A Empresa é vista como um bom lugar para se trabalhar?'
+                        ] }
+                ]
+            }
+        };
+
+        // Totalizadores estáticos das perguntas para a barra de progresso
+        let TOTAL_PERGUNTAS_SISTEMA = 0;
+        Object.values(SUBSYSTEMS).forEach(sub => {
+            sub.atividades.forEach(atv => {
+                TOTAL_PERGUNTAS_SISTEMA += atv.perguntas.length;
+            });
+        });
+
+        // Gerenciamento de estado[cite: 2]
+        let empresas = JSON.parse(localStorage.getItem('diagnosticos')) || [];
+        let empresaEditandoId = null;
+        let bsConfirmModal = null;
+
+        // -------------------------------------------------------------
+        // Funções de Infraestrutura de Dados e Cálculos (Mantidas)[cite: 2]
+        // -------------------------------------------------------------
+        function gerarId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        }
+
+        function getClassificacao(pct) {
+            if (pct >= 90) return { texto: 'Muito Satisfatório', letra: 'A', class: 'bg-success text-white' };
+            if (pct >= 70) return { texto: 'Satisfatório', letra: 'B', class: 'bg-info text-dark' };
+            if (pct >= 50) return { texto: 'Parcialmente Satisfatório', letra: 'C', class: 'bg-warning text-dark' };
+            return { texto: 'Insatisfatório', letra: 'D', class: 'bg-danger text-white' };
+        }
+
+        function calcularNotas(respostas) {
+            const resultado = {};
+            for (const [key, subsistema] of Object.entries(SUBSYSTEMS)) {
+                const atividades = subsistema.atividades;
+                const notasAtividade = [];
+                const detalhes = [];
+                let totalPerguntas = 0;
+                let somaPontos = 0;
+
+                atividades.forEach((atividade, idxAtv) => {
+                    const perguntas = atividade.perguntas;
+                    let somaAtv = 0;
+                    let countAtv = 0;
+                    perguntas.forEach((_, idxP) => {
+                        const chave = `${key}_${idxAtv}_${idxP}`;
+                        const valor = respostas[chave] !== undefined ? respostas[chave] : 0;
+                        somaAtv += valor;
+                        countAtv++;
+                        somaPontos += valor;
+                        totalPerguntas++;
+                        detalhes.push({
+                            subsistema: subsistema.label,
+                            atividade: atividade.nome,
+                            pergunta: idxP + 1,
+                            valor: valor
+                        });
+                    });
+                    const mediaAtv = countAtv > 0 ? somaAtv / countAtv : 0;
+                    notasAtividade.push({
+                        nome: atividade.nome,
+                        media: mediaAtv,
+                        count: countAtv,
+                        soma: somaAtv
+                    });
+                });
+
+                const mediaSubsistema = totalPerguntas > 0 ? somaPontos / totalPerguntas : 0;
+                const pctSubsistema = (mediaSubsistema / 5) * 100;
+                resultado[key] = {
+                    label: subsistema.label,
+                    media: mediaSubsistema,
+                    percentual: pctSubsistema,
+                    atividades: notasAtividade,
+                    detalhes: detalhes,
+                    totalPerguntas: totalPerguntas,
+                    somaPontos: somaPontos
+                };
+            }
+            return resultado;
+        }
+
+        function calcularMediaGeral(resultado) {
+            let soma = 0, count = 0;
+            for (const key of Object.keys(SUBSYSTEMS)) {
+                soma += resultado[key].media;
+                count++;
+            }
+            const media = count > 0 ? soma / count : 0;
+            const pct = (media / 5) * 100;
+            return { media, percentual: pct };
+        }
+
+        // -------------------------------------------------------------
+        // Renderizadores de Componentes UI Modernizados[cite: 2]
+        // -------------------------------------------------------------
+        function renderQuestions() {
+            for (const [key, subsistema] of Object.entries(SUBSYSTEMS)) {
+                const container = document.getElementById(`questions-${key}`);
+                let html = '';
+                subsistema.atividades.forEach((atividade, idxAtv) => {
+                    html += `<h5 class="mt-4 mb-3 fw-bold text-dark border-bottom pb-2 text-uppercase" style="font-size:0.85rem; letter-spacing:0.05em;"><i class="bi bi-tag text-indigo"></i> ${atividade.nome}</h5>`;
+                    atividade.perguntas.forEach((pergunta, idxP) => {
+                        const name = `${key}_${idxAtv}_${idxP}`;
+                        html += `
+                            <div class="question-item">
+                                <div class="question-text">${pergunta}</div>
+                                <div class="scale-options">
+                                    <label><input type="radio" name="${name}" value="0" checked> 0 - Nenhuma evidência</label>
+                                    <label><input type="radio" name="${name}" value="1"> 1 - Não atende</label>
+                                    <label><input type="radio" name="${name}" value="3"> 3 - Atende Mal</label>
+                                    <label><input type="radio" name="${name}" value="5"> 5 - Atende Plenamente</label>
+                                </div>
+                            </div>
+                        `;
+                    });
+                });
+                container.innerHTML = html;
+            }
+
+            // Bind de evento dinâmico para recalcular barra de progresso a cada clique
+            document.querySelectorAll('.scale-options input').forEach(input => {
+                input.addEventListener('change', atualizarBarraProgresso);
+            });
+        }
+
+        function atualizarBarraProgresso() {
+            const respostasAtuais = coletarRespostas();
+            let respondidas = 0;
+            
+            // Conta quantas perguntas não possuem valor zero ou que foram explicitamente selecionadas
+            // Para maior precisão, verificamos quantos inputs radio estão marcados com valor != 0 ou se o rascunho já foi salvo
+            for (const [key, subsistema] of Object.entries(SUBSYSTEMS)) {
+                subsistema.atividades.forEach((atividade, idxAtv) => {
+                    atividade.perguntas.forEach((_, idxP) => {
+                        const name = `${key}_${idxAtv}_${idxP}`;
+                        const selecionado = document.querySelector(`input[name="${name}"]:checked`);
+                        if (selecionado && selecionado.value !== "0") {
+                            respondidas++;
+                        }
+                    });
+                });
+            }
+
+            const pct = (respondidas / TOTAL_PERGUNTAS_SISTEMA) * 100;
+            const pBar = document.getElementById('diagnosticoProgressBar');
+            pBar.style.width = `${pct}%`;
+            pBar.textContent = `${Math.round(pct)}%`;
+            document.getElementById('progressContador').textContent = `${respondidas} / ${TOTAL_PERGUNTAS_SISTEMA} Itens Atendidos`;
+        }
+
+        function coletarRespostas() {
+            const respostas = {};
+            for (const [key, subsistema] of Object.entries(SUBSYSTEMS)) {
+                subsistema.atividades.forEach((atividade, idxAtv) => {
+                    atividade.perguntas.forEach((_, idxP) => {
+                        const name = `${key}_${idxAtv}_${idxP}`;
+                        const radios = document.querySelectorAll(`input[name="${name}"]`);
+                        let valor = 0;
+                        radios.forEach(r => {
+                            if (r.checked) valor = parseInt(r.value, 10);
+                        });
+                        respostas[name] = valor;
+                    });
+                });
+            }
+            return respostas;
+        }
+
+        // -------------------------------------------------------------
+        // Gerenciador Inteligente das Confirmações[cite: 2]
+        // -------------------------------------------------------------
+        function customConfirm(title, message, callback) {
+            document.getElementById('modalConfirmTitle').textContent = title;
+            document.getElementById('modalConfirmBody').textContent = message;
+            
+            const btnExec = document.getElementById('modalConfirmBtnExecute');
+            // Remove handlers antigos cloning o elemento
+            const newBtnExec = btnExec.cloneNode(true);
+            btnExec.parentNode.replaceChild(newBtnExec, btnExec);
+            
+            newBtnExec.addEventListener('click', () => {
+                bsConfirmModal.hide();
+                callback();
+            });
+            
+            bsConfirmModal.show();
+        }
+
+        function salvarDiagnostico(finalizar = false) {
+            const respostas = coletarRespostas();
+            const resultado = calcularNotas(respostas);
+            const geral = calcularMediaGeral(resultado);
+            const classificacao = getClassificacao(geral.percentual);
+
+            const empresa = empresas.find(e => e.id === empresaEditandoId);
+            if (!empresa) return;
+
+            empresa.respostas = respostas;
+            empresa.resultado = resultado;
+            empresa.geral = geral;
+            empresa.classificacao = classificacao;
+            empresa.finalizado = finalizar;
+            empresa.dataAtualizacao = new Date().toISOString();
+
+            localStorage.setItem('diagnosticos', JSON.stringify(empresas));
+
+            if (finalizar) {
+                mostrarResultado(empresaEditandoId);
+            } else {
+                alert('Rascunho salvo localmente com sucesso!');
+            }
+        }
+
+        function mostrarSecao(id) {
+            document.querySelectorAll('#sectionHome, #sectionDiagnostico, #sectionResultado, #sectionConsolidado, #sectionExecucao')
+                .forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+
+        // -------------------------------------------------------------
+        // Resultados Individuais Avançados[cite: 2]
+        // -------------------------------------------------------------
+        function mostrarResultado(empresaId) {
+            const empresa = empresas.find(e => e.id === empresaId);
+            if (!empresa) return;
+            document.getElementById('resultadoEmpresaNome').textContent = empresa.nome;
+            document.getElementById('resultPctGeral').textContent = empresa.geral.percentual.toFixed(1) + '%';
+            document.getElementById('resultClassificacao').textContent = `${empresa.classificacao.texto} (${empresa.classificacao.letra})`;
+
+            const tbody = document.getElementById('resultSubsistemas');
+            tbody.innerHTML = '';
+            for (const [key, sub] of Object.entries(SUBSYSTEMS)) {
+                const res = empresa.resultado[key];
+                const cls = getClassificacao(res.percentual);
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="fw-medium">${sub.label}</td>
+                        <td class="fw-bold text-primary">${res.percentual.toFixed(1)}%</td>
+                        <td><span class="badge badge-status ${cls.class}">${cls.texto}</span></td>
+                    </tr>
+                `;
+            }
+
+            const detTbody = document.querySelector('#tabelaDetalheResultado tbody');
+            detTbody.innerHTML = '';
+            for (const [key, sub] of Object.entries(SUBSYSTEMS)) {
+                const res = empresa.resultado[key];
+                res.atividades.forEach(atv => {
+                    const pct = (atv.media / 5) * 100;
+                    detTbody.innerHTML += `
+                        <tr>
+                            <td class="small text-muted">${sub.label}</td>
+                            <td class="fw-medium">${atv.nome}</td>
+                            <td><span class="badge bg-light text-dark border">${atv.media.toFixed(2)} / 5.00</span></td>
+                            <td class="fw-bold">${pct.toFixed(1)}%</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const recContainer = document.getElementById('recomendacoesContainer');
+            let recHtml = '<div class="row row-cols-1 row-cols-md-2 g-3">';
+            const todasAtividades = [];
+            for (const [key, sub] of Object.entries(SUBSYSTEMS)) {
+                const res = empresa.resultado[key];
+                res.atividades.forEach(atv => {
+                    todasAtividades.push({
+                        subsistema: sub.label,
+                        atividade: atv.nome,
+                        media: atv.media,
+                        pct: (atv.media / 5) * 100
+                    });
+                });
+            }
+            todasAtividades.sort((a, b) => a.media - b.media);
+            const piores = todasAtividades.slice(0, 5);
+            
+            piores.forEach((item, index) => {
+                recHtml += `
+                    <div class="col">
+                        <div class="p-3 border-start border-danger border-4 bg-white rounded shadow-sm">
+                            <span class="badge bg-danger mb-1">Prioridade ${index+1}</span>
+                            <h6 class="fw-bold mb-0 text-dark">${item.atividade}</h6>
+                            <p class="small text-muted mb-2">${item.subsistema} • Maturidade Atual: <strong>${item.pct.toFixed(1)}%</strong></p>
+                            <span class="small d-block text-dark"><i class="bi bi-arrow-right-short"></i> Estabelecer calibração imediata, mapeamento estruturado de processos e auditoria periódica de evidências práticas.</span>
+                        </div>
+                    </div>
+                `;
+            });
+            recHtml += '</div>';
+
+            // Nota contextual complementar baseada no percentual geral[cite: 2]
+            let notaContextual = "";
+            if (empresa.geral.percentual < 50) {
+                notaContextual = `<div class="alert alert-danger mt-3 mb-0"><i class="bi bi-exclamation-octagon"></i> <strong>Ação de Choque de Gestão:</strong> Formalize os processos e implemente gestão à vista para todas as metas de forma prioritária.</div>`;
+            } else if (empresa.geral.percentual < 70) {
+                notaContextual = `<div class="alert alert-warning mt-3 mb-0"><i class="bi bi-exclamation-triangle"></i> <strong>Ação Tática Prioritária:</strong> Estruture o ciclo PDCA completo, com análise de causas e ações corretivas documentadas.</div>`;
+            } else {
+                notaContextual = `<div class="alert alert-success mt-3 mb-0"><i class="bi bi-check-circle"></i> <strong>Próximos Passos de Excelência:</strong> Avance na maturidade integrando os subsistemas e adotando benchmarking internacional complexo.</div>`;
+            }
+            
+            recContainer.innerHTML = recHtml + notaContextual;
+
+            const labels = Object.values(SUBSYSTEMS).map(s => s.label);
+            const data = Object.values(empresa.resultado).map(r => r.percentual);
+            renderRadarIndividual(labels, data);
+
+            mostrarSecao('sectionResultado');
+            window.currentEmpresaId = empresaId;
+        }
+
+        // -------------------------------------------------------------
+        // Motores de Renderização de Gráficos (Chart.js)[cite: 2]
+        // -------------------------------------------------------------
+        let radarChartInstance = null;
+        function renderRadarIndividual(labels, data) {
+            const ctx = document.getElementById('radarChartIndividual').getContext('2d');
+            if (radarChartInstance) radarChartInstance.destroy();
+
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '% de Atendimento por Vetor',
+                        data: data,
+                        backgroundColor: 'rgba(79, 70, 229, 0.15)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: 'rgba(79, 70, 229, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(79, 70, 229, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: { stepSize: 20, display: false },
+                            grid: { color: '#e2e8f0' },
+                            angleLines: { color: '#e2e8f0' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        let chartSubsistemasInstance = null;
+        let chartRankingInstance = null;
+
+        function renderConsolidado() {
+            if (empresas.length === 0) {
+                document.querySelector('#sectionConsolidado .card-body').innerHTML = '<p class="text-muted p-4 text-center">Nenhuma corporação registrada até o momento.</p>';
+                return;
+            }
+
+            const medias = {};
+            for (const key of Object.keys(SUBSYSTEMS)) {
+                let soma = 0, count = 0;
+                empresas.forEach(emp => {
+                    if (emp.resultado && emp.resultado[key]) {
+                        soma += emp.resultado[key].percentual;
+                        count++;
+                    }
+                });
+                medias[key] = count > 0 ? soma / count : 0;
+            }
+
+            const ctxSub = document.getElementById('chartConsolidadoSubsistemas').getContext('2d');
+            if (chartSubsistemasInstance) chartSubsistemasInstance.destroy();
+            chartSubsistemasInstance = new Chart(ctxSub, {
+                type: 'bar',
+                data: {
+                    labels: Object.values(SUBSYSTEMS).map(s => s.label),
+                    datasets: [{
+                        data: Object.values(medias),
+                        backgroundColor: 'rgba(79, 70, 229, 0.8)',
+                        borderRadius: 6,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, max: 100, grid: { borderDash: [4,4] } } }
+                }
+            });
+
+            const empresasOrdenadas = [...empresas].filter(e => e.finalizado).sort((a, b) => b.geral.percentual - a.geral.percentual);
+            const ctxRank = document.getElementById('chartRankingEmpresas').getContext('2d');
+            if (chartRankingInstance) chartRankingInstance.destroy();
+            chartRankingInstance = new Chart(ctxRank, {
+                type: 'bar',
+                data: {
+                    labels: empresasOrdenadas.map(e => e.nome),
+                    datasets: [{
+                        data: empresasOrdenadas.map(e => e.geral.percentual),
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderRadius: 6,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, max: 100, grid: { borderDash: [4,4] } } }
+                }
+            });
+
+            const tbody = document.getElementById('tbodyConsolidado');
+            tbody.innerHTML = '';
+            empresas.forEach(emp => {
+                if (!emp.finalizado) {
+                    tbody.innerHTML += `
+                        <tr class="text-muted table-light">
+                            <td class="text-start"><strong>${emp.nome}</strong> <span class="badge bg-secondary">Rascunho</span></td>
+                            <td colspan="8" class="text-center small text-uppercase font-weight-bold">Avaliação parcial não finalizada</td>
+                        </tr>
+                    `;
+                    return;
+                }
+                const res = emp.resultado;
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="text-start fw-bold text-dark">${emp.nome}</td>
+                        <td>${res.estrategia.percentual.toFixed(0)}%</td>
+                        <td>${res.tatico.percentual.toFixed(0)}%</td>
+                        <td>${res.comercial.percentual.toFixed(0)}%</td>
+                        <td>${res.orcamentario.percentual.toFixed(0)}%</td>
+                        <td>${res.rotina.percentual.toFixed(0)}%</td>
+                        <td>${res.pessoas.percentual.toFixed(0)}%</td>
+                        <td class="fw-bold text-primary">${emp.geral.percentual.toFixed(1)}%</td>
+                        <td><span class="badge badge-status ${emp.classificacao.class}">${emp.classificacao.letra}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // -------------------------------------------------------------
+        // Listagem Avançada com Mecanismo de Filtro[cite: 2]
+        // -------------------------------------------------------------
+        function renderListaEmpresas(filtro = '') {
+            const tbody = document.getElementById('tbodyEmpresas');
+            const msg = document.getElementById('msgSemEmpresas');
+            
+            // Filtro inteligível baseado em texto minúsculo
+            const empresasFiltradas = empresas.filter(emp => {
+                return emp.nome.toLowerCase().includes(filtro.toLowerCase()) || 
+                       emp.responsavel.toLowerCase().includes(filtro.toLowerCase());
+            });
+
+            if (empresasFiltradas.length === 0) {
+                tbody.innerHTML = '';
+                msg.classList.remove('hidden');
+                return;
+            }
+            msg.classList.add('hidden');
+            tbody.innerHTML = '';
+            
+            empresasFiltradas.forEach(emp => {
+                const pct = emp.finalizado ? emp.geral.percentual : null;
+                const cls = emp.finalizado ? emp.classificacao : null;
+                const badgeColor = emp.finalizado ? 'success' : 'warning';
+                const labelStatus = emp.finalizado ? 'Finalizado' : 'Rascunho';
+                
+                tbody.innerHTML += `
+                    <tr class="company-row" data-id="${emp.id}">
+                        <td>
+                            <div class="fw-bold text-dark">${emp.nome}</div>
+                            <div class="text-muted small" style="font-size:0.75rem;"><i class="bi bi-clock"></i> Atualizado recentemente</div>
+                        </td>
+                        <td class="text-muted">${emp.responsavel}</td>
+                        <td class="text-muted" style="font-size:0.85rem;">${emp.dataAplicacao}</td>
+                        <td>
+                            ${pct !== null ? `
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-bold text-dark">${pct.toFixed(1)}%</span>
+                                    <div class="progress flex-grow-1" style="height: 6px; max-width:80px;">
+                                        <div class="progress-bar bg-success" style="width: ${pct}%"></div>
+                                    </div>
+                                </div>
+                            ` : `
+                                <span class="badge bg-light text-warning border border-warning-subtle">Ficha Incompleta</span>
+                            `}
+                        </td>
+                        <td>
+                            ${cls ? `<span class="badge badge-status ${cls.class}">${cls.texto}</span>` : `<span class="badge bg-secondary">Pendente</span>`}
+                        </td>
+                        <td class="text-end px-4">
+                            <button class="btn btn-sm btn-light border btn-continuar me-1 text-primary" data-id="${emp.id}">
+                                <i class="bi ${emp.finalizado ? 'bi-eye' : 'bi-play'}"></i> ${emp.finalizado ? 'Ver' : 'Editar'}
+                            </button>
+                            <button class="btn btn-sm btn-light border btn-excluir text-danger" data-id="${emp.id}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Handlers das Ações da Listagem[cite: 2]
+            document.querySelectorAll('.btn-continuar').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = this.dataset.id;
+                    const empresa = empresas.find(e => e.id === id);
+                    if (empresa.finalizado) {
+                        mostrarResultado(id);
+                    } else {
+                        iniciarDiagnostico(id);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.btn-excluir').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = this.dataset.id;
+                    customConfirm('Eliminar Registro', 'Tem certeza de que deseja apagar permanentemente este diagnóstico?', () => {
+                        empresas = empresas.filter(e => e.id !== id);
+                        localStorage.setItem('diagnosticos', JSON.stringify(empresas));
+                        renderListaEmpresas(document.getElementById('inputBusca').value);
+                    });
+                });
+            });
+        }
+
+        // -------------------------------------------------------------
+        // Inicialização de Fichas de Diagnóstico[cite: 2]
+        // -------------------------------------------------------------
+        function iniciarDiagnostico(empresaId = null) {
+            if (empresaId) {
+                const empresa = empresas.find(e => e.id === empresaId);
+                if (!empresa) return;
+                empresaEditandoId = empresaId;
+                document.getElementById('empresaNomeDisplay').textContent = empresa.nome;
+                if (empresa.respostas) {
+                    for (const [key, value] of Object.entries(empresa.respostas)) {
+                        const radios = document.querySelectorAll(`input[name="${key}"]`);
+                        radios.forEach(r => {
+                            if (parseInt(r.value, 10) === value) r.checked = true;
+                        });
+                    }
+                } else {
+                    document.querySelectorAll('input[type="radio"]').forEach(r => {
+                        if (r.value === '0') r.checked = true;
+                    });
+                }
+            } else {
+                const nome = document.getElementById('empresaNome').value.trim();
+                const responsavel = document.getElementById('responsavel').value.trim();
+                const dataAplicacao = document.getElementById('dataAplicacao').value;
+                if (!nome || !responsavel || !dataAplicacao) {
+                    alert('Preencha todos os campos cadastrais antes de prosseguir.');
+                    return;
+                }
+                const novaEmpresa = {
+                    id: gerarId(), nome, responsavel, dataAplicacao,
+                    dataCriacao: new Date().toISOString(),
+                    finalizado: false, respostas: null, resultado: null, geral: null, classificacao: null
+                };
+                empresas.push(novaEmpresa);
+                localStorage.setItem('diagnosticos', JSON.stringify(empresas));
+                empresaEditandoId = novaEmpresa.id;
+                document.getElementById('empresaNomeDisplay').textContent = novaEmpresa.nome;
+                document.querySelectorAll('input[type="radio"]').forEach(r => {
+                    if (r.value === '0') r.checked = true;
+                });
+            }
+            mostrarSecao('sectionDiagnostico');
+            atualizarBarraProgresso();
+            renderListaEmpresas();
+        }
+
+        // -------------------------------------------------------------
+        // População Controlada de Dados Iniciais Simulados[cite: 2]
+        // -------------------------------------------------------------
+        function popularDadosSimulacao() {
+            if (empresas.length > 0) return; // Proteção para não sobrepor dados existentes[cite: 2]
+
+            const nomes = [
+                'TechSolutions Ltda.', 'InovaGestão S.A.', 'QualiMax Indústria',
+                'MegaCorp Comércio', 'Prime Service Group', 'Alpha Consultoria',
+                'Beta Logística', 'Gamma Energia', 'Delta Tech', 'Omega Pharma'
+            ];
+            const responsaveis = [
+                'Carlos Silva', 'Mariana Costa', 'Pedro Rocha',
+                'Ana Paula Souza', 'Luciana Mendes', 'Rafael Oliveira',
+                'Juliana Lima', 'Felipe Santos', 'Camila Almeida', 'Bruno Pereira'
+            ];
+            const dataBase = '2026-06-29';
+
+            nomes.forEach((nome, idx) => {
+                let perfil = idx < 2 ? 'alta' : (idx < 5 ? 'media-alta' : (idx < 8 ? 'media-baixa' : 'baixa'));
+                const respostas = {};
+                
+                for (const [key, subsistema] of Object.entries(SUBSYSTEMS)) {
+                    subsistema.atividades.forEach((atividade, idxAtv) => {
+                        atividade.perguntas.forEach((_, idxP) => {
+                            const chave = `${key}_${idxAtv}_${idxP}`;
+                            let valor;
+                            if (perfil === 'alta') valor = Math.random() < 0.6 ? 5 : (Math.random() < 0.7 ? 3 : 1);
+                            else if (perfil === 'media-alta') valor = Math.random() < 0.4 ? 5 : (Math.random() < 0.6 ? 3 : 1);
+                            else if (perfil === 'media-baixa') valor = Math.random() < 0.3 ? 3 : (Math.random() < 0.5 ? 1 : 0);
+                            else valor = Math.random() < 0.3 ? 1 : 0;
+                            respostas[chave] = valor;
+                        });
+                    });
+                }
+
+                const resultado = calcularNotas(respostas);
+                const geral = calcularMediaGeral(resultado);
+                const classificacao = getClassificacao(geral.percentual);
+
+                empresas.push({
+                    id: gerarId(), nome, responsavel, dataAplicacao: dataBase,
+                    dataCriacao: new Date().toISOString(), finalizado: true,
+                    respostas, resultado, geral, classificacao
+                });
+            });
+            localStorage.setItem('diagnosticos', JSON.stringify(empresas));
+        }
+
+        // -------------------------------------------------------------
+        // Exportador/Importador de Arquivos JSON para Backup de Campo
+        // -------------------------------------------------------------
+        function exportarFichasParaJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(empresas, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `Backup_Diagnosticos_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importarFichasDoJSON(e) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const dadosImportados = JSON.parse(event.target.result);
+                    if (Array.isArray(dadosImportados)) {
+                        empresas = dadosImportados;
+                        localStorage.setItem('diagnosticos', JSON.stringify(empresas));
+                        renderListaEmpresas();
+                        alert('Massa de dados importada e sincronizada com sucesso!');
+                    } else {
+                        alert('Formato de arquivo inválido. Certifique-se de que é um arquivo gerado pelo sistema.');
+                    }
+                } catch (err) {
+                    alert('Falha crítica ao ler JSON. Arquivo corrompido.');
+                }
+            };
+            reader.readAsText(e.target.files[0]);
+        }
+
+        // -------------------------------------------------------------
+        // Mapeamento Geral de Eventos de Inicialização[cite: 2]
+        // -------------------------------------------------------------
+        document.addEventListener('DOMContentLoaded', function() {
+            bsConfirmModal = new bootstrap.Modal(document.getElementById('appModalConfirmation'));
+            
+            popularDadosSimulacao();
+            renderQuestions();
+            renderListaEmpresas();
+
+            // Busca reativa digitada
+            document.getElementById('inputBusca').addEventListener('input', function(e) {
+                renderListaEmpresas(e.target.value);
+            });
+
+            // Backup Handlers
+            document.getElementById('btnExportarDados').addEventListener('click', exportarFichasParaJSON);
+            document.getElementById('btnImportarDados').addEventListener('click', () => document.getElementById('fileImport').click());
+            document.getElementById('fileImport').addEventListener('change', importarFichasDoJSON);
+
+            document.getElementById('formCadastro').addEventListener('submit', function(e) {
+                e.preventDefault();
+                iniciarDiagnostico(null);
+            });
+
+            document.getElementById('btnHome').addEventListener('click', () => {
+                mostrarSecao('sectionHome');
+                renderListaEmpresas();
+            });
+            document.getElementById('btnVoltarHome').addEventListener('click', () => {
+                mostrarSecao('sectionHome');
+                renderListaEmpresas();
+            });
+            document.getElementById('btnConsolidado').addEventListener('click', () => {
+                mostrarSecao('sectionConsolidado');
+                renderConsolidado();
+            });
+            document.getElementById('btnVoltarConsolidado').addEventListener('click', () => {
+                mostrarSecao('sectionHome');
+                renderListaEmpresas();
+            });
+
+            document.getElementById('btnCancelarDiagnostico').addEventListener('click', function() {
+                customConfirm('Sair do Questionário', 'Deseja interromper o preenchimento? Alterações não salvas serão descartadas.', () => {
+                    mostrarSecao('sectionHome');
+                    renderListaEmpresas();
+                });
+            });
+
+            document.getElementById('btnSalvarRascunho').addEventListener('click', () => salvarDiagnostico(false));
+            
+            document.getElementById('btnFinalizarDiagnostico').addEventListener('click', function() {
+                customConfirm('Consolidar Diagnóstico', 'Deseja encerrar este formulário e computar os indicadores de auditoria?', () => {
+                    salvarDiagnostico(true);
+                });
+            });
+
+            document.getElementById('btnImprimirResultado').addEventListener('click', () => window.print());
+        });
+    </script>
+
+<script>
+// =============================================================
+// MÓDULO DE EXECUÇÃO ESTRATÉGICA — objetivos, KPIs, 5W2H e Gantt
+// =============================================================
+let strategyStore = JSON.parse(localStorage.getItem('strategyExecutionV2')) || {};
+let strategyCompanyId = null;
+let strategyChart = null;
+const STRATEGY_PERSPECTIVES = ['Financeira','Clientes e Mercado','Processos Internos','Pessoas e Inovação'];
+
+function saveStrategy(){ localStorage.setItem('strategyExecutionV2', JSON.stringify(strategyStore)); }
+function dateISO(d){ return new Date(d).toISOString().slice(0,10); }
+function addDays(base,days){ const d=new Date(base+'T12:00:00'); d.setDate(d.getDate()+days); return dateISO(d); }
+function esc(v){ return String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+function getCompanyStrategy(){
+  if(!strategyCompanyId) return {objectives:[],actions:[]};
+  if(!strategyStore[strategyCompanyId]) strategyStore[strategyCompanyId]={objectives:[],actions:[]};
+  return strategyStore[strategyCompanyId];
+}
+function seedStrategy(companyId){
+  if(strategyStore[companyId] && strategyStore[companyId].objectives?.length) return;
+  const today=dateISO(new Date());
+  strategyStore[companyId]={
+    objectives:[
+      {id:gerarId(),title:'Aumentar rentabilidade sustentável',perspective:'Financeira',owner:'Diretoria Financeira',kpi:'Margem EBITDA',current:12,target:18,unit:'%',deadline:addDays(today,180)},
+      {id:gerarId(),title:'Elevar retenção e valor percebido',perspective:'Clientes e Mercado',owner:'Diretoria Comercial',kpi:'NPS',current:55,target:75,unit:' pts',deadline:addDays(today,150)},
+      {id:gerarId(),title:'Reduzir tempo de ciclo operacional',perspective:'Processos Internos',owner:'Operações',kpi:'Lead time',current:12,target:7,unit:' dias',deadline:addDays(today,120)},
+      {id:gerarId(),title:'Fortalecer liderança orientada a dados',perspective:'Pessoas e Inovação',owner:'RH',kpi:'Gestores capacitados',current:30,target:90,unit:'%',deadline:addDays(today,200)}
+    ],actions:[]
+  };
+  const o=strategyStore[companyId].objectives;
+  const acts=[
+    ['Revisar rentabilidade por cliente e produto',o[0].id,'Controladoria',0,30,'Em andamento',35,'Mapear margem, custos e oportunidades por carteira','Relatório de rentabilidade validado',0],
+    ['Implantar rotina mensal de pricing',o[0].id,'Comercial',25,65,'Não iniciado',0,'Criar comitê e regras de preço/desconto','Aumentar margem sem perda relevante de volume',1],
+    ['Mapear jornada e causas de churn',o[1].id,'CX',0,35,'Em andamento',60,'Entrevistas, análise de reclamações e churn','Backlog priorizado de melhorias',0],
+    ['Redesenhar processo crítico ponta a ponta',o[2].id,'Operações',10,55,'Em andamento',25,'Aplicar SIPOC, análise de gargalos e novo fluxo','Lead time reduzido e padrão publicado',0],
+    ['Programa de formação de líderes',o[3].id,'RH',20,100,'Não iniciado',0,'Trilha de indicadores, PDCA e reuniões de resultado','Gestores certificados e planos aplicados',0]
+  ];
+  acts.forEach((a,i)=>strategyStore[companyId].actions.push({id:gerarId(),title:a[0],objectiveId:a[1],owner:a[2],start:addDays(today,a[3]),end:addDays(today,a[4]),status:a[5],progress:a[6],what:a[7],why:a[8],where:'Organização',how:'Plano estruturado com checkpoints quinzenais',cost:0,dependencyId:null,priority:i<2?'Alta':'Média',critical:i<2}));
+  strategyStore[companyId].actions[1].dependencyId=strategyStore[companyId].actions[0].id;
+  saveStrategy();
+}
+function actionHealth(a){
+  const now=new Date(); const end=new Date(a.end+'T23:59:59');
+  if(a.status==='Concluído'||Number(a.progress)>=100) return 'done';
+  if(end<now) return 'late';
+  if(a.status==='Bloqueado') return 'blocked';
+  return 'active';
+}
+function renderStrategyAll(){
+  if(!strategyCompanyId) return;
+  seedStrategy(strategyCompanyId);
+  renderStrategyDashboard(); renderStrategyMap(); renderStrategyActions(); renderGantt(); renderKanban();
+}
+function objectiveProgress(o){
+  if(o.target===o.current) return 100;
+  const higher=o.target>o.current;
+  const base=higher?Math.max(0,(o.current/Math.max(o.target,1))*100):Math.max(0,(o.target/Math.max(o.current,1))*100);
+  return Math.min(100,Math.round(base));
+}
+function renderStrategyDashboard(){
+  const data=getCompanyStrategy(), actions=data.actions||[];
+  const completed=actions.filter(a=>actionHealth(a)==='done').length;
+  const late=actions.filter(a=>actionHealth(a)==='late').length;
+  const avg=actions.length?Math.round(actions.reduce((s,a)=>s+Number(a.progress||0),0)/actions.length):0;
+  const blocked=actions.filter(a=>a.status==='Bloqueado').length;
+  document.getElementById('strategyKpis').innerHTML=[
+    ['Objetivos estratégicos',data.objectives.length,'bi-bullseye'],['Execução média',avg+'%','bi-graph-up'],['Ações concluídas',completed+'/'+actions.length,'bi-check2-circle'],['Atrasadas / bloqueadas',(late+blocked),'bi-exclamation-triangle']
+  ].map(x=>`<div class="col-6 col-xl-3"><div class="strategy-kpi"><div class="caption"><i class="bi ${x[2]} me-1"></i>${x[0]}</div><div class="value">${x[1]}</div></div></div>`).join('');
+  const counts=['done','active','late','blocked'].map(h=>actions.filter(a=>actionHealth(a)===h).length);
+  const ctx=document.getElementById('strategyStatusChart'); if(strategyChart) strategyChart.destroy();
+  strategyChart=new Chart(ctx,{type:'bar',data:{labels:['Concluídas','Em curso','Atrasadas','Bloqueadas'],datasets:[{data:counts,backgroundColor:['#10b981','#4f46e5','#ef4444','#f59e0b'],borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+  const alerts=[];
+  actions.filter(a=>actionHealth(a)==='late').slice(0,4).forEach(a=>alerts.push(`<div class="alert alert-danger py-2 mb-2"><strong>${esc(a.title)}</strong><br><span class="small">Prazo encerrado em ${new Date(a.end+'T12:00:00').toLocaleDateString('pt-BR')}.</span></div>`));
+  actions.filter(a=>a.status==='Bloqueado').slice(0,3).forEach(a=>alerts.push(`<div class="alert alert-warning py-2 mb-2"><strong>${esc(a.title)}</strong><br><span class="small">Ação bloqueada; revisar impedimento e dependências.</span></div>`));
+  document.getElementById('strategyAlerts').innerHTML=alerts.length?alerts.join(''):'<div class="text-center text-muted py-4"><i class="bi bi-shield-check display-6 d-block mb-2"></i>Nenhum alerta crítico no momento.</div>';
+  document.getElementById('objectivesSummary').innerHTML=data.objectives.length?data.objectives.map(o=>{
+    const linked=actions.filter(a=>a.objectiveId===o.id); const ap=linked.length?Math.round(linked.reduce((s,a)=>s+Number(a.progress||0),0)/linked.length):0;
+    return `<div class="objective-card border rounded-3 p-3 mb-3"><div class="d-flex flex-column flex-md-row justify-content-between gap-2"><div><span class="badge bg-light text-primary border mb-1">${esc(o.perspective)}</span><h6 class="fw-bold mb-1">${esc(o.title)}</h6><div class="small text-muted">${esc(o.owner)} · KPI: ${esc(o.kpi)} · Meta: ${esc(o.target)}${esc(o.unit)}</div></div><div class="text-md-end"><strong>${ap}%</strong><div class="small text-muted">execução das ações</div></div></div><div class="progress mt-2" style="height:8px"><div class="progress-bar" style="width:${ap}%"></div></div></div>`;
+  }).join(''):'<p class="text-muted">Cadastre o primeiro objetivo estratégico.</p>';
+}
+function renderStrategyMap(){
+  const data=getCompanyStrategy();
+  document.getElementById('strategyMap').innerHTML=STRATEGY_PERSPECTIVES.map((p,i)=>`<div class="col-lg-3"><div class="matrix-cell matrix-${['financeira','clientes','processos','pessoas'][i]}"><div class="small fw-bold text-uppercase text-muted mb-2">${p}</div>${data.objectives.filter(o=>o.perspective===p).map(o=>`<div class="p-2 bg-light border rounded mb-2"><strong class="small">${esc(o.title)}</strong><div class="progress mt-2" style="height:5px"><div class="progress-bar" style="width:${objectiveProgress(o)}%"></div></div></div>`).join('')||'<span class="small text-muted">Sem objetivos</span>'}</div></div>`).join('');
+}
+function renderStrategyActions(){
+  const data=getCompanyStrategy(); const filter=document.getElementById('filterActionStatus')?.value||'';
+  const objMap=Object.fromEntries(data.objectives.map(o=>[o.id,o])); const actMap=Object.fromEntries(data.actions.map(a=>[a.id,a]));
+  const rows=data.actions.filter(a=>!filter||a.status===filter).map(a=>{
+    const health=actionHealth(a), dep=a.dependencyId?actMap[a.dependencyId]:null;
+    return `<tr class="action-row ${health==='late'?'overdue':''} ${a.critical?'critical':''}"><td><strong>${esc(a.title)}</strong><div class="small text-muted">${esc(objMap[a.objectiveId]?.title||'Sem objetivo')} · Prioridade ${esc(a.priority)}</div></td><td>${esc(a.owner)}</td><td class="small">${new Date(a.start+'T12:00:00').toLocaleDateString('pt-BR')}<br><strong>${new Date(a.end+'T12:00:00').toLocaleDateString('pt-BR')}</strong></td><td style="min-width:130px"><div class="d-flex justify-content-between small"><span>${a.progress}%</span></div><div class="progress" style="height:7px"><div class="progress-bar ${health==='late'?'bg-danger':health==='done'?'bg-success':''}" style="width:${a.progress}%"></div></div></td><td><span class="badge ${a.status==='Concluído'?'bg-success':a.status==='Bloqueado'?'bg-warning text-dark':a.status==='Em andamento'?'bg-primary':'bg-secondary'}">${esc(a.status)}</span></td><td>${dep?`<span class="dependency-chip"><i class="bi bi-link-45deg"></i>${esc(dep.title)}</span>`:'—'}</td><td><button class="btn btn-light border btn-sm" onclick="editStrategicAction('${a.id}')"><i class="bi bi-pencil"></i></button> <button class="btn btn-light border btn-sm text-danger" onclick="deleteStrategicAction('${a.id}')"><i class="bi bi-trash"></i></button></td></tr>`;
+  }).join('');
+  document.getElementById('strategyActionsBody').innerHTML=rows||'<tr><td colspan="7" class="text-center text-muted p-4">Nenhuma ação encontrada.</td></tr>';
+}
+function renderGantt(){
+  const actions=getCompanyStrategy().actions||[]; if(!actions.length){document.getElementById('ganttContainer').innerHTML='<p class="text-muted">Cadastre ações para montar o cronograma.</p>';return;}
+  let min=new Date(Math.min(...actions.map(a=>new Date(a.start)))); let max=new Date(Math.max(...actions.map(a=>new Date(a.end)))); min.setDate(min.getDate()-min.getDay()); max.setDate(max.getDate()+(6-max.getDay()));
+  const weeks=[]; for(let d=new Date(min);d<=max;d.setDate(d.getDate()+7)) weeks.push(new Date(d));
+  const totalDays=Math.max(1,(max-min)/86400000+1); const cols=`280px repeat(${weeks.length},minmax(92px,1fr))`;
+  let html=`<div class="gantt-shell"><div class="gantt-grid" style="grid-template-columns:${cols}"><div class="gantt-head text-start ps-3">Ação / responsável</div>${weeks.map(w=>`<div class="gantt-head">${w.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})}</div>`).join('')}`;
+  actions.forEach(a=>{const st=(new Date(a.start)-min)/86400000;const en=(new Date(a.end)-min)/86400000+1;const startCol=2+Math.floor(st/7);const endCol=2+Math.ceil(en/7);const h=actionHealth(a);html+=`<div class="gantt-name"><strong>${esc(a.title)}</strong><div class="text-muted small">${esc(a.owner)} · ${a.progress}%</div></div><div class="gantt-bar-wrap" style="grid-template-columns:repeat(${weeks.length},minmax(92px,1fr))">${weeks.map(()=>'<div class="gantt-cell"></div>').join('')}<div class="gantt-bar ${h==='done'?'done':h==='late'?'late':''}" style="grid-column:${Math.max(1,startCol-1)} / ${Math.min(weeks.length+1,endCol-1)};grid-row:1">${esc(a.title)}</div></div>`;});
+  html+='</div></div>'; document.getElementById('ganttContainer').innerHTML=html;
+}
+function renderKanban(){
+  const data=getCompanyStrategy(); const cols=['Não iniciado','Em andamento','Bloqueado','Concluído'];
+  document.getElementById('kanbanBoard').innerHTML=cols.map(st=>`<div class="col-md-6 col-xl-3"><div class="kanban-col"><div class="d-flex justify-content-between mb-2"><strong>${st}</strong><span class="badge bg-white text-dark border">${data.actions.filter(a=>a.status===st).length}</span></div>${data.actions.filter(a=>a.status===st).map(a=>`<div class="kanban-item"><div class="small text-muted mb-1">${esc(a.owner)}</div><strong class="small">${esc(a.title)}</strong><div class="progress mt-2" style="height:5px"><div class="progress-bar" style="width:${a.progress}%"></div></div><div class="small text-end mt-1">${a.progress}%</div></div>`).join('')}</div></div>`).join('');
+}
+function switchStrategyView(view){
+  ['Dashboard','Map','Actions','Gantt','Kanban'].forEach(v=>document.getElementById('strategy'+v+'View').classList.add('hidden'));
+  document.getElementById('strategy'+view.charAt(0).toUpperCase()+view.slice(1)+'View').classList.remove('hidden');
+  document.querySelectorAll('[data-strategy-view]').forEach(b=>b.classList.toggle('active',b.dataset.strategyView===view));
+  if(view==='gantt') renderGantt();
+}
+function promptObjective(){
+  const title=prompt('Nome do objetivo estratégico:'); if(!title) return;
+  const perspective=prompt('Perspectiva: Financeira, Clientes e Mercado, Processos Internos ou Pessoas e Inovação','Financeira');
+  const owner=prompt('Responsável pelo objetivo:','Diretoria'); const kpi=prompt('Indicador principal:','Indicador'); const target=parseFloat(prompt('Meta numérica:','100'))||100;
+  getCompanyStrategy().objectives.push({id:gerarId(),title,perspective:STRATEGY_PERSPECTIVES.includes(perspective)?perspective:'Financeira',owner,kpi,current:0,target,unit:'%',deadline:addDays(dateISO(new Date()),180)}); saveStrategy(); renderStrategyAll();
+}
+function promptAction(existingId=null){
+  const data=getCompanyStrategy(); const a=existingId?data.actions.find(x=>x.id===existingId):null;
+  const title=prompt('O que será feito?',a?.title||''); if(!title)return;
+  const owner=prompt('Quem será o responsável?',a?.owner||'');
+  const start=prompt('Data de início (AAAA-MM-DD)',a?.start||dateISO(new Date())); const end=prompt('Data final (AAAA-MM-DD)',a?.end||addDays(dateISO(new Date()),30));
+  const progress=Math.min(100,Math.max(0,parseInt(prompt('Progresso de 0 a 100',a?.progress??0))||0));
+  const status=prompt('Status: Não iniciado, Em andamento, Bloqueado ou Concluído',a?.status||'Não iniciado');
+  const objectiveId=a?.objectiveId||data.objectives[0]?.id||null;
+  const objNames=data.objectives.map((o,i)=>`${i+1}-${o.title}`).join('\n'); const oi=parseInt(prompt('Vincule ao objetivo pelo número:\n'+objNames,'1'))-1;
+  const depNames=data.actions.filter(x=>x.id!==existingId).map((x,i)=>`${i+1}-${x.title}`).join('\n'); const di=parseInt(prompt('Dependência anterior (número, ou 0 para nenhuma):\n'+depNames,'0'))-1;
+  const payload={id:a?.id||gerarId(),title,owner,start,end,progress,status:['Não iniciado','Em andamento','Bloqueado','Concluído'].includes(status)?status:'Não iniciado',objectiveId:data.objectives[oi]?.id||objectiveId,dependencyId:di>=0?data.actions.filter(x=>x.id!==existingId)[di]?.id:null,what:title,why:prompt('Por que esta ação é necessária?',a?.why||''),where:'Organização',how:prompt('Como será executada?',a?.how||''),cost:0,priority:prompt('Prioridade: Alta, Média ou Baixa',a?.priority||'Média'),critical:confirm('Esta ação faz parte do caminho crítico?')};
+  if(a) Object.assign(a,payload); else data.actions.push(payload); saveStrategy(); renderStrategyAll();
+}
+window.editStrategicAction=id=>promptAction(id);
+window.deleteStrategicAction=id=>{if(confirm('Excluir esta ação?')){const d=getCompanyStrategy();d.actions=d.actions.filter(a=>a.id!==id);d.actions.forEach(a=>{if(a.dependencyId===id)a.dependencyId=null});saveStrategy();renderStrategyAll();}};
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const sel=document.getElementById('strategyCompany');
+  const refreshCompanies=()=>{sel.innerHTML=empresas.map(e=>`<option value="${e.id}">${esc(e.nome)}</option>`).join('');strategyCompanyId=sel.value||empresas[0]?.id||null;if(strategyCompanyId){sel.value=strategyCompanyId;renderStrategyAll();}};
+  document.getElementById('btnExecucao').addEventListener('click',()=>{mostrarSecao('sectionExecucao');refreshCompanies();});
+  sel.addEventListener('change',()=>{strategyCompanyId=sel.value;renderStrategyAll();});
+  document.querySelectorAll('[data-strategy-view]').forEach(b=>b.addEventListener('click',()=>switchStrategyView(b.dataset.strategyView)));
+  document.getElementById('btnNewObjective').addEventListener('click',promptObjective);
+  document.getElementById('btnNewAction').addEventListener('click',()=>promptAction());
+  document.getElementById('filterActionStatus').addEventListener('change',renderStrategyActions);
+});
+</script>
+
+</body>
+</html>
