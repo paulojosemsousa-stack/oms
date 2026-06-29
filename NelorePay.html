@@ -652,9 +652,9 @@
                     </div>
                     <div class="section-title">Operações tokenizadas em destaque</div>
                     <div style="display:flex;flex-direction:column;gap:8px;">
-                        <div class="card" style="padding:12px;"><div style="display:flex;justify-content:space-between;gap:10px;"><div><strong>CR-BEZ-2026-0042</strong><div style="font-size:12px;color:var(--text-secondary);">Token Bezerro • 8 a 10 meses • contrato com recriadores</div></div><div style="text-align:right;color:#168A4B;font-weight:900;">R$ 4,8 mi<br><span style="font-size:11px;color:var(--text-secondary);">82% captado</span></div></div></div>
-                        <div class="card" style="padding:12px;"><div style="display:flex;justify-content:space-between;gap:10px;"><div><strong>CR-GAR-2026-0018</strong><div style="font-size:12px;color:var(--text-secondary);">Token Garrote • recria • contrato com confinadores</div></div><div style="text-align:right;color:#168A4B;font-weight:900;">R$ 7,2 mi<br><span style="font-size:11px;color:var(--text-secondary);">68% captado</span></div></div></div>
-                        <div class="card" style="padding:12px;"><div style="display:flex;justify-content:space-between;gap:10px;"><div><strong>CR-ARB-2026-0091</strong><div style="font-size:12px;color:var(--text-secondary);">Token Arroba • boi gordo • contrato com frigorífico</div></div><div style="text-align:right;color:#168A4B;font-weight:900;">R$ 11,9 mi<br><span style="font-size:11px;color:var(--text-secondary);">91% captado</span></div></div></div>
+                        <div class="card" style="padding:12px;cursor:pointer;" onclick="openTokenDetail('Token Bezerro')"><div style="display:flex;justify-content:space-between;gap:10px;"><div><strong>CR-BEZ-2026-0042</strong><div style="font-size:12px;color:var(--text-secondary);">Token Bezerro • 8 a 10 meses • contrato com recriadores</div></div><div style="text-align:right;color:#168A4B;font-weight:900;">R$ 4,8 mi<br><span style="font-size:11px;color:var(--text-secondary);">82% captado</span></div></div></div>
+                        <div class="card" style="padding:12px;cursor:pointer;" onclick="openTokenDetail('Token Garrote')"><div style="display:flex;justify-content:space-between;gap:10px;"><div><strong>CR-GAR-2026-0018</strong><div style="font-size:12px;color:var(--text-secondary);">Token Garrote • recria • contrato com confinadores</div></div><div style="text-align:right;color:#168A4B;font-weight:900;">R$ 7,2 mi<br><span style="font-size:11px;color:var(--text-secondary);">68% captado</span></div></div></div>
+                        <div class="card" style="padding:12px;cursor:pointer;" onclick="openTokenDetail('Token Arroba')"><div style="display:flex;justify-content:space-between;gap:10px;"><div><strong>CR-ARB-2026-0091</strong><div style="font-size:12px;color:var(--text-secondary);">Token Arroba • boi gordo • contrato com frigorífico</div></div><div style="text-align:right;color:#168A4B;font-weight:900;">R$ 11,9 mi<br><span style="font-size:11px;color:var(--text-secondary);">91% captado</span></div></div></div>
                     </div>
                 </div>
 
@@ -1268,7 +1268,7 @@
     </div>
 
     <script>
-        const DATA_VERSION = 34;
+        const DATA_VERSION = 35;
         const NELOREPAY_LOGO_JPEG_BASE64 = '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';
         const NELOREPAY_LOGO_JPEG_WIDTH = 360;
         const NELOREPAY_LOGO_JPEG_HEIGHT = 140;
@@ -1580,7 +1580,7 @@
                 'Nova Piratininga Cargas Vivas', 'AgroRota Boi em Pé', 'Pantanal Beef Logistics',
                 'Arroba Sul Transportes'
             ];
-            const name = names[index - 1] || `Transportadora Nova Piratininga ${index}`;
+            const name = names[index - 1] || `Transportadora Boi Gordo ${index}`;
             const walletNumber = 'T' + padWallet(index).slice(1);
             const completedFreights = 52000 + index * 18400;
             const futureFreights = 38000 + index * 12600;
@@ -2062,31 +2062,132 @@
             });
         }
 
+        const TOKEN_OPERATIONS = {
+            'Token Bezerro': {
+                code: 'CR-BEZ-2026-0042',
+                icon: '🐄',
+                fase: 'Cria',
+                prazo: '9 meses',
+                target: 4800000,
+                captured: 82,
+                minimum: 5000,
+                expected: '1,35% a.m.',
+                risk: 'Moderado',
+                lastro: '2.650 bezerros rastreados de 7 a 9 arrobas',
+                ticket: 'R$ 1.800 por cabeça',
+                liquidation: 'Venda futura para recriadores homologados',
+                guarantee: 'Cessão fiduciária de recebíveis, CPR pecuária e rastreabilidade por lote',
+                docs: ['Contrato futuro de compra', 'GTA e cadastro do lote', 'CPR pecuária', 'Conta escrow NelorePay', 'Auditoria de lastro']
+            },
+            'Token Garrote': {
+                code: 'CR-GAR-2026-0018',
+                icon: '🐂',
+                fase: 'Recria',
+                prazo: '10 meses',
+                target: 7200000,
+                captured: 68,
+                minimum: 10000,
+                expected: '1,45% a.m.',
+                risk: 'Moderado+',
+                lastro: '4.300 garrotes rastreados de 12 a 15 arrobas',
+                ticket: 'R$ 1.650 por cabeça',
+                liquidation: 'Contrato com confinadores e frigoríficos parceiros',
+                guarantee: 'Recebíveis cedidos, seguro operacional e trava de destino do lote',
+                docs: ['Contrato de recria', 'Rastreabilidade sanitária', 'Nota de fornecimento', 'Custódia digital', 'Relatório de evolução ponderal']
+            },
+            'Token Arroba': {
+                code: 'CR-ARB-2026-0091',
+                icon: '🥩',
+                fase: 'Engorda',
+                prazo: '6 meses',
+                target: 11900000,
+                captured: 91,
+                minimum: 15000,
+                expected: '1,25% a.m.',
+                risk: 'Moderado',
+                lastro: '38.200 arrobas futuras de boi gordo',
+                ticket: 'R$ 310 por arroba futura',
+                liquidation: 'Liquidação pela compra do frigorífico parceiro',
+                guarantee: 'Contrato de abate, conta escrow e conciliação por nota fiscal',
+                docs: ['Contrato com frigorífico', 'Escala de abate', 'NF futura vinculada', 'Conta escrow', 'Auditoria de peso e rendimento']
+            }
+        };
+
         function openTokenDetail(tokenName) {
-            const meta = {
-                'Token Bezerro': { prazo: '8 a 10 meses', fase: 'Cria', lastro: 'bezerros de 7 a 9 arrobas', ticket: 'R$ 1.800 por cabeça', retorno: 'contrato futuro com recriadores' },
-                'Token Garrote': { prazo: '8 a 12 meses', fase: 'Recria', lastro: 'garrotes de 12 a 15 arrobas', ticket: 'R$ 1.500 por cabeça', retorno: 'contrato com confinadores ou frigoríficos' },
-                'Token Arroba': { prazo: '4 a 6 meses', fase: 'Engorda', lastro: 'boi gordo de 18 a 21 arrobas', ticket: 'R$ 2.500 por cabeça', retorno: 'venda final ao frigorífico' }
-            }[tokenName] || {};
+            const meta = TOKEN_OPERATIONS[tokenName] || TOKEN_OPERATIONS['Token Bezerro'];
+            const available = meta.target * (1 - meta.captured / 100);
             openQuickModal(`
                 <div>
                     <div style="text-align:center;margin-bottom:12px;">
-                        <div style="font-size:44px;">🐂</div>
+                        <div style="font-size:44px;">${meta.icon}</div>
                         <div style="font-size:20px;font-weight:900;">${tokenName}</div>
-                        <div style="font-size:12px;color:var(--text-secondary);">Recebível tokenizado da fase ${meta.fase}</div>
+                        <div style="font-size:12px;color:var(--text-secondary);">${meta.code} • Recebível tokenizado da fase ${meta.fase}</div>
                     </div>
                     <div class="card" style="padding:12px;margin-bottom:10px;">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                             <div><div class="metric-label">Prazo</div><div style="font-weight:900;">${meta.prazo}</div></div>
-                            <div><div class="metric-label">Ticket</div><div style="font-weight:900;">${meta.ticket}</div></div>
+                            <div><div class="metric-label">Retorno estimado</div><div style="font-weight:900;color:#168A4B;">${meta.expected}</div></div>
                             <div><div class="metric-label">Lastro</div><div style="font-weight:900;">${meta.lastro}</div></div>
-                            <div><div class="metric-label">Liquidação</div><div style="font-weight:900;">${meta.retorno}</div></div>
+                            <div><div class="metric-label">Risco</div><div style="font-weight:900;">${meta.risk}</div></div>
                         </div>
                     </div>
-                    <button class="btn btn-primary" style="width:100%;" onclick="showToast('Token CR reservado para análise do investidor'); closeQuickModal();">Reservar Token CR</button>
+                    <div class="card" style="padding:12px;margin-bottom:10px;background:#FAFBFC;">
+                        <div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:8px;">
+                            <div><div class="metric-label">Oferta total</div><div style="font-weight:900;">${formatCurrency(meta.target)}</div></div>
+                            <div style="text-align:right;"><div class="metric-label">Disponível</div><div style="font-weight:900;color:var(--secondary);">${formatCurrency(available)}</div></div>
+                        </div>
+                        <div style="height:8px;background:var(--border-color);border-radius:999px;overflow:hidden;"><div style="width:${meta.captured}%;height:100%;background:#168A4B;"></div></div>
+                        <div style="font-size:11px;color:var(--text-secondary);margin-top:6px;">${meta.captured}% captado • Mínimo ${formatCurrency(meta.minimum)}</div>
+                    </div>
+                    <div class="card" style="padding:12px;margin-bottom:10px;">
+                        <div style="font-weight:900;margin-bottom:6px;">Liquidação e garantias</div>
+                        <div style="font-size:12px;color:var(--text-secondary);line-height:1.45;">${meta.liquidation}. ${meta.guarantee}.</div>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">${meta.docs.map(doc => `<span style="font-size:10px;border:1px solid var(--border-color);border-radius:999px;padding:5px 7px;background:#fff;">${doc}</span>`).join('')}</div>
+                    </div>
+                    <label class="field-label">Valor do aporte</label>
+                    <input class="field-input" id="tokenInvestmentAmount" value="${formatCurrency(meta.minimum)}" inputmode="decimal">
+                    <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="confirmTokenInvestment('${meta.code}')">Investir neste Token CR</button>
                     <button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="closeQuickModal()">Fechar</button>
                 </div>
             `);
+        }
+
+        function confirmTokenInvestment(code) {
+            const operation = Object.values(TOKEN_OPERATIONS).find(item => item.code === code);
+            const amount = parseMoneyInput(document.getElementById('tokenInvestmentAmount')?.value);
+            if (!operation || !amount || amount <= 0) { showToast('Informe um valor válido.'); return; }
+            if (amount < operation.minimum) { showToast('Aporte mínimo: ' + formatCurrency(operation.minimum)); return; }
+            const data = getUserData(currentUser.role);
+            if (!data.wallet || data.wallet.balance < amount) { showToast('Saldo insuficiente para investir neste Token CR.'); return; }
+            const allocation = getInvestmentAllocation(data);
+            addTransaction(currentUser.role, 'Investimento Token CR', -amount, 'invest', `${operation.code} • ${operation.fase} • ${operation.expected}`);
+            allocation.fidic = Number(allocation.fidic || 0) + amount;
+            data.tokenInvestments = data.tokenInvestments || [];
+            data.tokenInvestments.unshift({
+                code: operation.code,
+                phase: operation.fase,
+                amount,
+                expected: operation.expected,
+                maturity: operation.prazo,
+                date: shortDate(0)
+            });
+            updateUserData(currentUser.role, { tokenInvestments: data.tokenInvestments, investmentAllocation: allocation });
+            closeQuickModal();
+            renderWallet();
+            renderStatement();
+            renderInvestment();
+            exibirModalSucesso(
+                'Token CR adquirido',
+                'Aporte registrado com lastro pecuário e liquidação pela cadeia NelorePay.',
+                [
+                    { label: 'Operação', value: operation.code },
+                    { label: 'Fase', value: operation.fase },
+                    { label: 'Valor investido', value: formatCurrency(amount) },
+                    { label: 'Retorno estimado', value: operation.expected }
+                ],
+                'TOK-' + Date.now(),
+                false
+            );
         }
 
         function openTokenAdvanceModal() {
@@ -2122,7 +2223,10 @@
             if (!amount || amount <= 0) { showToast('Informe um valor válido.'); return; }
             const net = amount * 0.982;
             addTransaction(currentUser.role, 'Antecipação Token CR', net, 'credit', document.getElementById('tokenAdvanceUse')?.value || 'Recebível pecuário');
+            updateUserData(currentUser.role, getUserData(currentUser.role));
             closeQuickModal();
+            renderWallet();
+            renderStatement();
             showToast('Token CR aprovado: ' + formatCurrency(net) + ' liberados na carteira.');
         }
 
@@ -3960,6 +4064,11 @@
         function fuelAuthorizationPdfBlob(req) {
             const authPayload = buildFuelAuthorizationPayload(req);
             const text = (x, y, value, size = 10, font = 'F1', color = '0 0 0') => `BT /${font} ${size} Tf ${color} rg ${x} ${y} Td (${pdfSafeText(value)}) Tj ET\n`;
+            const textCenter = (x, y, w, value, size = 10, font = 'F1', color = '0 0 0') => {
+                const safe = pdfSafeText(value);
+                const tx = x + Math.max(0, (w - safe.length * size * 0.52) / 2);
+                return text(tx.toFixed(2), y, safe, size, font, color);
+            };
             const box = (x, y, w, h, fill = '1 1 1', stroke = '0.82 0.86 0.90') => `q ${fill} rg ${x} ${y} ${w} ${h} re f ${stroke} RG 1 w ${x} ${y} ${w} ${h} re S Q\n`;
             const line = (x1, y1, x2, y2, color = '0.82 0.86 0.90') => `q ${color} RG 1 w ${x1} ${y1} m ${x2} ${y2} l S Q\n`;
             const logoBytes = base64ToUint8Array(NELOREPAY_LOGO_JPEG_BASE64);
@@ -3978,9 +4087,9 @@
             stream += 'q 0.00 0.33 0.65 rg 796 36 10 523 re f Q\n';
             stream += line(54, 492, 788, 492, '0.10 0.10 0.10');
             stream += box(58, 498, 150, 56, '1 1 1', '1 1 1');
-            stream += 'q 86 0 0 56 90 498 cm /Logo Do Q\n';
-            stream += text(486, 535, 'ORDEM DE ABASTECIMENTO NELOREPAY', 15, 'F2', '0.10 0.10 0.10');
-            stream += text(612, 514, req.number, 13, 'F2', '1.00 0.48 0.00');
+            stream += 'q 118 0 0 46 74 503 cm /Logo Do Q\n';
+            stream += textCenter(468, 535, 306, 'ORDEM DE ABASTECIMENTO NELOREPAY', 14, 'F2', '0.10 0.10 0.10');
+            stream += textCenter(468, 514, 306, req.number, 13, 'F2', '1.00 0.48 0.00');
 
             stream += box(64, 386, 330, 82, '0.96 0.98 1', '0.78 0.84 0.90');
             stream += text(80, 448, 'DADOS DO CLIENTE', 10, 'F2', '0.10 0.10 0.10');
@@ -4016,9 +4125,9 @@
             stream += text(80, 158, 'VALIDACAO OPERACIONAL', 10, 'F2', '0.10 0.10 0.10');
             stream += text(82, 140, 'QR Autorizacao', 8, 'F2', '0.10 0.10 0.10');
             stream += pdfQrRects(authPayload, 82, 82, 54);
-            stream += text(326, 148, 'CODIGO DE BARRAS DA AUTORIZACAO', 8, 'F2', '0.10 0.10 0.10');
+            stream += textCenter(242, 148, 330, 'CODIGO DE BARRAS DA AUTORIZACAO', 8, 'F2', '0.10 0.10 0.10');
             stream += pdfCode39Bars(req.authCode, 242, 104, 330, 32);
-            stream += text(350, 86, req.authCode, 12, 'F2', '0.10 0.10 0.10');
+            stream += textCenter(242, 86, 330, req.authCode, 12, 'F2', '0.10 0.10 0.10');
             stream += text(642, 140, 'QR localizacao posto', 8, 'F2', '0.10 0.10 0.10');
             stream += pdfQrRects(req.mapLink, 656, 82, 54);
             stream += text(80, 66, 'Conferir codigo, QR e liberar somente a litragem autorizada. Enviar ao motorista via WhatsApp.', 8, 'F1', '0.35 0.40 0.45');
@@ -4098,7 +4207,7 @@
                     <div class="fuel-auth-header">
                         <img class="fuel-auth-logo" src="nelorepay-logo.png" alt="NelorePay">
                         <div>
-                            <div class="fuel-auth-title">Requisição de Abastecimento</div>
+                            <div class="fuel-auth-title">Ordem de Abastecimento NelorePay</div>
                             <div class="fuel-auth-number">${req.number}</div>
                         </div>
                     </div>
