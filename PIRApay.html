@@ -359,7 +359,7 @@
         .logo-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .fuel-auth-card { background: #fff; border: 1px solid var(--border-color); border-radius: 18px; padding: 14px; color: var(--text-primary); }
         .fuel-auth-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 12px; }
-        .fuel-auth-logo { width: 104px; height: 42px; object-fit: contain; }
+        .fuel-auth-logo { width: 132px; height: 54px; object-fit: contain; object-position: center; border-radius: 8px; background: #fff; }
         .fuel-auth-title { font-size: 16px; font-weight: 900; text-align: right; }
         .fuel-auth-number { color: var(--primary); font-size: 12px; font-weight: 900; margin-top: 2px; }
         .fuel-auth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
@@ -372,7 +372,8 @@
         .fuel-auth-line strong { text-align: right; }
         .fuel-auth-codes { display: grid; grid-template-columns: 110px 1fr; gap: 10px; align-items: center; }
         .fuel-auth-qr { width: 104px; height: 104px; border: 1px solid var(--border-color); border-radius: 10px; background: #fff; padding: 4px; }
-        .fuel-auth-code { font-size: 16px; font-weight: 900; color: var(--primary); letter-spacing: 1px; word-break: break-word; }
+        .fuel-auth-code { font-size: 16px; font-weight: 900; color: var(--primary); letter-spacing: 1px; word-break: break-word; text-align: center; }
+        .fuel-auth-barcode-label { font-size: 10px; color: var(--primary); font-weight: 900; text-align: center; text-transform: uppercase; margin: 8px 0 4px; }
         .fuel-auth-barcode { width: 100%; height: 54px; background: #fff; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 8px; overflow: hidden; }
         .fuel-auth-footer { margin-top: 10px; display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; font-size: 11px; color: var(--text-secondary); }
         .fuel-auth-footer img { width: 76px; height: 76px; border: 1px solid var(--border-color); border-radius: 10px; padding: 3px; background: #fff; }
@@ -637,22 +638,34 @@
 
                 <div class="screen" id="screen-investimentos">
                     <div style="font-size:22px;font-weight:800;">📈 Crédito e Antecipação LBV</div>
-                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Rendimento de 120% do CDI • Gestão automatizada</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Renda Fixa, Fundos e FIDIC LBVFS comparados ao CDI dos últimos 12 meses</div>
                     <div class="card" style="padding:18px;text-align:center;margin-bottom:12px;">
                         <div style="font-size:12px;color:var(--text-secondary);">Saldo investido</div>
                         <div style="font-size:34px;font-weight:900;color:var(--primary);" id="investmentBalance">R$ 8.450,00</div>
                         <div style="font-size:12px;color:var(--secondary);" id="investmentYield">Rendimento acumulado: +R$ 240,32</div>
                     </div>
-                    <div class="chart-container" style="background:var(--bg-card);border-radius:var(--radius);padding:12px;border:1px solid var(--border-color);height:160px;">
-                        <canvas id="investChart" style="width:100%;height:100%;"></canvas>
+                    <div class="chart-container" style="background:var(--bg-card);border-radius:var(--radius);padding:12px;border:1px solid var(--border-color);height:250px;">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px;">
+                            <div>
+                                <div style="font-size:13px;font-weight:800;color:var(--text-primary);">Desempenho acumulado em 12 meses</div>
+                                <div style="font-size:11px;color:var(--text-secondary);">Base 100 • Série CDI referencial para demo</div>
+                            </div>
+                            <select id="investmentChartFocus" onchange="renderInvestment()" style="border:1px solid var(--border-color);border-radius:10px;padding:7px 8px;font-size:12px;background:#fff;color:var(--text-primary);">
+                                <option value="all">Comparar todos</option>
+                                <option value="cdb">Renda Fixa (CDB)</option>
+                                <option value="fip">Fundos (FIP)</option>
+                                <option value="fidic">FIDIC LBVFS</option>
+                            </select>
+                        </div>
+                        <canvas id="investChart" style="width:100%;height:178px;"></canvas>
                     </div>
+                    <div id="investmentLegend" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0;"></div>
                     <div style="display:flex;gap:10px;margin:14px 0;">
                         <button class="btn btn-secondary" style="flex:1;" onclick="abrirModalAporte()">➕ Aportar</button>
                         <button class="btn btn-outline" style="flex:1;" onclick="abrirModalResgate()">🔄 Resgatar</button>
                     </div>
-                    <div class="section-title">📊 Carteira</div>
-                    <div class="card" style="display:flex;justify-content:space-between;padding:12px 14px;border-radius:var(--radius-sm);"><span>Renda Fixa (CDB)</span><span style="font-weight:700;">R$ 6.200</span></div>
-                    <div class="card" style="display:flex;justify-content:space-between;padding:12px 14px;border-radius:var(--radius-sm);"><span>Fundos (FIP)</span><span style="font-weight:700;">R$ 2.250</span></div>
+                    <div class="section-title">📊 Carteira por produto</div>
+                    <div id="investmentProducts" style="display:flex;flex-direction:column;gap:8px;"></div>
                 </div>
 
                 <div class="screen" id="screen-beneficios">
@@ -1830,71 +1843,162 @@
             }, 1000);
         }
 
-        function renderInvestment() {
-            const data = getUserData(currentUser.role);
-            document.getElementById('investmentBalance').textContent = formatCurrency(data.wallet.invested || 0);
-            document.getElementById('investmentYield').textContent = 'Rendimento acumulado: +' + formatCurrency(data.wallet.yield || 0);
-            renderInvestChart(data.investmentHistory || []);
+        const INVESTMENT_PRODUCTS = {
+            cdb: { label: 'Renda Fixa (CDB)', short: 'CDB', color: '#0054A6', expected: '120% do CDI', risk: 'Baixo', liquidity: 'D+1' },
+            fip: { label: 'Fundos (FIP)', short: 'FIP', color: '#FF7A00', expected: 'Estratégia de participação', risk: 'Médio/Alto', liquidity: 'D+30' },
+            fidic: { label: 'FIDIC LBVFS', short: 'LBVFS', color: '#22A06B', expected: 'Crédito estruturado', risk: 'Médio', liquidity: 'D+15' }
+        };
+
+        const INVESTMENT_PERFORMANCE = {
+            labels: ['Jul/25', 'Ago/25', 'Set/25', 'Out/25', 'Nov/25', 'Dez/25', 'Jan/26', 'Fev/26', 'Mar/26', 'Abr/26', 'Mai/26', 'Jun/26'],
+            cdiMonthly: [1.06, 1.14, 1.10, 1.18, 1.12, 1.17, 1.06, 0.96, 1.16, 1.08, 1.16, 1.10],
+            series: {
+                cdi: { label: 'CDI', color: '#8A8A9E', values: [] },
+                cdb: { label: 'Renda Fixa (CDB)', color: '#0054A6', values: [] },
+                fip: { label: 'Fundos (FIP)', color: '#FF7A00', values: [100, 101.9, 103.3, 105.8, 106.7, 109.6, 111.2, 112.8, 115.7, 116.9, 119.5, 122.4] },
+                fidic: { label: 'FIDIC LBVFS', color: '#22A06B', values: [] }
+            }
+        };
+
+        INVESTMENT_PERFORMANCE.series.cdi.values = buildIndexedSeries(INVESTMENT_PERFORMANCE.cdiMonthly, 1);
+        INVESTMENT_PERFORMANCE.series.cdb.values = buildIndexedSeries(INVESTMENT_PERFORMANCE.cdiMonthly, 1.2);
+        INVESTMENT_PERFORMANCE.series.fidic.values = buildIndexedSeries(INVESTMENT_PERFORMANCE.cdiMonthly.map((v, i) => v + (i % 3 === 0 ? 0.06 : 0.02)), 1.28);
+
+        function buildIndexedSeries(monthlyRates, multiplier) {
+            let acc = 100;
+            return monthlyRates.map(rate => {
+                acc *= 1 + ((rate * multiplier) / 100);
+                return Number(acc.toFixed(2));
+            });
         }
 
-        function renderInvestChart(data) {
+        function getInvestmentAllocation(data) {
+            const invested = data.wallet.invested || 0;
+            const current = data.investmentAllocation || {};
+            const total = Object.values(current).reduce((sum, v) => sum + Number(v || 0), 0);
+            if (total > 0) {
+                return {
+                    cdb: Number(current.cdb || 0),
+                    fip: Number(current.fip || 0),
+                    fidic: Number(current.fidic || 0)
+                };
+            }
+            return {
+                cdb: Math.round(invested * 0.58),
+                fip: Math.round(invested * 0.22),
+                fidic: Math.max(0, invested - Math.round(invested * 0.58) - Math.round(invested * 0.22))
+            };
+        }
+
+        function renderInvestment() {
+            const data = getUserData(currentUser.role);
+            const allocation = getInvestmentAllocation(data);
+            document.getElementById('investmentBalance').textContent = formatCurrency(data.wallet.invested || 0);
+            document.getElementById('investmentYield').textContent = 'Rendimento acumulado: +' + formatCurrency(data.wallet.yield || 0);
+            renderInvestmentProducts(allocation);
+            renderInvestChart();
+        }
+
+        function renderInvestmentProducts(allocation) {
+            const target = document.getElementById('investmentProducts');
+            if (!target) return;
+            const total = Math.max(1, Object.values(allocation).reduce((sum, v) => sum + Number(v || 0), 0));
+            target.innerHTML = Object.entries(INVESTMENT_PRODUCTS).map(([key, product]) => {
+                const value = Number(allocation[key] || 0);
+                const pct = Math.round((value / total) * 100);
+                return `
+                    <div class="card" style="padding:12px 14px;border-radius:var(--radius-sm);">
+                        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+                            <div>
+                                <div style="font-weight:800;color:var(--text-primary);">${product.label}</div>
+                                <div style="font-size:11px;color:var(--text-secondary);">${product.expected} • Risco ${product.risk} • Liquidez ${product.liquidity}</div>
+                            </div>
+                            <div style="text-align:right;font-weight:900;color:${product.color};">${formatCurrency(value)}<div style="font-size:11px;color:var(--text-secondary);">${pct}%</div></div>
+                        </div>
+                        <div style="height:7px;background:var(--border-color);border-radius:999px;overflow:hidden;margin-top:10px;"><div style="width:${pct}%;height:100%;background:${product.color};border-radius:999px;"></div></div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderInvestChart() {
             const canvas = document.getElementById('investChart');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             canvas.width = canvas.clientWidth * 2;
             canvas.height = canvas.clientHeight * 2;
             ctx.scale(2, 2);
-            const w = canvas.width / 2,
-                h = canvas.height / 2;
+            const w = canvas.width / 2;
+            const h = canvas.height / 2;
             ctx.clearRect(0, 0, w, h);
-            if (!data || data.length === 0) {
-                ctx.fillStyle = '#8A8A9E';
-                ctx.font = '12px Inter';
-                ctx.textAlign = 'center';
-                ctx.fillText('Sem dados de investimento', w / 2, h / 2);
-                return;
-            }
-            const max = Math.max(...data);
-            const min = Math.min(...data);
-            const padding = 15;
-            const graphH = h - padding * 2;
-            const graphW = w - padding * 2;
-            const grad = ctx.createLinearGradient(0, padding, 0, h - padding);
-            grad.addColorStop(0, 'rgba(107,63,160,0.4)');
-            grad.addColorStop(1, 'rgba(107,63,160,0.0)');
-            ctx.beginPath();
-            data.forEach((v, i) => {
-                const x = padding + (i / (data.length - 1)) * graphW;
-                const y = padding + graphH - ((v - min) / (max - min)) * graphH;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            });
-            ctx.lineTo(padding + graphW, h - padding);
-            ctx.lineTo(padding, h - padding);
-            ctx.closePath();
-            ctx.fillStyle = grad;
-            ctx.fill();
-            ctx.beginPath();
-            data.forEach((v, i) => {
-                const x = padding + (i / (data.length - 1)) * graphW;
-                const y = padding + graphH - ((v - min) / (max - min)) * graphH;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            });
-            ctx.strokeStyle = '#FF7A00';
-            ctx.lineWidth = 3;
-            ctx.shadowColor = 'rgba(212,168,67,0.3)';
-            ctx.shadowBlur = 8;
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-            data.forEach((v, i) => {
-                const x = padding + (i / (data.length - 1)) * graphW;
-                const y = padding + graphH - ((v - min) / (max - min)) * graphH;
+            const focus = document.getElementById('investmentChartFocus') ? document.getElementById('investmentChartFocus').value : 'all';
+            const seriesKeys = focus === 'all' ? ['cdb', 'fip', 'fidic', 'cdi'] : [focus, 'cdi'];
+            const allValues = seriesKeys.flatMap(k => INVESTMENT_PERFORMANCE.series[k].values);
+            const max = Math.max(...allValues) + 1.2;
+            const min = Math.min(...allValues) - 1.2;
+            const padding = { left: 34, right: 12, top: 14, bottom: 30 };
+            const graphH = h - padding.top - padding.bottom;
+            const graphW = w - padding.left - padding.right;
+            const yFor = v => padding.top + graphH - ((v - min) / (max - min)) * graphH;
+            const xFor = i => padding.left + (i / (INVESTMENT_PERFORMANCE.labels.length - 1)) * graphW;
+
+            ctx.strokeStyle = '#E0E0E8';
+            ctx.lineWidth = 1;
+            ctx.font = '10px Inter';
+            ctx.fillStyle = '#8A8A9E';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 4; i++) {
+                const value = min + ((max - min) / 4) * i;
+                const y = yFor(value);
                 ctx.beginPath();
-                ctx.arc(x, y, 3, 0, 2 * Math.PI);
-                ctx.fillStyle = '#FF7A00';
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(w - padding.right, y);
+                ctx.stroke();
+                ctx.fillText(value.toFixed(0), padding.left - 6, y + 3);
+            }
+
+            INVESTMENT_PERFORMANCE.labels.forEach((label, i) => {
+                if (i % 2 !== 0 && i !== INVESTMENT_PERFORMANCE.labels.length - 1) return;
+                ctx.fillStyle = '#8A8A9E';
+                ctx.textAlign = 'center';
+                ctx.fillText(label.replace('/25', '').replace('/26', ''), xFor(i), h - 10);
+            });
+
+            seriesKeys.forEach(key => {
+                const series = INVESTMENT_PERFORMANCE.series[key];
+                ctx.beginPath();
+                series.values.forEach((v, i) => {
+                    const x = xFor(i);
+                    const y = yFor(v);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.strokeStyle = series.color;
+                ctx.lineWidth = key === 'cdi' ? 2 : 3;
+                ctx.setLineDash(key === 'cdi' ? [5, 5] : []);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                const lastX = xFor(series.values.length - 1);
+                const lastY = yFor(series.values[series.values.length - 1]);
+                ctx.beginPath();
+                ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+                ctx.fillStyle = series.color;
                 ctx.fill();
             });
+
+            renderInvestLegend(seriesKeys);
+        }
+
+        function renderInvestLegend(seriesKeys) {
+            const legend = document.getElementById('investmentLegend');
+            if (!legend) return;
+            legend.innerHTML = seriesKeys.map(key => {
+                const series = INVESTMENT_PERFORMANCE.series[key];
+                const first = series.values[0];
+                const last = series.values[series.values.length - 1];
+                const perf = ((last / first - 1) * 100).toFixed(2).replace('.', ',');
+                return `<span style="display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-color);border-radius:999px;padding:6px 9px;background:#fff;font-size:11px;font-weight:800;color:var(--text-primary);"><i style="width:10px;height:10px;border-radius:50%;background:${series.color};display:inline-block;"></i>${series.label}: +${perf}%</span>`;
+            }).join('');
         }
 
         function addTransaction(role, desc, amount, type, detail) {
@@ -2418,7 +2522,12 @@
                 <div style="text-align:center;">
                     <div style="font-size:48px;">💰</div>
                     <div style="font-size:20px;font-weight:700;color:var(--text-primary);">Aportar Investimento</div>
-                    <div style="font-size:14px;color:var(--text-secondary);margin-bottom:12px;">Digite o valor que deseja investir:</div>
+                    <div style="font-size:14px;color:var(--text-secondary);margin-bottom:12px;">Escolha o produto e o valor do aporte:</div>
+                    <select id="aporteProduto" style="width:100%;padding:12px;border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:15px;margin-bottom:10px;background:#fff;color:var(--text-primary);">
+                        <option value="cdb">Renda Fixa (CDB) • 120% do CDI • Baixo risco</option>
+                        <option value="fip">Fundos (FIP) • Participação • Médio/alto risco</option>
+                        <option value="fidic">FIDIC LBVFS • Crédito estruturado • Médio risco</option>
+                    </select>
                     <input id="aporteValor" type="number" min="0.01" step="0.01" placeholder="R$ 0,00" style="width:100%;padding:12px;border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:16px;margin-bottom:12px;">
                     <button class="btn btn-secondary" style="width:100%;" id="btnConfirmarAporte" onclick="confirmarAporte()">Confirmar Aporte</button>
                     <button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="closeQuickModal()">Cancelar</button>
@@ -2442,18 +2551,22 @@
                 return;
             }
             closeQuickModal();
-            addTransaction(currentUser.role, 'Aporte em Investimento', -valor, 'invest', 'Piracanjuba CDB 120% CDI');
+            const productKey = document.getElementById('aporteProduto') ? document.getElementById('aporteProduto').value : 'cdb';
+            const product = INVESTMENT_PRODUCTS[productKey] || INVESTMENT_PRODUCTS.cdb;
+            addTransaction(currentUser.role, 'Aporte em ' + product.label, -valor, 'invest', product.expected + ' • ' + product.liquidity);
+            const allocation = getInvestmentAllocation(data);
+            allocation[productKey] = Number(allocation[productKey] || 0) + valor;
             const hist = data.investmentHistory || [];
             const last = hist.length > 0 ? hist[hist.length - 1] : 100;
             hist.push(last + valor * 0.02);
-            updateUserData(currentUser.role, { investmentHistory: hist });
+            updateUserData(currentUser.role, { investmentHistory: hist, investmentAllocation: allocation });
             renderInvestment();
             const protocolo = 'TX-' + Date.now();
             
             exibirModalSucesso(
                 'Investimento realizado!',
-                'Seu dinheiro está rendendo 120% do CDI.',
-                [{ label: 'Valor', value: formatCurrency(valor) }],
+                'Aporte alocado em ' + product.label + '.',
+                [{ label: 'Produto', value: product.label }, { label: 'Valor', value: formatCurrency(valor) }],
                 protocolo,
                 false
             );
@@ -2799,10 +2912,10 @@
             stream += 'q 1.00 0.48 0.00 rg 36 36 10 523 re f Q\n';
             stream += 'q 0.00 0.33 0.65 rg 796 36 10 523 re f Q\n';
             stream += line(54, 492, 788, 492, '0.00 0.33 0.65');
-            stream += 'q 146 0 0 94 64 498 cm /Logo Do Q\n';
+            stream += box(58, 498, 150, 56, '1 1 1', '1 1 1');
+            stream += 'q 86 0 0 56 90 498 cm /Logo Do Q\n';
             stream += text(486, 535, 'REQUISICAO DE ABASTECIMENTO', 15, 'F2', '0.00 0.33 0.65');
             stream += text(612, 514, req.number, 13, 'F2', '1.00 0.48 0.00');
-            stream += text(612, 498, 'Formato papel moeda para autorizacao operacional', 8, 'F1', '0.35 0.40 0.45');
 
             stream += box(64, 386, 330, 82, '0.96 0.98 1', '0.78 0.84 0.90');
             stream += text(80, 448, 'DADOS DO CLIENTE', 10, 'F2', '0.00 0.33 0.65');
@@ -2835,12 +2948,12 @@
             stream += text(590, 214, `Total: ${formatCurrency(req.total)}`, 13, 'F2', '0.00 0.33 0.65');
 
             stream += box(64, 54, 702, 120, '1 1 1', '0.78 0.84 0.90');
-            stream += text(80, 154, 'VALIDACAO PARA O CAIXA', 10, 'F2', '0.00 0.33 0.65');
+            stream += text(80, 158, 'VALIDACAO PARA O CAIXA', 10, 'F2', '0.00 0.33 0.65');
             stream += text(82, 140, 'QR Autorizacao', 8, 'F2', '0.00 0.33 0.65');
             stream += pdfQrRects(authPayload, 82, 82, 54);
-            stream += text(242, 140, 'Codigo de barras da autorizacao', 8, 'F2', '0.00 0.33 0.65');
-            stream += pdfCode39Bars(req.authCode, 242, 108, 330, 34);
-            stream += text(330, 88, req.authCode, 12, 'F2', '0.00 0.33 0.65');
+            stream += text(326, 148, 'CODIGO DE BARRAS DA AUTORIZACAO', 8, 'F2', '0.00 0.33 0.65');
+            stream += pdfCode39Bars(req.authCode, 242, 104, 330, 32);
+            stream += text(350, 86, req.authCode, 12, 'F2', '0.00 0.33 0.65');
             stream += text(642, 140, 'QR localizacao posto', 8, 'F2', '0.00 0.33 0.65');
             stream += pdfQrRects(req.mapLink, 656, 82, 54);
             stream += text(80, 66, 'Conferir codigo, QR e liberar somente a litragem autorizada. Enviar ao motorista via WhatsApp.', 8, 'F1', '0.35 0.40 0.45');
@@ -2956,6 +3069,7 @@
                                 <img class="fuel-auth-qr" src="${escapeHtml(authQr)}" alt="QR Code de autorização">
                                 <div>
                                     <div class="fuel-auth-code">${escapeHtml(req.authCode)}</div>
+                                    <div class="fuel-auth-barcode-label">Código de barras da autorização</div>
                                     <div class="fuel-auth-barcode">${barcodeSvg(req.authCode)}</div>
                                 </div>
                             </div>
