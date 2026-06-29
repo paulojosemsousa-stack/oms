@@ -527,7 +527,7 @@
                 <div class="screen active" id="screen-home">
                     <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
                         <div style="font-size:44px;background:var(--bg-card);border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border-color);">👋</div>
-                        <div><div style="font-size:22px;font-weight:800;color:var(--text-primary);">Olá, <span id="homeUserName" class="student-switch" onclick="openStudentSelector()">Paulo</span></div>
+                        <div><div style="font-size:22px;font-weight:800;color:var(--text-primary);">Olá, <span id="homeUserName" class="student-switch" onclick="openActiveProfileSelector()">Paulo</span></div>
                         <div style="display:flex;align-items:center;gap:8px;margin-top:4px;"><span class="badge-cat" id="homeBadge" style="background:rgba(107,63,160,0.08);color:var(--primary);border:1px solid rgba(107,63,160,0.15);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;">🏆 Fidelizado</span></div></div>
                     </div>
                     <div class="card" style="margin-bottom:16px;border-left:4px solid var(--secondary);">
@@ -560,6 +560,10 @@
                         </div>
                         <div class="card" style="padding:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin-top:8px;background:linear-gradient(135deg,rgba(0,84,166,0.06),rgba(255,122,0,0.08));" onclick="navigateTo('postos')">
                             <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:28px;">⛽</span><div><div style="font-weight:600;">Postos Parceiros</div><div style="font-size:12px;color:var(--text-secondary);">Diesel, gasolina, etanol e ARLA com preço PiraPay</div></div></div>
+                            <span style="color:var(--primary);">→</span>
+                        </div>
+                        <div class="card" style="padding:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin-top:8px;background:linear-gradient(135deg,rgba(37,99,235,0.06),rgba(15,118,110,0.08));" onclick="navigateTo('logistica')">
+                            <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:28px;">🚚</span><div><div style="font-weight:600;">Transportadoras Piracanjuba</div><div style="font-size:12px;color:var(--text-secondary);">Fretes, abastecimento, antecipação e requisições</div></div></div>
                             <span style="color:var(--primary);">→</span>
                         </div>
                         <div class="card" style="padding:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin-top:8px;" onclick="navigateTo('fornecedor')">
@@ -606,6 +610,19 @@
                         <button class="btn btn-outline btn-sm" onclick="showToast('📄 Boleto gerado')">📄 Boleto</button>
                         <button class="btn btn-outline btn-sm" onclick="navigateTo('investimentos')">📈 Investir</button>
                     </div>
+                    <div class="card" id="freightWalletTools" style="display:none;padding:14px;margin-bottom:14px;border-left:4px solid #2563EB;">
+                        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px;">
+                            <div>
+                                <div style="font-weight:900;">🚚 Fretes PiraPay</div>
+                                <div style="font-size:12px;color:var(--text-secondary);" id="freightWalletSummary">Antecipe fretes concluídos e fretes futuros confirmados</div>
+                            </div>
+                            <button class="btn btn-outline btn-sm" onclick="navigateTo('logistica')">Ver logística</button>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                            <button class="btn btn-secondary btn-sm" onclick="openFreightAdvanceModal('completed')">Antecipar concluído</button>
+                            <button class="btn btn-primary btn-sm" onclick="openFreightAdvanceModal('future')">Antecipar futuro</button>
+                        </div>
+                    </div>
 
                     <div class="chart-card" style="margin-bottom:14px;">
                         <div class="section-title" style="margin-top:0;font-size:14px;">📊 Dashboard financeiro</div>
@@ -630,6 +647,8 @@
                             <option value="credit">Entradas (Reais)</option>
                             <option value="debit">Saídas (Reais)</option>
                             <option value="points">Compras com Pontos</option>
+                            <option value="fuel_issued">Requisições emitidas</option>
+                            <option value="fuel_used">Requisições utilizadas</option>
                         </select>
                     </div>
             
@@ -735,6 +754,49 @@
                     <div class="fuel-map" id="fuelMap"></div>
                     <div id="fuelRegionPanel" style="margin-top:12px;"></div>
                     <div class="fuel-source-note">Fonte dos preços médios: ANP, Levantamento de Preços de Combustíveis, resumo semanal 21/06/2026 a 27/06/2026. Óleo diesel corresponde ao Diesel B S500 comum conforme observação da ANP. ARLA 32 e etanol aditivado são estimativas comerciais PiraPay para simulação, pois não aparecem na tabela semanal de revenda da ANP.</div>
+                </div>
+
+                <div class="screen" id="screen-logistica">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;">
+                        <div>
+                            <div style="font-size:22px;font-weight:800;">🚚 Logística Piracanjuba</div>
+                            <div style="font-size:13px;color:var(--text-secondary);" id="carrierSubtitle">Transportadoras integradas ao PiraPay</div>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="openTransporterSelector()">Trocar transportadora</button>
+                    </div>
+                    <div class="grid-3" style="margin-bottom:12px;">
+                        <div class="metric-card"><div class="metric-value" id="carrierCompletedFreights">R$ 0</div><div class="metric-label">fretes concluídos</div></div>
+                        <div class="metric-card"><div class="metric-value" id="carrierFutureFreights">R$ 0</div><div class="metric-label">fretes futuros</div></div>
+                        <div class="metric-card"><div class="metric-value" id="carrierFuelSavings">R$ 0</div><div class="metric-label">economia abastecimento</div></div>
+                    </div>
+                    <div class="card" style="padding:14px;margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px;">
+                            <div>
+                                <div style="font-weight:900;" id="carrierName">Transportadora</div>
+                                <div style="font-size:12px;color:var(--text-secondary);" id="carrierMeta">Carteira • frota • rota</div>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="navigateTo('postos')">Comprar combustível</button>
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <button class="btn btn-secondary btn-sm" onclick="openFreightAdvanceModal('completed')">Antecipar frete concluído</button>
+                            <button class="btn btn-outline btn-sm" onclick="openFreightAdvanceModal('future')">Antecipar frete futuro</button>
+                            <button class="btn btn-outline btn-sm" onclick="openFuelSupplyReportModal()">Relatório de abastecimentos</button>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="card" style="padding:14px;">
+                            <div class="section-title" style="font-size:14px;margin-top:0;">Transportadoras parceiras</div>
+                            <div id="carrierList" style="display:flex;flex-direction:column;gap:8px;"></div>
+                        </div>
+                        <div class="card" style="padding:14px;">
+                            <div class="section-title" style="font-size:14px;margin-top:0;">Requisições de abastecimento</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+                                <button class="btn btn-outline btn-sm" onclick="renderFuelRequestsPanel('issued')">Emitidas</button>
+                                <button class="btn btn-outline btn-sm" onclick="renderFuelRequestsPanel('used')">Utilizadas</button>
+                            </div>
+                            <div id="carrierFuelRequests" style="display:flex;flex-direction:column;gap:8px;"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="screen" id="screen-comunidade">
@@ -1129,7 +1191,7 @@
     </div>
 
     <script>
-        const DATA_VERSION = 30;
+        const DATA_VERSION = 33;
         const PIRAPAY_LOGO_JPEG_BASE64 = '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';
         const PIRAPAY_LOGO_JPEG_WIDTH = 217;
         const PIRAPAY_LOGO_JPEG_HEIGHT = 140;
@@ -1233,7 +1295,7 @@
         const ROLES = {
             produtor: { label: 'Produtor Rural', pillClass: 'r-produtor', icon: '🥛', userName: 'Paulo Marques', initials: 'PM', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'home', cashback: 0.2 },
             fornecedor: { label: 'Fornecedor', pillClass: 'r-fornecedor', icon: '🌾', userName: 'AgroInsumos Cerrado', initials: 'AC', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'fornecedor', icon: '🌾', label: 'Fornecedor' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'fornecedor', cashback: 0.3 },
-            logistica: { label: 'Logística', pillClass: 'r-logistica', icon: '🚚', userName: 'Frota Leiteira Centro-Oeste', initials: 'FL', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'comunidade', cashback: 0.4 },
+            logistica: { label: 'Transportadora', pillClass: 'r-logistica', icon: '🚚', userName: 'Frota Leiteira Centro-Oeste', initials: 'FL', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'logistica', icon: '🚚', label: 'Logística' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'postos', icon: '⛽', label: 'Postos' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'logistica', cashback: 0.4 },
             colaborador: { label: 'Colaborador', pillClass: 'r-colaborador', icon: '👷', userName: 'Helena Martins', initials: 'HM', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'colaborador', icon: '👷', label: 'Colaborador' }, { id: 'vale-alimentacao', icon: '🛒', label: 'VA' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'colaborador', cashback: 0.5 },
             'rede-parceira': { label: 'Parceiro', pillClass: 'r-rede-parceira', icon: '🛍️', userName: 'Canal Distribuidor Piracanjuba', initials: 'CD', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'home', cashback: 0.35 },
             admin: { label: 'Admin', pillClass: 'r-admin', icon: '🛠️', userName: 'Equipe PiraPay', initials: 'LB', nav: [{ id: 'home', icon: '🏠', label: 'Home' }, { id: 'carteira', icon: '💳', label: 'Carteira' }, { id: 'investimentos', icon: '📈', label: 'Crédito' }, { id: 'beneficios', icon: '🎁', label: 'Benefícios' }, { id: 'rede-parceira', icon: '🛍️', label: 'Rede' }, { id: 'comunidade', icon: '🤝', label: 'Ecossistema' }, { id: 'estab-selecao', icon: '🏪', label: 'Canais' }, { id: 'admin-dashboard', icon: '📈', label: 'Dashboard' }, { id: 'config', icon: '⚙️', label: 'Config' }, { id: 'perfil', icon: '👤', label: 'Perfil' }], default: 'admin-dashboard', cashback: 0.5 },
@@ -1434,13 +1496,114 @@
             };
         }
 
+        function createTransporter(index) {
+            const names = [
+                'Frota Leiteira Centro-Oeste', 'Rodoleite Transportes', 'TransPira Captação',
+                'ViaLáctea Logística', 'Cerrado Milk Express', 'Lácteos Brasil Frota',
+                'Rota Fria Piracanjuba', 'Coleta Sul Transportes', 'AgroRota Distribuição',
+                'MilkWay Cargas Refrigeradas'
+            ];
+            const name = names[index - 1] || `Transportadora Piracanjuba ${index}`;
+            const walletNumber = 'T' + padWallet(index).slice(1);
+            const completedFreights = 52000 + index * 18400;
+            const futureFreights = 38000 + index * 12600;
+            const fuelSavings = 2800 + index * 620;
+            const fuelPoints = 24000 + index * 5200;
+            const fleet = 8 + index * 3;
+            const route = ['Goiânia → Bela Vista', 'Hidrolândia → Goiânia', 'Rio Verde → Morrinhos', 'Anápolis → Brasília', 'Luís Eduardo → Goiânia', 'Uberlândia → Goiânia', 'Itumbiara → Goiânia', 'Cristalina → Brasília', 'Jataí → Rio Verde', 'Catalão → Goiânia'][index - 1] || 'Rota Piracanjuba';
+            const stationPool = [
+                { name: 'MARAJÓ GRANDE GOIÂNIA', city: 'Goiânia', uf: 'GO', phone: '6239996267' },
+                { name: 'POSTO TABOCAO IV', city: 'Goiânia', uf: 'GO', phone: '6232968686' },
+                { name: 'MARAJO HIDROLANDIA 2', city: 'Hidrolândia', uf: 'GO', phone: '62991521859' },
+                { name: 'POSTO IMPERADOR', city: 'Luis Ed Magalhaes', uf: 'BA', phone: '7736286880' }
+            ];
+            const fuelRequests = Array.from({ length: 8 }, (_, i) => {
+                const station = stationPool[(index + i) % stationPool.length];
+                const productLabel = i % 3 === 0 ? 'Diesel S500' : 'Diesel S10';
+                const liters = 280 + ((index * 37 + i * 53) % 520);
+                const averagePrice = productLabel === 'Diesel S500' ? 6.72 + (i % 3) * 0.04 : 6.89 + (i % 4) * 0.05;
+                const pricePerLiter = +(averagePrice - (0.18 + ((index + i) % 5) * 0.04)).toFixed(2);
+                const savings = +(Math.max(0, averagePrice - pricePerLiter) * liters).toFixed(2);
+                const total = +(pricePerLiter * liters).toFixed(2);
+                const number = `REQ-FUEL-${String(index * 10 + i + 1).padStart(3, '0')}`;
+                return {
+                    number,
+                    authCode: `PIRA-${String(index * 10 + i + 1).padStart(6, '0')}-${String.fromCharCode(65 + index)}${i}X${index}`,
+                    status: i % 3 === 0 ? 'issued' : 'used',
+                    product: productLabel,
+                    productLabel,
+                    date: shortDate(i + 1),
+                    liters,
+                    averagePrice,
+                    pricePerLiter,
+                    total,
+                    savings,
+                    points: Math.round(total * 0.02 * 20),
+                    station: station.name,
+                    stationData: station,
+                    mapLink: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${station.name} ${station.city} ${station.uf} Brasil`)}`
+                };
+            });
+            const statement = [
+                { desc: 'Frete concluído', detail: `NF ${12000 + index} • ${route}`, date: shortDate(1), amount: completedFreights * 0.16, type: 'credit' },
+                { desc: 'Requisição emitida', detail: `${fuelRequests[0].number} • ${fuelRequests[0].productLabel} • ${fuelRequests[0].liters} L`, date: fuelRequests[0].date, amount: 0, type: 'fuel_issued', status: 'issued', savings: fuelRequests[0].savings, fuelPoints: fuelRequests[0].points },
+                { desc: 'Requisição utilizada', detail: `${fuelRequests[1].number} • ${fuelRequests[1].productLabel} • ${fuelRequests[1].liters} L`, date: fuelRequests[1].date, amount: 0, type: 'fuel_used', status: 'used', savings: fuelRequests[1].savings, fuelPoints: fuelRequests[1].points },
+                { desc: 'Antecipação de frete', detail: 'Fretes concluídos confirmados', date: shortDate(5), amount: completedFreights * 0.24, type: 'credit' },
+                { desc: 'Compra combustível', detail: 'Postos Parceiros PiraPay', date: shortDate(7), amount: -(6200 + index * 380), type: 'purchase' },
+                { desc: 'Cashback abastecimento', detail: `Economia acumulada ${formatCurrency(fuelSavings)}`, date: shortDate(7), amount: fuelPoints, type: 'cashback' }
+            ];
+            return {
+                id: 'transportadora-' + walletNumber,
+                name,
+                initials: initialsFromName(name),
+                walletNumber,
+                pixKey: walletNumber,
+                cpf: `45.77${index}.88${index}/0001-${String(10 + index).padStart(2, '0')}`,
+                doc: `45.77${index}.88${index}/0001-${String(10 + index).padStart(2, '0')}`,
+                photo: avatarDataUri(name, index + 140, 160),
+                title: `Transportadora parceira • ${fleet} veículos`,
+                company: 'Piracanjuba',
+                education: `Logística de captação • ${route}`,
+                course: 'Logística de Captação',
+                className: 'Contrato logístico PiraPay',
+                campus: cities[(index + 6) % cities.length],
+                city: cities[(index + 6) % cities.length],
+                level: index % 3 === 0 ? 'Transportadora Platinum' : 'Transportadora Parceira',
+                entryDate: `${String((index % 12) + 1).padStart(2, '0')}/202${index % 5}`,
+                ranking: index,
+                connections: 320 + index * 48,
+                followers: 1400 + index * 210,
+                openToWork: false,
+                openToBusiness: true,
+                specialties: ['Logística', 'Frota', 'Abastecimento', 'Coleta de leite'],
+                certifications: ['SLA Piracanjuba', 'Frota rastreada', 'Abastecimento PiraPay'],
+                completedCourses: ['Roteirização inteligente', 'Direção segura', 'Gestão de combustível'],
+                fleet,
+                route,
+                completedFreights,
+                futureFreights,
+                fuelSavings,
+                fuelPoints,
+                wallet: { balance: 68000 + index * 14500, points: 72000 + index * 6200, bill: 0, invested: 4000 + index * 600, yield: 120 + index * 18 },
+                statement,
+                fuelRequests,
+                freightHistory: [
+                    { type: 'completed', desc: 'Frete concluído', route, amount: completedFreights * 0.16, date: shortDate(1) },
+                    { type: 'future', desc: 'Frete futuro confirmado', route: 'Próxima janela • ' + route, amount: futureFreights * 0.18, date: shortDate(-8) }
+                ],
+                investmentHistory: [80, 92, 108, 126, 144, 162, 181, 205, 228, 252, 280, 308]
+            };
+        }
+
         function createSeedData() {
             const students = Array.from({ length: DEMO_SCALE.produtores }, (_, i) => createStudent(i + 1));
             const teachers = Array.from({ length: DEMO_SCALE.colaboradores }, (_, i) => createTeacher(i + 1));
+            const transporters = Array.from({ length: 10 }, (_, i) => createTransporter(i + 1));
             return {
                 version: DATA_VERSION,
                 activeStudentWallet: '000000001',
                 activeTeacherWallet: 'D00000001',
+                activeTransporterWallet: 'T00000001',
                 marketingBanner: {
                     title: 'Piracanjuba ProForce',
                     subtitle: '10 g de proteínas para abastecer sua rotina',
@@ -1452,6 +1615,7 @@
                     stats: DEMO_SCALE,
                     students,
                     teachers,
+                    transporters,
                     communityPosts: createCommunityPosts(),
                     companies: Array.from({ length: DEMO_SCALE.empresas }, (_, i) => ({ name: companies[i % companies.length] + ' ' + (i + 1), segment: specialties[i % specialties.length] })),
                     professors: Array.from({ length: DEMO_SCALE.colaboradores }, (_, i) => ({ name: `${firstNames[(i + 5) % firstNames.length]} ${lastNames[i % lastNames.length]}`, area: specialties[i % specialties.length] })),
@@ -1459,7 +1623,7 @@
                 },
                 users: {
                     fornecedor: { wallet: { balance: 342000, points: 0, bill: 0, invested: 0, yield: 0 }, statement: [], points: 0, investmentHistory: [] },
-                    logistica: { wallet: { balance: 15000, points: 85000, bill: 0, invested: 4000, yield: 120 }, statement: buildStatement(71, '000000071'), points: 85000, investmentHistory: [80, 90, 110, 130, 150, 170, 190, 210, 230, 250, 270, 290] },
+                    logistica: transporters[0],
                     'rede-parceira': { wallet: { balance: 42800, points: 9400, bill: 0, invested: 0, yield: 0 }, statement: [], points: 0, investmentHistory: [] },
                     admin: { wallet: { balance: 0, points: 0, bill: 0, invested: 0, yield: 0 }, statement: [], points: 0, investmentHistory: [] },
                     postos: {
@@ -1504,19 +1668,25 @@
             return (appData.demo && appData.demo.teachers || []).find(t => t.walletNumber === appData.activeTeacherWallet) || (appData.demo && appData.demo.teachers ? appData.demo.teachers[0] : null);
         }
 
+        function getActiveTransporter() {
+            return (appData.demo && appData.demo.transporters || []).find(t => t.walletNumber === appData.activeTransporterWallet) || (appData.demo && appData.demo.transporters ? appData.demo.transporters[0] : null);
+        }
+
         function getWalletRegistry() {
             const students = (appData.demo && appData.demo.students || []).map(s => ({ name: s.name, doc: s.cpf, walletNumber: s.walletNumber }));
             const teachers = (appData.demo && appData.demo.teachers || []).map(t => ({ name: t.name, doc: t.cpf, walletNumber: t.walletNumber }));
+            const transporters = (appData.demo && appData.demo.transporters || []).map(t => ({ name: t.name, doc: t.doc || t.cpf, walletNumber: t.walletNumber }));
             return students.concat(teachers).concat([
                 { name: 'Distribuidor Regional', doc: '12.345.678/0001-90', walletNumber: '900000001' },
                 { name: 'Posto Frota Parceiro', doc: '98.765.432/0001-10', walletNumber: '900000002' },
                 { name: 'AgroInsumos Hub', doc: '11.222.333/0001-55', walletNumber: '900000003' }
-            ]);
+            ]).concat(transporters);
         }
 
         function getUserData(role) {
             if (role === 'produtor') return getActiveStudent();
             if (role === 'colaborador') return getActiveTeacher();
+            if (role === 'logistica') return getActiveTransporter();
             return appData.users[role] || getActiveStudent();
         }
 
@@ -1530,6 +1700,13 @@
             if (role === 'colaborador') {
                 const idx = appData.demo.teachers.findIndex(t => t.walletNumber === appData.activeTeacherWallet);
                 if (idx >= 0) appData.demo.teachers[idx] = { ...appData.demo.teachers[idx], ...data };
+                saveAppData();
+                return;
+            }
+            if (role === 'logistica') {
+                const idx = appData.demo.transporters.findIndex(t => t.walletNumber === appData.activeTransporterWallet);
+                if (idx >= 0) appData.demo.transporters[idx] = { ...appData.demo.transporters[idx], ...data };
+                appData.users.logistica = appData.demo.transporters[idx] || data;
                 saveAppData();
                 return;
             }
@@ -1583,6 +1760,7 @@
             renderProfileDetails();
             renderTeacherDashboard();
             renderMealCard();
+            renderLogisticsDashboard();
             renderMarketingBanner();
         }
 
@@ -1601,7 +1779,7 @@
             ['headerAvatar', 'sidebarAvatar', 'perfilAvatar'].forEach(id => {
                 const el = document.getElementById(id);
                 if (!el) return;
-                const profile = u.role === 'produtor' ? getActiveStudent() : u.role === 'colaborador' ? getActiveTeacher() : null;
+                const profile = u.role === 'produtor' ? getActiveStudent() : u.role === 'colaborador' ? getActiveTeacher() : u.role === 'logistica' ? getActiveTransporter() : null;
                 if (profile && profile.photo) el.innerHTML = `<img src="${profile.photo}" alt="${profile.name}">`;
                 else el.textContent = u.initials;
             });
@@ -1641,6 +1819,13 @@
                 currentUser.initials = t.initials;
                 currentUser.cashback = 0.5;
             }
+            if (currentUser.role === 'logistica') {
+                const t = getActiveTransporter();
+                if (!t) return;
+                currentUser.userName = t.name;
+                currentUser.initials = t.initials;
+                currentUser.cashback = 0.4;
+            }
         }
 
         function renderNav() {
@@ -1671,6 +1856,7 @@
             if (screen === 'colaborador') renderTeacherDashboard();
             if (screen === 'vale-alimentacao') renderMealCard();
             if (screen === 'config') renderMarketingAdmin();
+            if (screen === 'logistica') renderLogisticsDashboard();
             if (screen === 'carteira') { renderWallet();
                 renderStatement(); renderFinancialDashboard(); }
             if (screen === 'estab-recebimento') renderRecebimentoHistorico();
@@ -1717,6 +1903,12 @@
             if (pixKey) pixKey.textContent = data.pixKey || data.walletNumber || '900000001';
             const homePoints = document.getElementById('homePointBalance');
             if (homePoints) homePoints.textContent = formatPoints(data.wallet.points);
+            const freightTools = document.getElementById('freightWalletTools');
+            if (freightTools) freightTools.style.display = currentUser.role === 'logistica' ? 'block' : 'none';
+            const freightSummary = document.getElementById('freightWalletSummary');
+            if (freightSummary && currentUser.role === 'logistica') {
+                freightSummary.textContent = `Concluídos ${formatCurrency(data.completedFreights || 0)} • Futuros ${formatCurrency(data.futureFreights || 0)} • Economia ${formatCurrency(data.fuelSavings || 0)}`;
+            }
             renderFinancialDashboard();
         }
 
@@ -1770,7 +1962,7 @@
                 'lanchonete': '🛒', 'curso': '🥛', 'viagem': '🚚',
                 'pix': '💳', 'invest': '📈', 'redeem': '🔄', 'credit': '💰', 
                 'debit': '💸', 'points': '⭐', 'purchase': '🛒', 'pix_sent': '🔁',
-                'pix_received': '✅', 'cashback': '💎'
+                'pix_received': '✅', 'cashback': '💎', 'fuel_issued': '🧾', 'fuel_used': '✅'
             };
 
             if (!data.statement || data.statement.length === 0) {
@@ -1791,6 +1983,8 @@
                 if (filterType === 'credit') transacoesFiltradas = transacoesFiltradas.filter(t => t.amount >= 0 && !isPointType(t));
                 if (filterType === 'debit') transacoesFiltradas = transacoesFiltradas.filter(t => t.amount < 0 && !isPointType(t));
                 if (filterType === 'points') transacoesFiltradas = transacoesFiltradas.filter(t => isPointType(t));
+                if (filterType === 'fuel_issued') transacoesFiltradas = transacoesFiltradas.filter(t => t.type === 'fuel_issued');
+                if (filterType === 'fuel_used') transacoesFiltradas = transacoesFiltradas.filter(t => t.type === 'fuel_used');
             }
 
             if (transacoesFiltradas.length === 0) {
@@ -1803,7 +1997,8 @@
                 const isPoint = ['points', 'voucher', 'cashback'].includes(t.type);
                 const amountClass = isPoint ? 'points' : t.amount >= 0 ? 'credit' : 'debit';
                 const sign = t.amount >= 0 ? '+' : '-';
-                const amountText = isPoint ? `${sign} ${formatPoints(Math.abs(t.amount))} pts` : `${sign} ${formatCurrency(Math.abs(t.amount))}`;
+                const amountText = t.type === 'fuel_issued' ? 'Emitida' : t.type === 'fuel_used' ? 'Utilizada' : isPoint ? `${sign} ${formatPoints(Math.abs(t.amount))} pts` : `${sign} ${formatCurrency(Math.abs(t.amount))}`;
+                const fuelMeta = (t.type === 'fuel_issued' || t.type === 'fuel_used') ? `<div style="font-size:11px;color:#168A4B;margin-top:4px;">Economia ${formatCurrency(t.savings || 0)} • ${formatPoints(t.fuelPoints || 0)} pts recebidos</div>` : '';
                 
                 return `<div class="card extrato-item" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:var(--radius-sm);margin-bottom:8px;">
                     <div>
@@ -1812,6 +2007,7 @@
                             <span style="font-weight:600;">${t.desc}</span>
                         </div>
                         <span style="font-size:11px;color:var(--text-tertiary);">${t.detail ? t.detail + ' • ' : ''}${t.date}</span>
+                        ${fuelMeta}
                     </div>
                     <div class="statement-amount ${amountClass}" style="font-weight:800;text-align:right;">${amountText}</div>
                 </div>`;
@@ -2175,7 +2371,572 @@
 
         function openActiveProfileSelector() {
             if (currentUser && currentUser.role === 'colaborador') openTeacherSelector();
+            else if (currentUser && currentUser.role === 'logistica') openTransporterSelector();
             else openStudentSelector();
+        }
+
+        function openTransporterSelector() {
+            if (!appData.demo || !appData.demo.transporters) return;
+            const rows = appData.demo.transporters.map(t => `
+                <div class="card" onclick="switchTransporter('${t.walletNumber}')" style="padding:12px;border-radius:16px;cursor:pointer;border-color:${t.walletNumber === appData.activeTransporterWallet ? 'var(--primary)' : 'var(--border-color)'};background:${t.walletNumber === appData.activeTransporterWallet ? 'rgba(0,84,166,0.06)' : '#fff'};">
+                    <div style="display:flex;gap:12px;align-items:flex-start;">
+                        <div style="width:44px;height:44px;border-radius:14px;overflow:hidden;background:var(--primary);display:flex;align-items:center;justify-content:center;flex:0 0 44px;"><img src="${t.photo}" alt="${t.name}" style="width:100%;height:100%;object-fit:cover;"></div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
+                                <div style="font-weight:900;color:var(--text-primary);line-height:1.15;">${t.name}</div>
+                                <span class="badge-cat" style="background:${t.walletNumber === appData.activeTransporterWallet ? 'rgba(0,84,166,0.12)' : 'rgba(138,138,158,0.10)'};color:${t.walletNumber === appData.activeTransporterWallet ? 'var(--primary)' : 'var(--text-secondary)'};">${t.walletNumber === appData.activeTransporterWallet ? 'Ativa' : 'Selecionar'}</span>
+                            </div>
+                            <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;line-height:1.35;">${t.route}</div>
+                            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+                                <span class="demo-chip" style="font-size:10px;padding:4px 7px;">${t.fleet} veículos</span>
+                                <span class="demo-chip" style="font-size:10px;padding:4px 7px;">${t.walletNumber}</span>
+                                <span class="demo-chip" style="font-size:10px;padding:4px 7px;color:#168A4B;border-color:rgba(22,138,75,0.2);">Economia ${formatCurrency(t.fuelSavings || 0)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            openQuickModal(`
+                <div>
+                    <div style="font-size:20px;font-weight:900;text-align:center;margin-bottom:4px;">Selecionar transportadora</div>
+                    <div style="font-size:12px;color:var(--text-secondary);text-align:center;margin-bottom:12px;">10 transportadoras que prestam serviço para a Piracanjuba</div>
+                    <div style="display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow:auto;padding-right:2px;">${rows}</div>
+                    <button class="btn btn-outline" style="width:100%;margin-top:12px;" onclick="closeQuickModal()">Fechar</button>
+                </div>
+            `);
+        }
+
+        function switchTransporter(walletNumber) {
+            appData.activeTransporterWallet = walletNumber;
+            appData.users.logistica = getActiveTransporter();
+            saveAppData();
+            refreshCurrentUser();
+            applyUI();
+            renderWallet();
+            renderStatement();
+            renderInvestment();
+            renderProfileDetails();
+            renderLogisticsDashboard();
+            closeQuickModal();
+            showToast('🚚 Transportadora alterada para ' + getActiveTransporter().name);
+        }
+
+        function renderLogisticsDashboard() {
+            const t = getActiveTransporter();
+            if (!t) return;
+            const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+            setText('carrierSubtitle', `${t.route} • ${t.fleet} veículos • carteira ${t.walletNumber}`);
+            setText('carrierCompletedFreights', fmtMoneyShort(t.completedFreights || 0));
+            setText('carrierFutureFreights', fmtMoneyShort(t.futureFreights || 0));
+            setText('carrierFuelSavings', formatCurrency(t.fuelSavings || 0));
+            setText('carrierName', t.name);
+            setText('carrierMeta', `Carteira ${t.walletNumber} • ${t.city} • ${t.level}`);
+            const list = document.getElementById('carrierList');
+            if (list && appData.demo && appData.demo.transporters) {
+                list.innerHTML = appData.demo.transporters.map(item => `
+                    <div class="card" onclick="switchTransporter('${item.walletNumber}')" style="padding:12px;border-radius:14px;cursor:pointer;border-color:${item.walletNumber === t.walletNumber ? 'var(--primary)' : 'var(--border-color)'};background:${item.walletNumber === t.walletNumber ? 'linear-gradient(135deg, rgba(0,84,166,0.08), #fff)' : '#fff'};">
+                        <div style="display:flex;gap:10px;align-items:flex-start;">
+                            <div style="width:38px;height:38px;border-radius:12px;background:${item.walletNumber === t.walletNumber ? 'var(--primary)' : 'rgba(0,84,166,0.08)'};color:${item.walletNumber === t.walletNumber ? '#fff' : 'var(--primary)'};display:flex;align-items:center;justify-content:center;font-weight:900;flex:0 0 38px;">${item.name.split(' ').map(p => p[0]).slice(0, 2).join('')}</div>
+                            <div style="min-width:0;flex:1;">
+                                <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
+                                    <div style="font-weight:900;color:var(--text-primary);line-height:1.15;">${item.name}</div>
+                                    <span class="badge-cat" style="height:max-content;background:${item.walletNumber === t.walletNumber ? 'rgba(0,84,166,0.12)' : 'rgba(138,138,158,0.10)'};color:${item.walletNumber === t.walletNumber ? 'var(--primary)' : 'var(--text-secondary)'};">${item.walletNumber === t.walletNumber ? 'Ativa' : 'Selecionar'}</span>
+                                </div>
+                                <div style="font-size:12px;color:var(--text-secondary);line-height:1.25;margin-top:4px;">${item.route}</div>
+                                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;">
+                                    <span class="demo-chip" style="font-size:10px;padding:4px 7px;">${item.fleet} veículos</span>
+                                    <span class="demo-chip" style="font-size:10px;padding:4px 7px;">${item.walletNumber}</span>
+                                    <span class="demo-chip" style="font-size:10px;padding:4px 7px;color:#168A4B;border-color:rgba(22,138,75,0.2);">${formatCurrency(item.fuelSavings || 0)} economia</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            renderFuelRequestsPanel('issued');
+        }
+
+        function renderFuelRequestsPanel(status = 'issued') {
+            const t = getActiveTransporter();
+            const target = document.getElementById('carrierFuelRequests');
+            if (!target || !t) return;
+            const rows = (t.fuelRequests || []).filter(r => status === 'all' || r.status === status);
+            target.innerHTML = rows.map(r => `
+                <div class="card" style="padding:10px;border-radius:var(--radius-sm);">
+                    <div style="display:flex;justify-content:space-between;gap:10px;">
+                        <div>
+                            <button onclick="baixarPdfRequisicao('${r.number}')" style="border:none;background:transparent;color:var(--primary);font-weight:900;padding:0;cursor:pointer;text-decoration:underline;">${r.number}</button>
+                            <div style="font-size:12px;color:var(--text-secondary);">${r.product || r.productLabel} • ${r.station} • ${r.date} • ${r.liters || '-'} L</div>
+                            <div style="font-size:11px;color:#168A4B;margin-top:3px;">Economia ${formatCurrency(r.savings || 0)} • ${formatPoints(r.points || 0)} pts</div>
+                        </div>
+                        <span class="badge-cat" style="height:max-content;background:${r.status === 'used' ? 'rgba(22,138,75,0.10)' : 'rgba(0,84,166,0.10)'};color:${r.status === 'used' ? '#168A4B' : 'var(--primary)'};">${r.status === 'used' ? 'Utilizada' : 'Emitida'}</span>
+                    </div>
+                </div>
+            `).join('') || '<div style="font-size:12px;color:var(--text-secondary);text-align:center;padding:12px;">Nenhuma requisição neste filtro.</div>';
+        }
+
+        function fuelRequestComparableDate(dateText) {
+            const [d, m] = String(dateText || '').split('/').map(n => parseInt(n, 10));
+            return new Date(2026, (m || 1) - 1, d || 1).getTime();
+        }
+
+        function fuelRequestsByPeriod(startDate, endDate) {
+            const t = getActiveTransporter();
+            if (!t) return [];
+            const start = startDate ? new Date(startDate + 'T00:00:00').getTime() : -Infinity;
+            const end = endDate ? new Date(endDate + 'T23:59:59').getTime() : Infinity;
+            return (t.fuelRequests || [])
+                .filter(r => {
+                    const ts = fuelRequestComparableDate(r.date);
+                    return ts >= start && ts <= end;
+                })
+                .sort((a, b) => fuelRequestComparableDate(a.date) - fuelRequestComparableDate(b.date));
+        }
+
+        function prepareFuelReportRows(rows) {
+            let accumulatedSavings = 0;
+            return rows.map(r => {
+                const liters = Number(r.liters || 0);
+                const pricePerLiter = Number(r.pricePerLiter || 0);
+                const averagePrice = Number(r.averagePrice || r.pricePerLiter || 0);
+                const economyPerLiter = Math.max(0, averagePrice - pricePerLiter);
+                const calculatedSavings = +(economyPerLiter * liters).toFixed(2);
+                accumulatedSavings += calculatedSavings;
+                return {
+                    ...r,
+                    liters,
+                    pricePerLiter,
+                    averagePrice,
+                    economyPerLiter: +economyPerLiter.toFixed(2),
+                    calculatedSavings,
+                    accumulatedSavings,
+                    aboveAverage: pricePerLiter > averagePrice
+                };
+            });
+        }
+
+        function openFuelSupplyReportModal() {
+            const today = '2026-06-29';
+            openQuickModal(`
+                <div>
+                    <div style="text-align:center;margin-bottom:12px;">
+                        <div style="font-size:44px;">⛽</div>
+                        <div style="font-size:20px;font-weight:900;">Relatório de abastecimentos</div>
+                        <div style="font-size:12px;color:var(--text-secondary);">Preço comprado, preço médio e economia acumulada</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <div>
+                            <label class="field-label">Início</label>
+                            <input class="field-input" id="fuelReportStart" type="date" value="2026-06-01">
+                        </div>
+                        <div>
+                            <label class="field-label">Fim</label>
+                            <input class="field-input" id="fuelReportEnd" type="date" value="${today}">
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+                        <button class="btn btn-primary" onclick="renderFuelSupplyReport()">Gerar relatório</button>
+                        <button class="btn btn-outline" onclick="downloadFuelSupplyReportPdf()">Exportar PDF</button>
+                    </div>
+                    <div id="fuelSupplyReportContent" style="margin-top:12px;"></div>
+                </div>
+            `);
+            setTimeout(renderFuelSupplyReport, 40);
+        }
+
+        function renderFuelSupplyReport() {
+            const start = document.getElementById('fuelReportStart')?.value || '';
+            const end = document.getElementById('fuelReportEnd')?.value || '';
+            const rows = fuelRequestsByPeriod(start, end);
+            const target = document.getElementById('fuelSupplyReportContent');
+            if (!target) return;
+            if (!rows.length) {
+                target.innerHTML = '<div class="card" style="text-align:center;padding:12px;color:var(--text-secondary);">Nenhum abastecimento no período.</div>';
+                return;
+            }
+            const preparedRows = prepareFuelReportRows(rows);
+            const totalLiters = preparedRows.reduce((s, r) => s + Number(r.liters || 0), 0);
+            const totalMarket = preparedRows.reduce((s, r) => s + Number(r.averagePrice || 0) * Number(r.liters || 0), 0);
+            const totalPaid = preparedRows.reduce((s, r) => s + Number(r.pricePerLiter || 0) * Number(r.liters || 0), 0);
+            const totalSavings = preparedRows.reduce((s, r) => s + Number(r.calculatedSavings || 0), 0);
+            const totalPoints = rows.reduce((s, r) => s + Number(r.points || 0), 0);
+            const weightedPaid = totalPaid / Math.max(1, totalLiters);
+            const weightedMarket = totalMarket / Math.max(1, totalLiters);
+            const economyPct = totalMarket > 0 ? (totalSavings / totalMarket) * 100 : 0;
+            const noEconomyCount = preparedRows.filter(r => r.aboveAverage || r.calculatedSavings <= 0).length;
+            const stationMap = {};
+            preparedRows.forEach(r => {
+                const key = r.station || 'Posto em cadastro';
+                if (!stationMap[key]) stationMap[key] = { station: key, liters: 0, savings: 0, points: 0, total: 0, market: 0, count: 0 };
+                stationMap[key].liters += Number(r.liters || 0);
+                stationMap[key].savings += Number(r.calculatedSavings || 0);
+                stationMap[key].points += Number(r.points || 0);
+                stationMap[key].total += Number(r.pricePerLiter || 0) * Number(r.liters || 0);
+                stationMap[key].market += Number(r.averagePrice || 0) * Number(r.liters || 0);
+                stationMap[key].count += 1;
+            });
+            const byStation = Object.values(stationMap).sort((a, b) => b.savings - a.savings);
+            target.innerHTML = `
+                <div class="grid-3" style="margin-bottom:10px;">
+                    <div class="metric-card"><div class="metric-value">${formatPoints(totalLiters)} L</div><div class="metric-label">volume abastecido</div></div>
+                    <div class="metric-card"><div class="metric-value">${formatCurrency(totalSavings)}</div><div class="metric-label">economia acumulada</div></div>
+                    <div class="metric-card"><div class="metric-value">${formatPoints(totalPoints)} pts</div><div class="metric-label">pontos recebidos</div></div>
+                </div>
+                <div class="card" style="padding:12px;border-radius:var(--radius-sm);margin-bottom:10px;background:linear-gradient(135deg, rgba(22,138,75,0.09), #fff);">
+                    <div style="font-weight:900;color:#168A4B;">Ganho claro do período: ${formatCurrency(totalSavings)}</div>
+                    <div style="font-size:12px;color:var(--text-secondary);margin-top:3px;line-height:1.35;">
+                        Compra média PiraPay ${formatCurrency(weightedPaid)}/L contra mercado ${formatCurrency(weightedMarket)}/L.
+                        A economia só entra quando o preço comprado fica abaixo do preço médio.
+                        ${noEconomyCount ? `${noEconomyCount} requisição(ões) sem economia entraram como R$ 0,00.` : 'Todas as requisições ficaram abaixo da média.'}
+                    </div>
+                    <div style="font-size:12px;color:#168A4B;font-weight:800;margin-top:6px;">Economia equivalente a ${economyPct.toFixed(1).replace('.', ',')}% do gasto médio de mercado.</div>
+                </div>
+                <div class="chart-wrap" style="height:290px;margin-bottom:12px;"><canvas id="fuelSupplyReportChart"></canvas></div>
+                <div class="section-title" style="font-size:14px;margin-top:0;">Quebra por posto</div>
+                <div style="display:flex;flex-direction:column;gap:8px;">${byStation.map(st => `
+                    <div class="card" style="padding:10px;border-radius:var(--radius-sm);">
+                        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+                            <div>
+                                <div style="font-weight:900;">${escapeHtml(st.station)}</div>
+                                <div style="font-size:12px;color:var(--text-secondary);">${formatPoints(st.liters)} L • ${st.count} requisições • pago médio ${formatCurrency(st.total / Math.max(1, st.liters))}/L • mercado ${formatCurrency(st.market / Math.max(1, st.liters))}/L</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-weight:900;color:#168A4B;">${formatCurrency(st.savings)}</div>
+                                <div style="font-size:11px;color:var(--text-secondary);">${formatPoints(st.points)} pts</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}</div>
+                <div class="section-title" style="font-size:14px;">Requisições do período</div>
+                <div style="display:flex;flex-direction:column;gap:8px;">${preparedRows.map(r => `
+                    <div class="card" style="padding:10px;border-radius:var(--radius-sm);">
+                        <div style="display:flex;justify-content:space-between;gap:10px;">
+                            <div>
+                                <button onclick="baixarPdfRequisicao('${r.number}')" style="border:none;background:transparent;color:var(--primary);font-weight:900;padding:0;cursor:pointer;text-decoration:underline;">${r.number}</button>
+                                <div style="font-size:12px;color:var(--text-secondary);">${r.date} • ${escapeHtml(r.station || '')} • ${r.product || r.productLabel} • ${r.liters || 0} L</div>
+                                <div style="font-size:11px;color:${r.calculatedSavings > 0 ? '#168A4B' : '#C14949'};margin-top:2px;">${r.calculatedSavings > 0 ? `Economia ${formatCurrency(r.economyPerLiter)}/L` : 'Sem economia contra a média'}</div>
+                            </div>
+                            <div style="text-align:right;font-size:12px;">
+                                <strong>${formatCurrency(r.pricePerLiter || 0)}/L</strong><br>
+                                <span style="color:var(--text-secondary);">média ${formatCurrency(r.averagePrice || 0)}/L</span><br>
+                                <span style="color:${r.calculatedSavings > 0 ? '#168A4B' : '#C14949'};">${formatCurrency(r.calculatedSavings || 0)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}</div>
+            `;
+            setTimeout(() => drawFuelSupplyReportChart(preparedRows), 30);
+        }
+
+        function drawFuelSupplyReportChart(rows) {
+            const canvas = document.getElementById('fuelSupplyReportChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.clientWidth * 2;
+            canvas.height = canvas.clientHeight * 2;
+            ctx.scale(2, 2);
+            const w = canvas.width / 2, h = canvas.height / 2;
+            ctx.clearRect(0, 0, w, h);
+            const pad = { l: 46, r: 14, t: 28, b: 24 };
+            const graphW = w - pad.l - pad.r;
+            const priceTop = 48;
+            const priceH = 122;
+            const savingTop = 204;
+            const savingH = 58;
+            const prices = rows.flatMap(r => [Number(r.pricePerLiter || 0), Number(r.averagePrice || r.pricePerLiter || 0)]);
+            let minPrice = Math.min(...prices);
+            let maxPrice = Math.max(...prices);
+            const margin = Math.max(0.05, (maxPrice - minPrice) * 0.18);
+            minPrice = Math.max(0, minPrice - margin);
+            maxPrice = maxPrice + margin;
+            const maxSaving = Math.max(1, ...rows.map(r => Number(r.accumulatedSavings || 0)));
+            const xFor = i => pad.l + (rows.length === 1 ? graphW / 2 : (i / (rows.length - 1)) * graphW);
+            const yPrice = v => priceTop + priceH - ((v - minPrice) / Math.max(0.01, maxPrice - minPrice)) * priceH;
+            const ySaving = v => savingTop + savingH - (v / maxSaving) * savingH;
+            ctx.font = '11px Inter';
+            ctx.fillStyle = '#1C1C2E';
+            ctx.fillText('Preço por litro na mesma escala', pad.l, 34);
+            ctx.fillText('Economia acumulada em reais', pad.l, savingTop - 12);
+            const grid = (top, height) => {
+                ctx.strokeStyle = '#E0E0E8';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 3; i++) {
+                    const y = top + (height / 3) * i;
+                    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+                }
+            };
+            grid(priceTop, priceH);
+            grid(savingTop, savingH);
+            ctx.font = '10px Inter';
+            ctx.fillStyle = '#8A8A9E';
+            ctx.textAlign = 'right';
+            ctx.fillText(formatCurrency(maxPrice).replace('R$ ', 'R$'), pad.l - 6, priceTop + 4);
+            ctx.fillText(formatCurrency(minPrice).replace('R$ ', 'R$'), pad.l - 6, priceTop + priceH);
+            ctx.fillText(formatCurrency(maxSaving).replace('R$ ', 'R$'), pad.l - 6, savingTop + 4);
+            ctx.fillText('R$ 0', pad.l - 6, savingTop + savingH);
+            rows.forEach((r, i) => {
+                if (Number(r.calculatedSavings || 0) <= 0) return;
+                const x = xFor(i);
+                const y1 = yPrice(r.averagePrice);
+                const y2 = yPrice(r.pricePerLiter);
+                ctx.strokeStyle = 'rgba(22,138,75,0.24)';
+                ctx.lineWidth = 7;
+                ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y2); ctx.stroke();
+            });
+            const draw = (values, color, yFn, dash = []) => {
+                ctx.beginPath();
+                values.forEach((v, i) => {
+                    const x = xFor(i), y = yFn(v);
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                });
+                ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.setLineDash(dash); ctx.stroke(); ctx.setLineDash([]);
+                values.forEach((v, i) => {
+                    ctx.fillStyle = color;
+                    ctx.beginPath(); ctx.arc(xFor(i), yFn(v), 3, 0, Math.PI * 2); ctx.fill();
+                });
+            };
+            draw(rows.map(r => r.averagePrice), '#8A8A9E', yPrice, [5, 5]);
+            draw(rows.map(r => r.pricePerLiter), '#0054A6', yPrice);
+            draw(rows.map(r => r.accumulatedSavings), '#168A4B', ySaving);
+            ctx.font = '10px Inter'; ctx.fillStyle = '#8A8A9E'; ctx.textAlign = 'center';
+            rows.forEach((r, i) => { if (i % 2 === 0 || i === rows.length - 1) ctx.fillText(r.date, xFor(i), h - 8); });
+            ctx.textAlign = 'left';
+            [['Preço compra', '#0054A6'], ['Preço médio', '#8A8A9E'], ['Economia acum.', '#168A4B']].forEach((l, i) => {
+                ctx.fillStyle = l[1]; ctx.fillRect(pad.l + i * 120, 4, 9, 9);
+                ctx.fillStyle = '#5A5A6E'; ctx.fillText(l[0], pad.l + 13 + i * 120, 12);
+            });
+        }
+
+        function fuelSupplyReportPdfBlob(rows, start, end) {
+            const t = getActiveTransporter();
+            const preparedRows = prepareFuelReportRows(rows);
+            const totalLiters = preparedRows.reduce((s, r) => s + r.liters, 0);
+            const totalMarket = preparedRows.reduce((s, r) => s + r.averagePrice * r.liters, 0);
+            const totalPaid = preparedRows.reduce((s, r) => s + r.pricePerLiter * r.liters, 0);
+            const totalSavings = preparedRows.reduce((s, r) => s + r.calculatedSavings, 0);
+            const totalPoints = preparedRows.reduce((s, r) => s + Number(r.points || 0), 0);
+            const weightedPaid = totalPaid / Math.max(1, totalLiters);
+            const weightedMarket = totalMarket / Math.max(1, totalLiters);
+            const economyPct = totalMarket > 0 ? (totalSavings / totalMarket) * 100 : 0;
+            const stationMap = {};
+            preparedRows.forEach(r => {
+                const key = r.station || 'Posto em cadastro';
+                if (!stationMap[key]) stationMap[key] = { station: key, liters: 0, savings: 0, total: 0, market: 0, count: 0 };
+                stationMap[key].liters += r.liters;
+                stationMap[key].savings += r.calculatedSavings;
+                stationMap[key].total += r.pricePerLiter * r.liters;
+                stationMap[key].market += r.averagePrice * r.liters;
+                stationMap[key].count += 1;
+            });
+            const byStation = Object.values(stationMap).sort((a, b) => b.savings - a.savings).slice(0, 5);
+            const text = (x, y, value, size = 10, font = 'F1', color = '0 0 0') => `BT /${font} ${size} Tf ${color} rg ${x} ${y} Td (${pdfSafeText(value)}) Tj ET\n`;
+            const textCenter = (cx, y, value, size = 10, font = 'F1', color = '0 0 0') => {
+                const approxWidth = String(value || '').length * size * 0.54;
+                return text(cx - approxWidth / 2, y, value, size, font, color);
+            };
+            const box = (x, y, w, h, fill = '1 1 1', stroke = '0.82 0.86 0.90') => `q ${fill} rg ${x} ${y} ${w} ${h} re f ${stroke} RG 1 w ${x} ${y} ${w} ${h} re S Q\n`;
+            const line = (x1, y1, x2, y2, color = '0.82 0.86 0.90', width = 1) => `q ${color} RG ${width} w ${x1} ${y1} m ${x2} ${y2} l S Q\n`;
+            const drawSeries = (values, x0, y0, cw, ch, min, max, color, dash = '') => {
+                let ops = `q ${color} RG 2.2 w ${dash}`;
+                values.forEach((v, i) => {
+                    const x = x0 + (values.length === 1 ? cw / 2 : (i / (values.length - 1)) * cw);
+                    const y = y0 + ((v - min) / Math.max(0.01, max - min)) * ch;
+                    ops += `${i === 0 ? '' : ' '}${x.toFixed(2)} ${y.toFixed(2)} ${i === 0 ? 'm' : 'l'} `;
+                });
+                return ops + 'S Q\n';
+            };
+            const logoBytes = base64ToUint8Array(PIRAPAY_LOGO_JPEG_BASE64);
+            let stream = '';
+            stream += 'q 0.96 0.98 1 rg 0 0 842 595 re f Q\n';
+            stream += pdfGuilloche(24, 24, 794, 547);
+            stream += box(28, 28, 786, 539, '1 1 1', '0.00 0.33 0.65');
+            stream += 'q 98 0 0 64 48 488 cm /Logo Do Q\n';
+            stream += textCenter(500, 540, 'RELATORIO DE ABASTECIMENTOS', 15, 'F2', '0.00 0.33 0.65');
+            stream += textCenter(500, 520, `${start || 'inicio'} a ${end || 'fim'}`, 10, 'F1', '0.35 0.40 0.45');
+            stream += text(48, 472, t.name, 14, 'F2', '0.00 0.33 0.65');
+            stream += text(48, 456, `${t.route} | Carteira ${t.walletNumber}`, 10, 'F1', '0.35 0.40 0.45');
+
+            stream += box(48, 394, 172, 48, '0.95 0.99 0.96', '0.70 0.86 0.75');
+            stream += text(62, 424, formatCurrency(totalSavings), 18, 'F2', '0.09 0.54 0.29');
+            stream += text(62, 408, 'economia real apurada', 9, 'F1', '0.35 0.40 0.45');
+            stream += box(236, 394, 172, 48, '0.96 0.98 1', '0.78 0.84 0.90');
+            stream += text(250, 424, `${formatPoints(totalLiters)} L`, 18, 'F2', '0.00 0.33 0.65');
+            stream += text(250, 408, 'volume abastecido', 9, 'F1', '0.35 0.40 0.45');
+            stream += box(424, 394, 172, 48, '1 0.98 0.92', '0.90 0.82 0.62');
+            stream += text(438, 424, `${formatPoints(totalPoints)} pts`, 18, 'F2', '1.00 0.48 0.00');
+            stream += text(438, 408, 'pontos recebidos', 9, 'F1', '0.35 0.40 0.45');
+            stream += box(612, 394, 154, 48, '1 1 1', '0.78 0.84 0.90');
+            stream += text(626, 424, `${economyPct.toFixed(1).replace('.', ',')}%`, 18, 'F2', '0.09 0.54 0.29');
+            stream += text(626, 408, 'sobre preco medio', 9, 'F1', '0.35 0.40 0.45');
+
+            stream += box(48, 350, 718, 30, '1 1 1', '0.78 0.84 0.90');
+            stream += text(62, 368, `Como a economia foi calculada: preco medio ${formatCurrency(weightedMarket)}/L menos preco PiraPay ${formatCurrency(weightedPaid)}/L, multiplicado pela litragem.`, 9, 'F1', '0.15 0.18 0.25');
+            stream += text(62, 356, 'Quando o preco comprado fica igual ou acima da media, a economia daquela requisicao e registrada como R$ 0,00.', 8, 'F1', '0.35 0.40 0.45');
+
+            stream += box(48, 210, 718, 124, '0.98 0.99 1', '0.78 0.84 0.90');
+            stream += text(62, 318, 'Evolucao visual', 10, 'F2', '0.00 0.33 0.65');
+            stream += text(496, 318, 'Azul: preco PiraPay', 8, 'F2', '0.00 0.33 0.65');
+            stream += text(610, 318, 'Cinza: preco medio', 8, 'F2', '0.54 0.54 0.62');
+            stream += text(496, 306, 'Verde: economia acumulada', 8, 'F2', '0.09 0.54 0.29');
+            const prices = preparedRows.flatMap(r => [r.pricePerLiter, r.averagePrice]);
+            let minPrice = Math.max(0, Math.min(...prices) - 0.12);
+            let maxPrice = Math.max(...prices) + 0.12;
+            const x0 = 94, cw = 618;
+            const priceY = 258, priceH = 43;
+            const saveY = 226, saveH = 22;
+            for (let i = 0; i <= 2; i++) {
+                stream += line(x0, priceY + (priceH / 2) * i, x0 + cw, priceY + (priceH / 2) * i, '0.86 0.89 0.92');
+                stream += line(x0, saveY + (saveH / 2) * i, x0 + cw, saveY + (saveH / 2) * i, '0.86 0.89 0.92');
+            }
+            preparedRows.forEach((r, i) => {
+                if (r.calculatedSavings <= 0) return;
+                const x = x0 + (preparedRows.length === 1 ? cw / 2 : (i / (preparedRows.length - 1)) * cw);
+                const yAvg = priceY + ((r.averagePrice - minPrice) / Math.max(0.01, maxPrice - minPrice)) * priceH;
+                const yPay = priceY + ((r.pricePerLiter - minPrice) / Math.max(0.01, maxPrice - minPrice)) * priceH;
+                stream += line(x, yAvg, x, yPay, '0.09 0.54 0.29', 4);
+            });
+            stream += drawSeries(preparedRows.map(r => r.averagePrice), x0, priceY, cw, priceH, minPrice, maxPrice, '0.54 0.54 0.62', '[4 4] 0 d ');
+            stream += drawSeries(preparedRows.map(r => r.pricePerLiter), x0, priceY, cw, priceH, minPrice, maxPrice, '0.00 0.33 0.65');
+            stream += drawSeries(preparedRows.map(r => r.accumulatedSavings), x0, saveY, cw, saveH, 0, Math.max(1, totalSavings), '0.09 0.54 0.29');
+
+            stream += text(48, 192, 'Ganhos por posto', 11, 'F2', '0.00 0.33 0.65');
+            byStation.forEach((st, i) => {
+                const y = 170 - i * 18;
+                stream += text(58, y, `${i + 1}. ${st.station}`, 8, 'F2');
+                stream += text(270, y, `${formatPoints(st.liters)} L`, 8);
+                stream += text(350, y, `${st.count} req.`, 8);
+                stream += text(430, y, `Pago ${formatCurrency(st.total / Math.max(1, st.liters))}/L`, 8);
+                stream += text(560, y, `Economia ${formatCurrency(st.savings)}`, 8, 'F2', '0.09 0.54 0.29');
+            });
+
+            stream += text(48, 62, 'Requisicoes analisadas', 10, 'F2', '0.00 0.33 0.65');
+            preparedRows.slice(0, 6).forEach((r, i) => {
+                const x = 190 + i * 98;
+                stream += text(x, 62, r.number, 7, 'F2', '0.00 0.33 0.65');
+                stream += text(x, 50, `${r.date} | ${formatCurrency(r.calculatedSavings)}`, 7, 'F1', r.calculatedSavings > 0 ? '0.09 0.54 0.29' : '0.76 0.29 0.29');
+            });
+            stream += text(48, 44, 'PDF gerado pelo PiraPay para demonstrar economia por escolha de posto parceiro.', 7, 'F1', '0.35 0.40 0.45');
+
+            const objects = [
+                '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj',
+                '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj',
+                '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> /XObject << /Logo 7 0 R >> >> /Contents 6 0 R >> endobj',
+                '4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj',
+                '5 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj',
+                `6 0 obj << /Length ${stream.length} >> stream\n${stream}\nendstream endobj`,
+                [
+                    `7 0 obj << /Type /XObject /Subtype /Image /Width ${PIRAPAY_LOGO_JPEG_WIDTH} /Height ${PIRAPAY_LOGO_JPEG_HEIGHT} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${logoBytes.byteLength} >> stream\n`,
+                    logoBytes,
+                    '\nendstream endobj'
+                ]
+            ];
+            return pdfBlobFromObjects(objects);
+        }
+
+        function downloadFuelSupplyReportPdf() {
+            const start = document.getElementById('fuelReportStart')?.value || '';
+            const end = document.getElementById('fuelReportEnd')?.value || '';
+            const rows = fuelRequestsByPeriod(start, end);
+            if (!rows.length) { showToast('⚠️ Nenhum abastecimento para exportar.'); return; }
+            const blob = fuelSupplyReportPdfBlob(rows, start, end);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `relatorio-abastecimentos-${start || 'inicio'}-${end || 'fim'}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast('📄 Relatório PDF exportado');
+        }
+
+        function fuelRequestToPdfReq(record) {
+            const t = getActiveTransporter();
+            const stationData = record.stationData || PARTNER_STATIONS.find(s => s.name === record.station) || { name: record.station || 'Posto parceiro', city: 'Goiânia', uf: 'GO', phone: 'Cadastro PiraPay' };
+            return {
+                number: record.number,
+                authCode: record.authCode || `PIRA-${String(record.number || '').replace(/\D/g, '').slice(-6).padStart(6, '0')}-LOG`,
+                station: stationData,
+                client: {
+                    name: t.name,
+                    doc: t.doc || t.cpf || 'Documento em cadastro',
+                    walletNumber: t.walletNumber
+                },
+                productLabel: record.productLabel || record.product || 'Diesel S10',
+                liters: record.liters || 100,
+                pricePerLiter: record.pricePerLiter || 0,
+                total: record.total || ((record.pricePerLiter || 0) * (record.liters || 100)),
+                mapLink: record.mapLink || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${stationData.name} ${stationData.city} ${stationData.uf} Brasil`)}`
+            };
+        }
+
+        function baixarPdfRequisicao(number) {
+            const t = getActiveTransporter();
+            const record = (t && t.fuelRequests || []).find(r => r.number === number);
+            if (!record) { showToast('⚠️ Requisição não encontrada.'); return; }
+            const req = fuelRequestToPdfReq(record);
+            const blob = fuelAuthorizationPdfBlob(req);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${req.number}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast('📄 PDF da requisição baixado');
+        }
+
+        function openFreightAdvanceModal(type) {
+            const t = getActiveTransporter();
+            if (!t) return;
+            const base = type === 'future' ? t.futureFreights || 0 : t.completedFreights || 0;
+            const max = type === 'future' ? base * 0.45 : base * 0.85;
+            const feeRate = type === 'future' ? 0.026 : 0.014;
+            openQuickModal(`
+                <div style="text-align:center;">
+                    <div style="font-size:46px;">🚚</div>
+                    <div style="font-size:20px;font-weight:900;">Antecipar ${type === 'future' ? 'fretes futuros' : 'fretes concluídos'}</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">${t.name} • ${type === 'future' ? 'até 45% dos fretes confirmados' : 'até 85% dos fretes concluídos'}</div>
+                    <div class="metric-card" style="margin-bottom:12px;"><div class="metric-label">Disponível para antecipar</div><div class="metric-value" style="font-size:24px;color:var(--primary);">${formatCurrency(max)}</div></div>
+                    <label class="field-label" style="text-align:left;">Valor desejado</label>
+                    <input class="field-input" id="freightAdvanceValue" value="${max.toFixed(2).replace('.', ',')}" inputmode="decimal">
+                    <div style="font-size:11px;color:var(--text-secondary);margin:-4px 0 12px;">Taxa simulada: ${(feeRate * 100).toFixed(1).replace('.', ',')}%</div>
+                    <button class="btn btn-primary" style="width:100%;" onclick="confirmFreightAdvance('${type}')">Confirmar antecipação</button>
+                    <button class="btn btn-outline" style="width:100%;margin-top:8px;" onclick="closeQuickModal()">Cancelar</button>
+                </div>
+            `);
+        }
+
+        function confirmFreightAdvance(type) {
+            const t = getActiveTransporter();
+            const value = parseMoneyInput(document.getElementById('freightAdvanceValue').value);
+            const base = type === 'future' ? t.futureFreights || 0 : t.completedFreights || 0;
+            const max = type === 'future' ? base * 0.45 : base * 0.85;
+            if (isNaN(value) || value <= 0) { showToast('⚠️ Valor inválido.'); return; }
+            if (value > max + 0.01) { showToast('❌ Valor acima do limite disponível.'); return; }
+            const fee = value * (type === 'future' ? 0.026 : 0.014);
+            const net = value - fee;
+            t.wallet.balance += net;
+            if (type === 'future') t.futureFreights = Math.max(0, t.futureFreights - value);
+            else t.completedFreights = Math.max(0, t.completedFreights - value);
+            t.statement.unshift({ desc: 'Antecipação de frete', detail: type === 'future' ? 'Fretes futuros confirmados' : 'Fretes concluídos', date: shortDate(0), amount: net, type: 'credit' });
+            updateUserData('logistica', t);
+            closeQuickModal();
+            renderLogisticsDashboard();
+            renderWallet();
+            renderStatement();
+            exibirModalSucesso(
+                'Frete antecipado',
+                'Crédito liberado na carteira da transportadora',
+                [
+                    { label: 'Valor solicitado', value: formatCurrency(value) },
+                    { label: 'Taxa', value: formatCurrency(fee) },
+                    { label: 'Crédito líquido', value: formatCurrency(net) }
+                ],
+                'FRT-' + Date.now(),
+                true
+            );
         }
 
         function renderMealCard() {
@@ -3085,12 +3846,33 @@
                     </div>
                     <div class="fuel-auth-actions">
                         <button class="btn btn-success wide" onclick="compartilharFuelAuthorizationPdf()">Enviar PDF pelo WhatsApp</button>
+                        <button class="btn btn-secondary wide" onclick="marcarFuelAuthorizationUtilizada()">Marcar como utilizada</button>
                         <button class="btn btn-primary" onclick="downloadFuelAuthorizationPdf()">Baixar PDF</button>
                         <button class="btn btn-outline" onclick="window.open('${escapeHtml(whatsappUrl)}','_blank')">Enviar texto</button>
                         <button class="btn btn-outline" onclick="closeQuickModal()">Fechar</button>
                     </div>
                 </div>
             `);
+        }
+
+        function marcarFuelAuthorizationUtilizada() {
+            if (!lastFuelAuthorization) { showToast('⚠️ Nenhuma requisição aberta.'); return; }
+            const data = getUserData(currentUser.role);
+            const reqNumber = lastFuelAuthorization.number;
+            data.fuelRequests = data.fuelRequests || [];
+            const req = data.fuelRequests.find(r => r.number === reqNumber);
+            if (req) req.status = 'used';
+            (data.statement || []).forEach(item => {
+                if ((item.type === 'fuel_issued' || item.type === 'fuel_used') && item.detail && item.detail.includes(reqNumber)) {
+                    item.type = 'fuel_used';
+                    item.status = 'used';
+                    item.desc = 'Requisição utilizada';
+                }
+            });
+            updateUserData(currentUser.role, data);
+            renderStatement();
+            renderLogisticsDashboard();
+            showToast('✅ Requisição marcada como utilizada');
         }
 
         function escapeHtml(value) {
@@ -3532,7 +4314,7 @@
                 walletNumber: data.walletNumber || data.pixKey || '900000001'
             };
             const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${stationData.name} ${stationData.city} ${stationData.uf} Brasil`)}`;
-            openFuelAuthorization({
+            const fuelRequest = {
                 number: reqInfo.number,
                 authCode,
                 station: stationData,
@@ -3541,8 +4323,42 @@
                 liters,
                 pricePerLiter: opportunity.price,
                 total,
-                mapLink
+                mapLink,
+                savings: Math.max(0, (opportunity.average - opportunity.price) * liters),
+                points: Math.round(total * 0.02 * 20)
+            };
+            data.fuelRequests = data.fuelRequests || [];
+            data.fuelRequests.unshift({
+                number: fuelRequest.number,
+                authCode: fuelRequest.authCode,
+                status: 'issued',
+                product: fuelRequest.productLabel,
+                productLabel: fuelRequest.productLabel,
+                date: shortDate(0),
+                liters: fuelRequest.liters,
+                pricePerLiter: fuelRequest.pricePerLiter,
+                averagePrice: opportunity.average,
+                total: fuelRequest.total,
+                savings: fuelRequest.savings,
+                points: fuelRequest.points,
+                station: stationData.name,
+                stationData,
+                mapLink: fuelRequest.mapLink
             });
+            data.statement.unshift({
+                desc: 'Requisição emitida',
+                detail: `${fuelRequest.number} • ${fuelRequest.productLabel} • ${liters} L`,
+                date: shortDate(0),
+                amount: 0,
+                type: 'fuel_issued',
+                status: 'issued',
+                savings: fuelRequest.savings,
+                fuelPoints: fuelRequest.points
+            });
+            updateUserData(currentUser.role, data);
+            renderStatement();
+            renderLogisticsDashboard();
+            openFuelAuthorization(fuelRequest);
         }
 
         function renderRedeParceira() {
