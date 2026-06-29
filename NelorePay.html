@@ -762,6 +762,14 @@
                     </div>
                     <div class="section-title">📊 Carteira por produto</div>
                     <div id="investmentProducts" style="display:flex;flex-direction:column;gap:8px;"></div>
+                    <div class="section-title">🪙 Ativos tokenizados disponíveis</div>
+                    <div id="tokenizedAssetMarketplace" style="display:flex;flex-direction:column;gap:8px;"></div>
+                    <div class="section-title">🔐 Minhas posições tokenizadas</div>
+                    <div id="tokenPortfolioList" style="display:flex;flex-direction:column;gap:8px;"></div>
+                    <div class="card" style="padding:12px;margin-top:12px;background:#FAFBFC;">
+                        <div style="font-weight:900;margin-bottom:6px;">Transparência da carteira</div>
+                        <div style="font-size:12px;color:var(--text-secondary);line-height:1.45;">Cada ativo exibe lastro, prazo, rentabilidade estimada, risco, liquidez, documentos e trilha no ledger. Esta é uma simulação de produto e não representa recomendação de investimento.</div>
+                    </div>
                 </div>
 
                 <div class="screen" id="screen-beneficios">
@@ -1187,6 +1195,29 @@
                         <div class="section-title" style="margin-top:0;font-size:14px;">📈 Evolução mensal de receitas e custos</div>
                         <div class="chart-wrap"><canvas id="adminChart"></canvas></div>
                     </div>
+                    <div class="chart-card" style="margin-top:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">
+                            <div>
+                                <div class="section-title" style="margin:0;font-size:14px;">📒 Ledger de ativos tokenizados</div>
+                                <div style="font-size:11px;color:var(--text-secondary);">Trilha de emissão, reserva, compra, custódia, liquidação e repasse</div>
+                            </div>
+                            <select id="adminLedgerFilter" onchange="renderTokenLedger()" class="field-input" style="width:auto;margin:0;padding:8px 10px;font-size:12px;">
+                                <option value="all">Todos eventos</option>
+                                <option value="emissao">Emissão</option>
+                                <option value="reserva">Reserva</option>
+                                <option value="compra">Compra</option>
+                                <option value="custodia">Custódia</option>
+                                <option value="liquidacao">Liquidação</option>
+                                <option value="repasse">Repasse</option>
+                            </select>
+                        </div>
+                        <div class="grid-3" style="margin-bottom:10px;">
+                            <div class="metric-card"><div class="metric-value" id="ledgerIssued">R$ 0</div><div class="metric-label">emitido</div></div>
+                            <div class="metric-card"><div class="metric-value" id="ledgerCaptured">R$ 0</div><div class="metric-label">captado</div></div>
+                            <div class="metric-card"><div class="metric-value" id="ledgerInvestors">0</div><div class="metric-label">investidores</div></div>
+                        </div>
+                        <div id="adminTokenLedger" style="display:flex;flex-direction:column;gap:8px;"></div>
+                    </div>
                     <button class="btn btn-outline" style="width:100%;margin-top:14px;" onclick="showToast('📄 Relatório de rentabilidade exportado (demo)')">Exportar relatório completo</button>
                 </div>
 
@@ -1268,7 +1299,7 @@
     </div>
 
     <script>
-        const DATA_VERSION = 35;
+        const DATA_VERSION = 36;
         const NELOREPAY_LOGO_JPEG_BASE64 = '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';
         const NELOREPAY_LOGO_JPEG_WIDTH = 360;
         const NELOREPAY_LOGO_JPEG_HEIGHT = 140;
@@ -1724,6 +1755,20 @@
             };
         }
 
+        function createTokenLedger() {
+            return [
+                { id: 'LED-2026-0001', date: '21/06', event: 'emissao', assetCode: 'CR-BEZ-2026-0042', asset: 'Token Bezerro', from: 'Fazenda Nova Piratininga', to: 'Conta escrow NelorePay', amount: 4800000, status: 'Registrado', hash: '0xBEZ42A91', note: 'Emissão lastreada em 2.650 bezerros rastreados' },
+                { id: 'LED-2026-0002', date: '21/06', event: 'custodia', assetCode: 'CR-BEZ-2026-0042', asset: 'Token Bezerro', from: 'Auditoria de lastro', to: 'Custódia digital', amount: 4800000, status: 'Validado', hash: '0xBEZ42C12', note: 'GTA, CPR e contrato futuro anexados' },
+                { id: 'LED-2026-0003', date: '22/06', event: 'compra', assetCode: 'CR-BEZ-2026-0042', asset: 'Token Bezerro', from: 'Investidor Paulo Marques', to: 'Token Bezerro', amount: 35000, status: 'Liquidado', hash: '0xBEZ42F32', note: 'Compra fracionada com carteira NelorePay' },
+                { id: 'LED-2026-0004', date: '23/06', event: 'emissao', assetCode: 'CR-GAR-2026-0018', asset: 'Token Garrote', from: 'Fazenda Nova Piratininga', to: 'Conta escrow NelorePay', amount: 7200000, status: 'Registrado', hash: '0xGAR18A44', note: 'Recebível de recria com contrato de confinamento' },
+                { id: 'LED-2026-0005', date: '24/06', event: 'reserva', assetCode: 'CR-GAR-2026-0018', asset: 'Token Garrote', from: 'Mesa NelorePay', to: 'Investidores qualificados demo', amount: 1250000, status: 'Reservado', hash: '0xGAR18R07', note: 'Reserva em book primário' },
+                { id: 'LED-2026-0006', date: '25/06', event: 'emissao', assetCode: 'CR-ARB-2026-0091', asset: 'Token Arroba', from: 'Frigorífico Nova Piratininga', to: 'Conta escrow NelorePay', amount: 11900000, status: 'Registrado', hash: '0xARB91A81', note: 'Contrato de abate e compra futura vinculados' },
+                { id: 'LED-2026-0007', date: '26/06', event: 'compra', assetCode: 'CR-ARB-2026-0091', asset: 'Token Arroba', from: 'Frigorífico parceiro', to: 'Token Arroba', amount: 420000, status: 'Liquidado', hash: '0xARB91B19', note: 'Compra com liquidação futura pela arroba' },
+                { id: 'LED-2026-0008', date: '27/06', event: 'liquidacao', assetCode: 'CR-BEZ-2026-0042', asset: 'Token Bezerro', from: 'Conta escrow NelorePay', to: 'Investidores Token Bezerro', amount: 184000, status: 'Parcial', hash: '0xBEZ42L64', note: 'Liquidação parcial por lote entregue' },
+                { id: 'LED-2026-0009', date: '28/06', event: 'repasse', assetCode: 'CR-BEZ-2026-0042', asset: 'Token Bezerro', from: 'Conta escrow NelorePay', to: 'Revenda de Insumos Pecuários', amount: 98000, status: 'Executado', hash: '0xBEZ42P41', note: 'Repasse para pagamento à vista de insumos' }
+            ];
+        }
+
         function createSeedData() {
             const students = Array.from({ length: DEMO_SCALE.produtores }, (_, i) => createStudent(i + 1));
             const teachers = Array.from({ length: DEMO_SCALE.colaboradores }, (_, i) => createTeacher(i + 1));
@@ -1773,6 +1818,7 @@
                         received_history: [{ client: 'Paulo Marques', doc: '101.201.301-11', token: 'A3B2C1', amount: 320, date: '10/06' }, { client: 'Ana Paula Souza', doc: '102.202.302-12', token: 'D4E5F6', amount: 89, date: '08/06' }]
                     }
                 },
+                tokenLedger: createTokenLedger(),
                 adminMetrics: { receita: 370000, custo: 265000, inadimplencia: 4.2, produtores: 7000, colaboradores: 4000 }
             };
         }
@@ -2073,6 +2119,7 @@
                 minimum: 5000,
                 expected: '1,35% a.m.',
                 risk: 'Moderado',
+                liquidity: 'D+7 no secundário',
                 lastro: '2.650 bezerros rastreados de 7 a 9 arrobas',
                 ticket: 'R$ 1.800 por cabeça',
                 liquidation: 'Venda futura para recriadores homologados',
@@ -2089,6 +2136,7 @@
                 minimum: 10000,
                 expected: '1,45% a.m.',
                 risk: 'Moderado+',
+                liquidity: 'D+15 no secundário',
                 lastro: '4.300 garrotes rastreados de 12 a 15 arrobas',
                 ticket: 'R$ 1.650 por cabeça',
                 liquidation: 'Contrato com confinadores e frigoríficos parceiros',
@@ -2105,6 +2153,7 @@
                 minimum: 15000,
                 expected: '1,25% a.m.',
                 risk: 'Moderado',
+                liquidity: 'D+5 no secundário',
                 lastro: '38.200 arrobas futuras de boi gordo',
                 ticket: 'R$ 310 por arroba futura',
                 liquidation: 'Liquidação pela compra do frigorífico parceiro',
@@ -2171,6 +2220,7 @@
                 maturity: operation.prazo,
                 date: shortDate(0)
             });
+            addTokenLedger('compra', operation, amount, data.name || currentUser.userName, operation.code, 'Compra fracionada pela carteira de investimentos tokenizados');
             updateUserData(currentUser.role, { tokenInvestments: data.tokenInvestments, investmentAllocation: allocation });
             closeQuickModal();
             renderWallet();
@@ -2403,9 +2453,9 @@
         }
 
         const INVESTMENT_PRODUCTS = {
-            cdb: { label: 'Token CR Sênior', short: 'CR', color: '#1B1B1B', expected: '120% do CDI', risk: 'Baixo', liquidity: 'D+1' },
-            fip: { label: 'Fundo Pecuário', short: 'FIP', color: '#D6A84A', expected: 'Estratégia de participação', risk: 'Médio/Alto', liquidity: 'D+30' },
-            fidic: { label: 'FIDC Agro Recebíveis', short: 'FIDC', color: '#168A4B', expected: 'Crédito estruturado', risk: 'Médio', liquidity: 'D+15' }
+            cdb: { label: 'Token CR Sênior', short: 'CR', color: '#1B1B1B', expected: '120% do CDI', risk: 'Baixo', liquidity: 'D+1', minimum: 1000, backing: 'Cota sênior de recebíveis pecuários', custody: 'Custódia digital NelorePay' },
+            fip: { label: 'Fundo Pecuário Tokenizado', short: 'FIP', color: '#D6A84A', expected: 'Estratégia de participação', risk: 'Médio/Alto', liquidity: 'D+30', minimum: 5000, backing: 'Participação em projetos do ciclo do boi', custody: 'Administrador fiduciário demo' },
+            fidic: { label: 'FIDC Agro Recebíveis Token', short: 'FIDC', color: '#168A4B', expected: 'Crédito estruturado', risk: 'Médio', liquidity: 'D+15', minimum: 2500, backing: 'Direitos creditórios de boi, frete e insumos', custody: 'Conta escrow e ledger auditável' }
         };
 
         const INVESTMENT_PERFORMANCE = {
@@ -2455,6 +2505,8 @@
             document.getElementById('investmentBalance').textContent = formatCurrency(data.wallet.invested || 0);
             document.getElementById('investmentYield').textContent = 'Rendimento acumulado: +' + formatCurrency(data.wallet.yield || 0);
             renderInvestmentProducts(allocation);
+            renderTokenizedAssets();
+            renderTokenPortfolio();
             renderInvestChart();
         }
 
@@ -2471,6 +2523,7 @@
                             <div>
                                 <div style="font-weight:800;color:var(--text-primary);">${product.label}</div>
                                 <div style="font-size:11px;color:var(--text-secondary);">${product.expected} • Risco ${product.risk} • Liquidez ${product.liquidity}</div>
+                                <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;">Mínimo ${formatCurrency(product.minimum)} • ${product.backing} • ${product.custody}</div>
                             </div>
                             <div style="text-align:right;font-weight:900;color:${product.color};">${formatCurrency(value)}<div style="font-size:11px;color:var(--text-secondary);">${pct}%</div></div>
                         </div>
@@ -2478,6 +2531,91 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        function renderTokenizedAssets() {
+            const target = document.getElementById('tokenizedAssetMarketplace');
+            if (!target || typeof TOKEN_OPERATIONS === 'undefined') return;
+            target.innerHTML = Object.entries(TOKEN_OPERATIONS).map(([name, op]) => {
+                const available = op.target * (1 - op.captured / 100);
+                const statusColor = op.captured >= 90 ? '#D6A84A' : '#168A4B';
+                return `
+                    <div class="card" style="padding:12px 14px;border-radius:var(--radius-sm);cursor:pointer;" onclick="openTokenDetail('${name}')">
+                        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+                            <div style="display:flex;gap:10px;min-width:0;">
+                                <div style="width:42px;height:42px;border-radius:12px;background:rgba(214,168,74,0.16);display:flex;align-items:center;justify-content:center;font-size:24px;flex:0 0 42px;">${op.icon}</div>
+                                <div style="min-width:0;">
+                                    <div style="font-weight:900;color:var(--text-primary);">${op.code}</div>
+                                    <div style="font-size:12px;color:var(--text-secondary);">${name} • ${op.fase} • ${op.prazo} • retorno estimado ${op.expected}</div>
+                                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;">
+                                        <span class="demo-chip" style="font-size:10px;padding:4px 7px;">Lastro auditado</span>
+                                        <span class="demo-chip" style="font-size:10px;padding:4px 7px;">Liquidez ${op.liquidity || 'secundária D+7'}</span>
+                                        <span class="demo-chip" style="font-size:10px;padding:4px 7px;">Risco ${op.risk}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="text-align:right;min-width:92px;">
+                                <div style="font-weight:900;color:${statusColor};">${op.captured}%</div>
+                                <div style="font-size:10px;color:var(--text-secondary);">captado</div>
+                                <div style="font-size:11px;font-weight:900;color:var(--primary);margin-top:5px;">${formatCurrency(available)}</div>
+                            </div>
+                        </div>
+                        <div style="height:7px;background:var(--border-color);border-radius:999px;overflow:hidden;margin-top:10px;"><div style="width:${op.captured}%;height:100%;background:${statusColor};border-radius:999px;"></div></div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderTokenPortfolio() {
+            const target = document.getElementById('tokenPortfolioList');
+            if (!target) return;
+            const data = getUserData(currentUser.role);
+            const rows = data.tokenInvestments || [
+                { code: 'CR-BEZ-2026-0042', phase: 'Cria', amount: 35000, expected: '1,35% a.m.', maturity: '9 meses', date: '22/06' },
+                { code: 'CR-ARB-2026-0091', phase: 'Engorda', amount: 18000, expected: '1,25% a.m.', maturity: '6 meses', date: '26/06' }
+            ];
+            if (!rows.length) {
+                target.innerHTML = '<div class="card" style="padding:12px;text-align:center;color:var(--text-secondary);">Nenhuma posição tokenizada ainda. Escolha um ativo disponível para simular a compra.</div>';
+                return;
+            }
+            target.innerHTML = rows.slice(0, 6).map(row => {
+                const projected = Number(row.amount || 0) * (1 + parseFloat(String(row.expected || '1').replace(',', '.')) / 100 * 6);
+                return `
+                    <div class="card" style="padding:12px;border-radius:var(--radius-sm);">
+                        <div style="display:flex;justify-content:space-between;gap:12px;">
+                            <div>
+                                <div style="font-weight:900;color:var(--text-primary);">${row.code}</div>
+                                <div style="font-size:12px;color:var(--text-secondary);">${row.phase} • ${row.maturity} • comprado em ${row.date}</div>
+                                <div style="font-size:11px;color:#168A4B;margin-top:4px;">Rentabilidade estimada ${row.expected} • custódia NelorePay</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="font-weight:900;color:var(--primary);">${formatCurrency(row.amount || 0)}</div>
+                                <div style="font-size:10px;color:var(--text-secondary);">projeção ${formatCurrency(projected)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addTokenLedger(event, operation, amount, from, to, note) {
+            appData.tokenLedger = appData.tokenLedger || createTokenLedger();
+            const seq = appData.tokenLedger.length + 1;
+            const date = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+            appData.tokenLedger.unshift({
+                id: 'LED-2026-' + String(seq).padStart(4, '0'),
+                date,
+                event,
+                assetCode: operation.code,
+                asset: operation.fase ? 'Token ' + (operation.fase === 'Cria' ? 'Bezerro' : operation.fase === 'Recria' ? 'Garrote' : 'Arroba') : operation.label,
+                from,
+                to,
+                amount,
+                status: event === 'compra' ? 'Liquidado' : 'Registrado',
+                hash: '0x' + Math.random().toString(16).slice(2, 10).toUpperCase(),
+                note
+            });
+            saveAppData();
         }
 
         function renderInvestChart() {
@@ -3694,8 +3832,8 @@
                     <div style="font-size:14px;color:var(--text-secondary);margin-bottom:12px;">Escolha o produto e o valor do aporte:</div>
                     <select id="aporteProduto" style="width:100%;padding:12px;border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:15px;margin-bottom:10px;background:#fff;color:var(--text-primary);">
                         <option value="cdb">Token CR Sênior • 120% do CDI • Baixo risco</option>
-                        <option value="fip">Fundo Pecuário • Participação • Médio/alto risco</option>
-                        <option value="fidic">FIDC Agro Recebíveis • Crédito estruturado • Médio risco</option>
+                        <option value="fip">Fundo Pecuário Tokenizado • Participação • Médio/alto risco</option>
+                        <option value="fidic">FIDC Agro Recebíveis Token • Crédito estruturado • Médio risco</option>
                     </select>
                     <input id="aporteValor" type="number" min="0.01" step="0.01" placeholder="R$ 0,00" style="width:100%;padding:12px;border:1px solid var(--border-color);border-radius:var(--radius-sm);font-size:16px;margin-bottom:12px;">
                     <button class="btn btn-secondary" style="width:100%;" id="btnConfirmarAporte" onclick="confirmarAporte()">Confirmar Aporte</button>
@@ -3719,12 +3857,18 @@
                 if (btn) btn.disabled = false;
                 return;
             }
-            closeQuickModal();
             const productKey = document.getElementById('aporteProduto') ? document.getElementById('aporteProduto').value : 'cdb';
             const product = INVESTMENT_PRODUCTS[productKey] || INVESTMENT_PRODUCTS.cdb;
+            if (valor < product.minimum) {
+                showToast('Aporte mínimo: ' + formatCurrency(product.minimum));
+                if (btn) btn.disabled = false;
+                return;
+            }
+            closeQuickModal();
             addTransaction(currentUser.role, 'Aporte em ' + product.label, -valor, 'invest', product.expected + ' • ' + product.liquidity);
             const allocation = getInvestmentAllocation(data);
             allocation[productKey] = Number(allocation[productKey] || 0) + valor;
+            addTokenLedger('compra', { code: product.short + '-NEL-2026', label: product.label }, valor, data.name || currentUser.userName, product.label, 'Aporte pela carteira de ativos tokenizados');
             const hist = data.investmentHistory || [];
             const last = hist.length > 0 ? hist[hist.length - 1] : 100;
             hist.push(last + valor * 0.02);
@@ -5215,6 +5359,48 @@
             }).join('');
         }
 
+        function renderTokenLedger() {
+            const target = document.getElementById('adminTokenLedger');
+            if (!target) return;
+            const filter = document.getElementById('adminLedgerFilter')?.value || 'all';
+            const ledger = appData.tokenLedger || createTokenLedger();
+            const issued = ledger.filter(l => l.event === 'emissao').reduce((sum, l) => sum + Number(l.amount || 0), 0);
+            const captured = ledger.filter(l => ['compra', 'reserva'].includes(l.event)).reduce((sum, l) => sum + Number(l.amount || 0), 0);
+            const investors = new Set(ledger.filter(l => l.event === 'compra').map(l => l.from)).size;
+            const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+            setText('ledgerIssued', fmtMoneyShort(issued));
+            setText('ledgerCaptured', fmtMoneyShort(captured));
+            setText('ledgerInvestors', investors || 1);
+            const rows = ledger.filter(l => filter === 'all' || l.event === filter);
+            const eventColor = {
+                emissao: '#1B1B1B',
+                reserva: '#D6A84A',
+                compra: '#168A4B',
+                custodia: '#0F766E',
+                liquidacao: '#0054A6',
+                repasse: '#FF7A00'
+            };
+            target.innerHTML = rows.slice(0, 12).map(item => `
+                <div class="card" style="padding:12px;border-radius:var(--radius-sm);">
+                    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+                        <div style="min-width:0;">
+                            <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;">
+                                <span style="font-weight:900;color:var(--text-primary);">${item.id}</span>
+                                <span class="badge-cat" style="background:${eventColor[item.event] || '#8A8A9E'}22;color:${eventColor[item.event] || '#5A5A6E'};">${item.event}</span>
+                                <span style="font-size:11px;color:var(--text-secondary);">${item.date}</span>
+                            </div>
+                            <div style="font-size:12px;color:var(--text-secondary);margin-top:5px;">${item.assetCode} • ${item.from} → ${item.to}</div>
+                            <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">${item.note} • hash ${item.hash}</div>
+                        </div>
+                        <div style="text-align:right;min-width:88px;">
+                            <div style="font-weight:900;color:var(--primary);">${formatCurrency(item.amount || 0)}</div>
+                            <div style="font-size:10px;color:#168A4B;font-weight:800;">${item.status}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('') || '<div style="font-size:12px;color:var(--text-secondary);text-align:center;padding:12px;">Nenhum evento para este filtro.</div>';
+        }
+
         function renderAdminDashboard(period) {
             const mult = period;
             const receitas = ADMIN_BASE.receitas.map(r => ({ nome: r.nome, cor: r.cor, valor: r.valor * mult }));
@@ -5229,6 +5415,7 @@
             document.getElementById('kpiMargemPct').textContent = 'Margem líquida • ' + (totalReceita > 0 ? (margem / totalReceita * 100).toFixed(1) : 0).replace('.', ',') + '%';
             
             renderBreakdown('receitaBreakdown', receitas, totalReceita); renderBreakdown('custoBreakdown', custos, totalCusto);
+            renderTokenLedger();
             
             const canvas = document.getElementById('adminChart');
             if (!canvas) return;
