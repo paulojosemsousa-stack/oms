@@ -324,6 +324,105 @@
         .report-chart{height:300px;position:relative}
         @media(max-width:900px){.bsc-level-grid{grid-template-columns:1fr}}
         @media print{#strategyTabs,.report-controls,.app-header,.strategy-hero{display:none!important}.report-print-area{border:0;padding:0}}
+
+        /* ════════════════════════════════════════════
+           ADMIN — CENTRAL DE TOKENS C-LEVEL
+        ════════════════════════════════════════════ */
+        .admin-hero{background:linear-gradient(135deg,#0f172a 0%,#1e293b 55%,#0f172a 100%);color:white;border-radius:20px;padding:2.5rem;margin-bottom:2rem;position:relative;overflow:hidden;}
+        .admin-hero::before{content:"";position:absolute;width:380px;height:380px;border-radius:50%;background:rgba(79,70,229,.12);right:-130px;top:-190px;pointer-events:none;}
+        .admin-hero::after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(124,58,237,.09);left:-70px;bottom:-110px;pointer-events:none;}
+        .admin-stat{background:rgba(255,255,255,.08);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:1.2rem;text-align:center;}
+        .admin-stat .val{font-size:2.25rem;font-weight:800;line-height:1;color:white;}
+        .admin-stat .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.55);margin-top:.4rem;}
+        .admin-stat.s-active .val{color:#a5f3fc;}
+        .admin-stat.s-used .val{color:#86efac;}
+        .admin-stat.s-expired .val{color:#fca5a5;}
+
+        .token-list-item{display:flex;align-items:center;gap:1rem;padding:1.1rem 1.25rem;border:1px solid var(--border-color);border-radius:14px;background:white;margin-bottom:.75rem;transition:all .2s;}
+        .token-list-item:hover{box-shadow:0 4px 14px rgba(0,0,0,.07);transform:translateY(-1px);}
+        .token-list-item.s-used{border-color:#10b981;background:#f0fdf4;}
+        .token-list-item.s-expired{opacity:.5;background:#f8fafc;}
+        .token-list-item.s-active{border-color:#4f46e5;}
+        .token-code-badge{font-family:'Courier New',monospace;font-size:1.05rem;font-weight:800;color:var(--primary);background:var(--primary-light);border:1px solid #c7d2fe;border-radius:8px;padding:.3rem .75rem;letter-spacing:.14em;white-space:nowrap;cursor:pointer;transition:all .15s;}
+        .token-code-badge:hover{background:#c7d2fe;}
+        .token-meta{flex:1;min-width:0;}
+        .token-meta .t-name{font-weight:700;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .token-meta .t-company{font-size:.82rem;color:var(--text-muted);}
+        .token-expiry{font-size:.8rem;color:var(--text-muted);display:flex;align-items:center;gap:.3rem;white-space:nowrap;}
+        .token-expiry.critical{color:#ef4444;font-weight:600;}
+        .token-expiry.done{color:#10b981;}
+        .tok-badge{padding:.25rem .65rem;border-radius:999px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
+        .tok-badge.active{background:#eef2ff;color:#4f46e5;}
+        .tok-badge.used{background:#ecfdf5;color:#059669;}
+        .tok-badge.expired{background:#f1f5f9;color:#94a3b8;}
+        .token-empty{text-align:center;padding:3rem 1rem;color:var(--text-muted);}
+        .token-empty i{font-size:3rem;color:#e2e8f0;display:block;margin-bottom:1rem;}
+
+        /* Copy toast */
+        .copy-toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(60px);background:#0f172a;color:white;border-radius:12px;padding:.65rem 1.4rem;font-size:.875rem;font-weight:600;z-index:99999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;}
+        .copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+        /* ════════════════════════════════════════════
+           GUEST OVERLAY — EXPERIÊNCIA C-LEVEL
+        ════════════════════════════════════════════ */
+        .guest-overlay{position:fixed;inset:0;background:#f8fafc;z-index:9998;display:flex;flex-direction:column;overflow:hidden;}
+        .guest-overlay.hidden{display:none!important;}
+        .guest-header{background:white;border-bottom:1px solid var(--border-color);padding:.875rem 2rem;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;position:relative;gap:1rem;}
+        .guest-header-brand{display:flex;align-items:center;gap:.75rem;}
+        .guest-header-brand .g-icon{width:38px;height:38px;background:var(--primary-light);border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--primary);font-size:1.15rem;flex-shrink:0;}
+        .guest-topbar{height:3px;background:linear-gradient(90deg,var(--primary),#7c3aed);transition:width .5s cubic-bezier(.4,0,.2,1);position:absolute;bottom:0;left:0;}
+        .guest-scroll{flex:1;overflow-y:auto;padding:2rem 1rem;}
+        .guest-inner{max-width:820px;margin:0 auto;width:100%;}
+        .guest-footer{background:white;border-top:1px solid var(--border-color);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:1rem;}
+
+        /* Subsystem step dots */
+        .subsystem-steps{display:flex;gap:5px;align-items:center;}
+        .subsystem-step{width:8px;height:8px;border-radius:4px;background:#e2e8f0;transition:all .35s;}
+        .subsystem-step.active{width:24px;background:var(--primary);}
+        .subsystem-step.done{background:#10b981;width:8px;}
+
+        /* Guest intro */
+        .guest-intro{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3rem 1rem;min-height:60vh;}
+        .guest-intro-icon{width:88px;height:88px;background:linear-gradient(135deg,#eef2ff,#e0e7ff);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:2.75rem;margin:0 auto 2rem;color:var(--primary);}
+        .guest-intro h2{font-size:2rem;font-weight:800;color:var(--text-dark);margin-bottom:.75rem;}
+        .guest-intro .lead{color:var(--text-muted);max-width:540px;line-height:1.7;font-size:1.02rem;}
+        .guest-info-card{background:white;border:1px solid var(--border-color);border-radius:16px;padding:1.5rem;margin-top:2rem;width:100%;max-width:480px;text-align:left;}
+
+        /* Guest questions */
+        .guest-section-header{margin-bottom:2rem;}
+        .guest-section-header .eyebrow{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--primary);margin-bottom:.5rem;}
+        .guest-section-header h2{font-size:1.65rem;font-weight:800;color:var(--text-dark);margin-bottom:.35rem;}
+        .guest-section-header .subsub{color:var(--text-muted);font-size:.9rem;}
+
+        .guest-q{background:white;border:2px solid #e8ecf2;border-radius:16px;padding:1.5rem;margin-bottom:1rem;transition:border-color .3s,box-shadow .2s;}
+        .guest-q.answered{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.06);}
+        .guest-q-num{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted);margin-bottom:.5rem;}
+        .guest-q-text{font-weight:600;font-size:1rem;color:var(--text-dark);line-height:1.55;margin-bottom:1.25rem;}
+
+        .guest-scale{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+        @media(min-width:600px){.guest-scale{grid-template-columns:repeat(4,1fr);}}
+        .gs-opt{border:2px solid var(--border-color);border-radius:12px;padding:.875rem .5rem;text-align:center;cursor:pointer;transition:all .2s;background:white;user-select:none;}
+        .gs-opt:hover:not(.selected){transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+        .gs-opt .gs-val{font-size:1.5rem;font-weight:900;line-height:1;margin-bottom:.3rem;}
+        .gs-opt .gs-lbl{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;line-height:1.3;}
+
+        .gs-opt[data-v="0"]{border-color:#e2e8f0;} .gs-opt[data-v="0"] .gs-val{color:#94a3b8;} .gs-opt[data-v="0"] .gs-lbl{color:#94a3b8;} .gs-opt[data-v="0"].selected{border-color:#94a3b8;background:#f1f5f9;}
+        .gs-opt[data-v="1"]{border-color:#fecaca;} .gs-opt[data-v="1"] .gs-val{color:#ef4444;} .gs-opt[data-v="1"] .gs-lbl{color:#ef4444;} .gs-opt[data-v="1"].selected{border-color:#ef4444;background:#fef2f2;}
+        .gs-opt[data-v="3"]{border-color:#fde68a;} .gs-opt[data-v="3"] .gs-val{color:#d97706;} .gs-opt[data-v="3"] .gs-lbl{color:#d97706;} .gs-opt[data-v="3"].selected{border-color:#f59e0b;background:#fffbeb;}
+        .gs-opt[data-v="5"]{border-color:#6ee7b7;} .gs-opt[data-v="5"] .gs-val{color:#10b981;} .gs-opt[data-v="5"] .gs-lbl{color:#10b981;} .gs-opt[data-v="5"].selected{border-color:#10b981;background:#ecfdf5;}
+
+        /* Guest thank you */
+        .guest-ty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:3rem 1rem;}
+        .guest-ty .ty-icon{width:96px;height:96px;background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:3rem;margin:0 auto 2rem;color:#10b981;}
+        .guest-ty h2{font-size:2rem;font-weight:800;margin-bottom:.75rem;}
+        .guest-ty .sub{color:var(--text-muted);max-width:500px;line-height:1.7;}
+
+        /* Enhanced existing scale options with color coding */
+        .scale-options label:has(input[value="0"]:checked){border-color:#94a3b8;background:#f1f5f9;color:#64748b;}
+        .scale-options label:has(input[value="1"]:checked){border-color:#ef4444;background:#fef2f2;color:#dc2626;}
+        .scale-options label:has(input[value="3"]:checked){border-color:#f59e0b;background:#fffbeb;color:#b45309;}
+        .scale-options label:has(input[value="5"]:checked){border-color:#10b981;background:#ecfdf5;color:#059669;}
+        .question-item.fully-answered{border-color:#4f46e5;background:#fafbff;}
     </style>
 </head>
 <body>
@@ -339,6 +438,7 @@
                 <button class="btn btn-outline-secondary" id="btnHome"><i class="bi bi-house"></i> Início</button>
                 <button class="btn btn-outline-secondary" id="btnConsolidado"><i class="bi bi-pie-chart"></i> Painel Consolidado</button>
                 <button class="btn btn-primary" id="btnExecucao"><i class="bi bi-diagram-3"></i> Execução Estratégica</button>
+                <button class="btn btn-dark" id="btnAdmin"><i class="bi bi-shield-lock"></i> Admin</button>
                 <button class="btn btn-light border" id="btnExportarDados" title="Exportar JSON para Backup"><i class="bi bi-download"></i> Backup</button>
                 <button class="btn btn-light border" id="btnImportarDados" title="Restaurar dados via JSON"><i class="bi bi-upload"></i> Restaurar</button>
                 <input type="file" id="fileImport" class="hidden" accept=".json" />
@@ -713,6 +813,122 @@
 
     </div>
 
+
+        <!-- ═══════════════════════════════════════
+             SEÇÃO ADMIN — CENTRAL DE TOKENS
+        ═══════════════════════════════════════ -->
+        <div id="sectionAdmin" class="hidden">
+
+            <!-- Hero Admin -->
+            <div class="admin-hero">
+                <div class="position-relative" style="z-index:1;">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div style="width:52px;height:52px;background:rgba(255,255,255,.12);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;">
+                            <i class="bi bi-shield-lock"></i>
+                        </div>
+                        <div>
+                            <h2 class="fw-800 mb-0" style="font-size:1.5rem;font-weight:800;">Central de Tokens — Diagnóstico de Maturidade</h2>
+                            <p class="mb-0" style="color:rgba(255,255,255,.6);font-size:.9rem;">Gere convites seguros de 24h para convidados participarem do diagnóstico</p>
+                        </div>
+                    </div>
+                    <div class="row g-3" id="adminStatsRow">
+                        <div class="col-6 col-md-3"><div class="admin-stat"><div class="val" id="statTotal">0</div><div class="lbl">Total gerados</div></div></div>
+                        <div class="col-6 col-md-3"><div class="admin-stat s-active"><div class="val" id="statActive">0</div><div class="lbl">Ativos agora</div></div></div>
+                        <div class="col-6 col-md-3"><div class="admin-stat s-used"><div class="val" id="statUsed">0</div><div class="lbl">Utilizados</div></div></div>
+                        <div class="col-6 col-md-3"><div class="admin-stat s-expired"><div class="val" id="statExpired">0</div><div class="lbl">Expirados</div></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Gerador de Token -->
+                <div class="col-lg-5">
+                    <div class="card">
+                        <div class="card-header"><i class="bi bi-plus-circle text-primary me-1"></i> Gerar Novo Token de Convite</div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-600">Empresa / Organização</label>
+                                <select class="form-select" id="tokenEmpresa">
+                                    <option value="">— Selecione a empresa —</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-600">Nome do Convidado</label>
+                                <input type="text" class="form-control" id="tokenGuestName" placeholder="Ex: Dr. Ricardo Almeida" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-600">Cargo / Função</label>
+                                <input type="text" class="form-control" id="tokenGuestRole" placeholder="Ex: CEO, Diretor Operacional…" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-600">E-mail (opcional, para referência)</label>
+                                <input type="email" class="form-control" id="tokenGuestEmail" placeholder="convidado@empresa.com.br" />
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-600">Validade do Token</label>
+                                <select class="form-select" id="tokenValidity">
+                                    <option value="24">24 horas (padrão)</option>
+                                    <option value="48">48 horas</option>
+                                    <option value="72">72 horas</option>
+                                    <option value="168">7 dias</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary w-100 justify-content-center" id="btnGerarToken">
+                                <i class="bi bi-key-fill"></i> Gerar Token &amp; Link de Convite
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Token gerado (resultado) -->
+                    <div id="tokenGeradoCard" class="card hidden" style="border-color:#4f46e5;">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                <span class="fw-bold">Token gerado com sucesso!</span>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small fw-600 text-uppercase" style="letter-spacing:.06em;">Código do Convidado</label>
+                                <div id="tokenGeradoCodigo" class="token-code-badge d-inline-block mb-2" title="Clique para copiar o código" onclick="copiarTexto(this.textContent,'Código copiado!')"></div>
+                                <div class="text-muted small">Clique no código para copiar</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small fw-600 text-uppercase" style="letter-spacing:.06em;">Link de Acesso Direto</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control form-control-sm" id="tokenGeradoLink" readonly style="font-size:.8rem;font-family:'Courier New',monospace;" />
+                                    <button class="btn btn-outline-primary btn-sm" onclick="copiarTexto(document.getElementById('tokenGeradoLink').value,'Link copiado!')"><i class="bi bi-clipboard"></i></button>
+                                </div>
+                            </div>
+                            <div class="alert alert-info py-2 px-3 small mb-0">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Compartilhe o link OU o código com o convidado. O link leva direto ao formulário.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Tokens -->
+                <div class="col-lg-7">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-list-check text-primary me-1"></i> Tokens Emitidos</span>
+                            <div class="d-flex gap-2 align-items-center">
+                                <select class="form-select form-select-sm" id="tokenFilterStatus" style="width:auto;">
+                                    <option value="">Todos</option>
+                                    <option value="active">Ativos</option>
+                                    <option value="used">Utilizados</option>
+                                    <option value="expired">Expirados</option>
+                                </select>
+                                <button class="btn btn-sm btn-outline-danger" id="btnLimparExpirados" title="Remover expirados"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body" style="max-height:580px;overflow-y:auto;" id="tokenListContainer">
+                            <div class="token-empty"><i class="bi bi-key"></i><p class="mb-0">Nenhum token gerado ainda.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <!-- Modais Customizados Dinâmicos (Para evitar Alertas feios do Navegador) -->
     <div class="modal fade" id="appModalConfirmation" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -725,6 +941,74 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Não</button>
                     <button type="button" class="btn btn-primary" id="modalConfirmBtnExecute">Sim, prosseguir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════
+         GUEST OVERLAY — EXPERIÊNCIA C-LEVEL
+    ═══════════════════════════════════════════ -->
+    <div id="guestOverlay" class="guest-overlay hidden">
+
+        <!-- Header fixo -->
+        <div class="guest-header">
+            <div class="guest-header-brand">
+                <div class="g-icon"><i class="bi bi-shield-check"></i></div>
+                <div>
+                    <div class="fw-bold text-dark" style="font-size:.95rem;" id="guestHeaderTitle">Diagnóstico de Maturidade</div>
+                    <div class="text-muted" style="font-size:.78rem;" id="guestHeaderCompany">—</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="subsystem-steps" id="guestStepDots"></div>
+                <span class="badge bg-light text-dark border" id="guestStepLabel" style="font-size:.75rem;"></span>
+            </div>
+            <div class="guest-topbar" id="guestTopBar" style="width:0%"></div>
+        </div>
+
+        <!-- Conteúdo scrollável -->
+        <div class="guest-scroll">
+            <div class="guest-inner" id="guestContent">
+                <!-- Preenchido por JS -->
+            </div>
+        </div>
+
+        <!-- Rodapé de navegação -->
+        <div class="guest-footer" id="guestFooter">
+            <button class="btn btn-outline-secondary" id="guestBtnPrev"><i class="bi bi-arrow-left"></i> Anterior</button>
+            <div class="text-center">
+                <div class="text-muted small" id="guestProgressText"></div>
+            </div>
+            <button class="btn btn-primary" id="guestBtnNext">Próximo <i class="bi bi-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- Copy Toast -->
+    <div class="copy-toast" id="copyToast"></div>
+
+    <!-- Modal: Entrada de Código Convidado -->
+    <div class="modal fade" id="modalGuestCode" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:16px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-key-fill text-primary me-2"></i>Acessar Diagnóstico</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body pt-3">
+                    <p class="text-muted small mb-3">Se você recebeu um código de convite, informe-o abaixo para acessar o formulário de diagnóstico.</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-600">Código do Convite</label>
+                        <input type="text" class="form-control text-center fw-bold" id="inputGuestCode"
+                               placeholder="Ex: ABC-123456"
+                               style="font-size:1.25rem;letter-spacing:.15em;font-family:'Courier New',monospace;text-transform:uppercase;" />
+                        <div class="invalid-feedback" id="guestCodeError">Código inválido ou expirado.</div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnValidateGuestCode"><i class="bi bi-arrow-right-circle"></i> Acessar</button>
                 </div>
             </div>
         </div>
@@ -1203,7 +1487,7 @@
         }
 
         function mostrarSecao(id) {
-            document.querySelectorAll('#sectionHome, #sectionDiagnostico, #sectionResultado, #sectionConsolidado, #sectionExecucao')
+            document.querySelectorAll('#sectionHome, #sectionDiagnostico, #sectionResultado, #sectionConsolidado, #sectionExecucao, #sectionAdmin')
                 .forEach(el => el.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             window.scrollTo(0,0);
@@ -1981,9 +2265,461 @@ function shareExecutiveWhatsApp(){const d=getCompanyStrategy(),a=d.actions,done=
 function shareMapWhatsApp(){const d=getCompanyStrategy();let text=`*Mapa Estratégico BSC - ${companyName()}*\n`;['Financeira','Clientes e Mercado','Processos Internos','Pessoas e Inovação'].forEach(p=>{text+=`\n*${p}*\n`;const os=d.objectives.filter(o=>o.perspective===p);text+=os.length?os.map(o=>`• ${o.title} | ${o.kpi}: ${o.current}${o.unit} → ${o.target}${o.unit}`).join('\n'):'• Sem objetivos';text+='\n';});whatsappOpen(text);}
 function shareActionsWhatsApp(){const d=getCompanyStrategy();let text=`*Plano de Ação - ${companyName()}*\n\n`;text+=d.actions.slice(0,30).map((a,i)=>`${i+1}. *${a.title}*\nResponsável: ${a.owner} | Prazo: ${new Date(a.end+'T12:00:00').toLocaleDateString('pt-BR')}\nStatus: ${a.status} | Progresso: ${a.progress}%`).join('\n\n');if(d.actions.length>30)text+=`\n\n... e mais ${d.actions.length-30} ações.`;whatsappOpen(text);}
 
-document.addEventListener('DOMContentLoaded',()=>{
+
+        // ═══════════════════════════════════════════════════════
+        // SISTEMA DE TOKENS — ADMIN C-LEVEL
+        // ═══════════════════════════════════════════════════════
+        function loadTokens(){return JSON.parse(localStorage.getItem('guestTokens')||'[]');}
+        function saveTokens(t){localStorage.setItem('guestTokens',JSON.stringify(t));}
+
+        function getTokenStatus(tok){
+            if(tok.usedAt) return 'used';
+            if(new Date()>new Date(tok.expiresAt)) return 'expired';
+            return 'active';
+        }
+
+        function gerarCodigo(){
+            const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            const part=n=>Array.from({length:n},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+            return part(3)+'-'+part(6);
+        }
+
+        function gerarToken(){
+            const empId=document.getElementById('tokenEmpresa').value;
+            const guestName=document.getElementById('tokenGuestName').value.trim();
+            const guestRole=document.getElementById('tokenGuestRole').value.trim();
+            const guestEmail=document.getElementById('tokenGuestEmail').value.trim();
+            const hours=parseInt(document.getElementById('tokenValidity').value)||24;
+
+            if(!empId){alert('Selecione a empresa para o token.');return;}
+            if(!guestName){alert('Informe o nome do convidado.');return;}
+
+            const empresa=empresas.find(e=>e.id===empId);
+            if(!empresa){alert('Empresa não encontrada.');return;}
+
+            const now=new Date();
+            const tok={
+                id:gerarId(),
+                code:gerarCodigo(),
+                companyId:empId,
+                companyName:empresa.nome,
+                guestName,guestRole,guestEmail,
+                createdAt:now.toISOString(),
+                expiresAt:new Date(now.getTime()+hours*3600*1000).toISOString(),
+                usedAt:null,
+                responses:null
+            };
+
+            const tokens=loadTokens();
+            tokens.unshift(tok);
+            saveTokens(tokens);
+
+            // Mostrar card do resultado
+            document.getElementById('tokenGeradoCodigo').textContent=tok.code;
+            const link=window.location.href.split('#')[0]+'#guest:'+tok.id;
+            document.getElementById('tokenGeradoLink').value=link;
+            document.getElementById('tokenGeradoCard').classList.remove('hidden');
+
+            renderAdminTokens();
+            renderAdminStats();
+        }
+
+        function revogarToken(id){
+            const tokens=loadTokens();
+            const idx=tokens.findIndex(t=>t.id===id);
+            if(idx>-1){
+                tokens[idx].expiresAt=new Date(0).toISOString();
+                saveTokens(tokens);
+                renderAdminTokens();
+                renderAdminStats();
+            }
+        }
+
+        function limparExpirados(){
+            const tokens=loadTokens().filter(t=>getTokenStatus(t)!=='expired');
+            saveTokens(tokens);
+            renderAdminTokens();
+            renderAdminStats();
+        }
+
+        function tokenExpiryLabel(tok){
+            const status=getTokenStatus(tok);
+            if(status==='used') return '<span class="token-expiry done"><i class="bi bi-check-circle-fill"></i> Utilizado em '+new Date(tok.usedAt).toLocaleString('pt-BR')+'</span>';
+            if(status==='expired') return '<span class="token-expiry"><i class="bi bi-clock"></i> Expirou</span>';
+            const ms=new Date(tok.expiresAt)-new Date();
+            const h=Math.floor(ms/3600000), m=Math.floor((ms%3600000)/60000);
+            const critical=h<2;
+            return `<span class="token-expiry${critical?' critical':''}"><i class="bi bi-clock${critical?'-history':''}"></i> Expira em ${h}h ${m}m</span>`;
+        }
+
+        function renderAdminTokens(){
+            const tokens=loadTokens();
+            const filter=document.getElementById('tokenFilterStatus')?.value||'';
+            const container=document.getElementById('tokenListContainer');
+            if(!container) return;
+
+            const filtered=filter?tokens.filter(t=>getTokenStatus(t)===filter):tokens;
+
+            if(!filtered.length){
+                container.innerHTML='<div class="token-empty"><i class="bi bi-key"></i><p class="mb-1">Nenhum token encontrado.</p></div>';
+                return;
+            }
+
+            container.innerHTML=filtered.map(tok=>{
+                const status=getTokenStatus(tok);
+                const badge={active:'<span class="tok-badge active">Ativo</span>',used:'<span class="tok-badge used">Utilizado</span>',expired:'<span class="tok-badge expired">Expirado</span>'}[status];
+                const link=window.location.href.split('#')[0]+'#guest:'+tok.id;
+                return `
+                <div class="token-list-item s-${status}">
+                    <div class="token-meta">
+                        <div class="t-name">${esc(tok.guestName)}${tok.guestRole?` <span class="text-muted fw-normal">· ${esc(tok.guestRole)}</span>`:''}</div>
+                        <div class="t-company"><i class="bi bi-building me-1"></i>${esc(tok.companyName)}</div>
+                        <div class="mt-1">${tokenExpiryLabel(tok)}</div>
+                    </div>
+                    <div class="d-flex flex-column align-items-end gap-2">
+                        ${badge}
+                        <div class="token-code-badge" title="Clique para copiar o código" onclick="copiarTexto('${tok.code}','Código copiado!')">${tok.code}</div>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-xs btn-light border btn-sm px-2" title="Copiar Link" onclick="copiarTexto('${link}','Link copiado!')"><i class="bi bi-clipboard"></i></button>
+                            ${status==='active'?`<button class="btn btn-xs btn-light border btn-sm px-2 text-danger" title="Revogar" onclick="revogarToken('${tok.id}')"><i class="bi bi-x-circle"></i></button>`:''}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderAdminStats(){
+            const tokens=loadTokens();
+            const active=tokens.filter(t=>getTokenStatus(t)==='active').length;
+            const used=tokens.filter(t=>getTokenStatus(t)==='used').length;
+            const expired=tokens.filter(t=>getTokenStatus(t)==='expired').length;
+            document.getElementById('statTotal').textContent=tokens.length;
+            document.getElementById('statActive').textContent=active;
+            document.getElementById('statUsed').textContent=used;
+            document.getElementById('statExpired').textContent=expired;
+        }
+
+        function populateTokenEmpresaSelect(){
+            const sel=document.getElementById('tokenEmpresa');
+            if(!sel) return;
+            sel.innerHTML='<option value="">— Selecione a empresa —</option>'+
+                empresas.map(e=>`<option value="${e.id}">${esc(e.nome)}</option>`).join('');
+        }
+
+        function copiarTexto(texto,msg){
+            navigator.clipboard.writeText(texto).then(()=>{
+                const toast=document.getElementById('copyToast');
+                toast.textContent=msg||'Copiado!';
+                toast.classList.add('show');
+                setTimeout(()=>toast.classList.remove('show'),2200);
+            }).catch(()=>{
+                // fallback
+                const ta=document.createElement('textarea');
+                ta.value=texto; document.body.appendChild(ta);
+                ta.select(); document.execCommand('copy');
+                ta.remove();
+                const toast=document.getElementById('copyToast');
+                toast.textContent=msg||'Copiado!';
+                toast.classList.add('show');
+                setTimeout(()=>toast.classList.remove('show'),2200);
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // GUEST MODE — EXPERIÊNCIA C-LEVEL DE DIAGNÓSTICO
+        // ═══════════════════════════════════════════════════════
+        const SUBSYSTEM_KEYS=Object.keys(SUBSYSTEMS);
+        const SUBSYSTEM_ICONS={estrategia:'bi-compass',tatico:'bi-layers',comercial:'bi-cart3',orcamentario:'bi-cash-coin',rotina:'bi-calendar-check',pessoas:'bi-people'};
+        let guestState={token:null,currentStep:-1,responses:{},guestName:'',guestRole:''};
+        // steps: -1=intro, 0..5=subsystems, 6=thankyou
+
+        function openGuestMode(tokenOrCode){
+            let tok=null;
+            const tokens=loadTokens();
+            // try by id first, then by code
+            tok=tokens.find(t=>t.id===tokenOrCode)||tokens.find(t=>t.code===tokenOrCode.toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/(.{3})/,'$1-').slice(0,10));
+            // fallback: match code without formatting
+            if(!tok){
+                const clean=tokenOrCode.toUpperCase().replace(/[^A-Z0-9]/g,'');
+                tok=tokens.find(t=>t.code.replace('-','')===clean);
+            }
+            if(!tok){alert('Token não encontrado. Verifique o código e tente novamente.');return false;}
+            const status=getTokenStatus(tok);
+            if(status==='expired'){alert('Este convite expirou. Solicite um novo token ao administrador.');return false;}
+            if(status==='used'){alert('Este convite já foi utilizado. Cada token permite apenas uma resposta.');return false;}
+
+            guestState={token:tok,currentStep:-1,responses:{},guestName:'',guestRole:tok.guestRole||''};
+            document.getElementById('guestHeaderTitle').textContent='Diagnóstico de Maturidade';
+            document.getElementById('guestHeaderCompany').textContent=tok.companyName;
+            renderGuestStep();
+            document.getElementById('guestOverlay').classList.remove('hidden');
+            return true;
+        }
+
+        function renderGuestStep(){
+            const state=guestState;
+            const n=SUBSYSTEM_KEYS.length;
+            const step=state.currentStep;
+            const overlay=document.getElementById('guestOverlay');
+            const content=document.getElementById('guestContent');
+            const btnPrev=document.getElementById('guestBtnPrev');
+            const btnNext=document.getElementById('guestBtnNext');
+            const progressText=document.getElementById('guestProgressText');
+            const topBar=document.getElementById('guestTopBar');
+            const stepLabel=document.getElementById('guestStepLabel');
+            const stepDots=document.getElementById('guestStepDots');
+
+            // Dots
+            stepDots.innerHTML=SUBSYSTEM_KEYS.map((_,i)=>{
+                let cls='subsystem-step';
+                if(i<step) cls+=' done';
+                else if(i===step) cls+=' active';
+                return `<div class="${cls}"></div>`;
+            }).join('');
+
+            if(step===-1){
+                // Intro Screen
+                topBar.style.width='0%';
+                stepLabel.textContent='Introdução';
+                btnPrev.classList.add('hidden');
+                btnNext.innerHTML='Iniciar <i class="bi bi-arrow-right"></i>';
+                progressText.textContent='';
+                content.innerHTML=`
+                <div class="guest-intro">
+                    <div class="guest-intro-icon"><i class="bi bi-shield-check"></i></div>
+                    <h2>Olá, ${esc(state.token.guestName||'Convidado')}!</h2>
+                    <p class="lead">Você foi convidado(a) para participar do <strong>Diagnóstico de Maturidade de Gestão</strong> da organização <strong>${esc(state.token.companyName)}</strong>.</p>
+                    <div class="guest-info-card">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="text-muted small fw-600 text-uppercase mb-1" style="letter-spacing:.05em;">Seu nome</div>
+                                <input type="text" class="form-control" id="guestInputName" value="${esc(state.token.guestName)}" placeholder="Seu nome completo" />
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="text-muted small fw-600 text-uppercase mb-1" style="letter-spacing:.05em;">Seu cargo</div>
+                                <input type="text" class="form-control" id="guestInputRole" value="${esc(state.token.guestRole||'')}" placeholder="Ex: CEO, Diretor..." />
+                            </div>
+                        </div>
+                        <div class="mt-3 p-3 bg-light rounded-3">
+                            <div class="row g-2 text-center">
+                                <div class="col-4"><div class="fw-bold text-primary">${n}</div><div class="text-muted" style="font-size:.78rem;">Subsistemas</div></div>
+                                <div class="col-4"><div class="fw-bold text-primary">${TOTAL_PERGUNTAS_SISTEMA}</div><div class="text-muted" style="font-size:.78rem;">Perguntas</div></div>
+                                <div class="col-4"><div class="fw-bold text-primary">~${Math.ceil(TOTAL_PERGUNTAS_SISTEMA*0.4)} min</div><div class="text-muted" style="font-size:.78rem;">Estimativa</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            } else if(step>=0 && step<n){
+                // Subsystem Question Screen
+                const pct=Math.round((step/n)*100);
+                topBar.style.width=pct+'%';
+                const key=SUBSYSTEM_KEYS[step];
+                const sub=SUBSYSTEMS[key];
+                stepLabel.textContent=`${step+1} / ${n}`;
+                btnPrev.classList.remove('hidden');
+                btnPrev.innerHTML='<i class="bi bi-arrow-left"></i> Anterior';
+                if(step===n-1){
+                    btnNext.innerHTML='Finalizar <i class="bi bi-check-circle"></i>';
+                    btnNext.className='btn btn-success';
+                } else {
+                    btnNext.innerHTML='Próximo <i class="bi bi-arrow-right"></i>';
+                    btnNext.className='btn btn-primary';
+                }
+                const answered=Object.keys(state.responses).filter(k=>k.startsWith(key+'-')).length;
+                const totalQ=sub.atividades.reduce((s,a)=>s+a.perguntas.length,0);
+                progressText.textContent=`${answered} de ${totalQ} respondidas`;
+
+                let html=`
+                <div class="guest-section-header">
+                    <div class="eyebrow"><i class="bi ${SUBSYSTEM_ICONS[key]||'bi-grid'} me-1"></i>Subsistema ${step+1} de ${n}</div>
+                    <h2>${sub.label}</h2>
+                    <div class="subsub">Avalie cada item com base na realidade atual da organização.</div>
+                </div>`;
+
+                let qGlobal=0;
+                sub.atividades.forEach((atv,ai)=>{
+                    html+=`<div class="mb-2 mt-4"><span class="badge bg-light text-dark border fw-600 py-1 px-2" style="font-size:.75rem;letter-spacing:.04em;"><i class="bi bi-tag me-1 text-primary"></i>${esc(atv.nome)}</span></div>`;
+                    atv.perguntas.forEach((pergunta,pi)=>{
+                        qGlobal++;
+                        const rKey=`${key}-${ai}-${pi}`;
+                        const curVal=state.responses[rKey];
+                        const isAnswered=curVal!==undefined&&curVal!==null;
+                        html+=`
+                        <div class="guest-q${isAnswered?' answered':''}" id="gq-${rKey}">
+                            <div class="guest-q-num">Questão ${qGlobal}</div>
+                            <div class="guest-q-text">${esc(pergunta)}</div>
+                            <div class="guest-scale">
+                                ${[{v:0,l:'Sem evidência'},{v:1,l:'Não atende'},{v:3,l:'Atende mal'},{v:5,l:'Atende plenamente'}].map(opt=>`
+                                <div class="gs-opt${curVal===opt.v?' selected':''}" data-v="${opt.v}" data-key="${rKey}" onclick="guestSelectAnswer(this,'${rKey}',${opt.v})">
+                                    <div class="gs-val">${opt.v}</div>
+                                    <div class="gs-lbl">${opt.l}</div>
+                                </div>`).join('')}
+                            </div>
+                        </div>`;
+                    });
+                });
+                content.innerHTML=html;
+                content.closest('.guest-scroll').scrollTop=0;
+            } else {
+                // Thank you
+                topBar.style.width='100%';
+                stepLabel.textContent='Concluído';
+                btnPrev.classList.add('hidden');
+                document.getElementById('guestFooter').classList.add('hidden');
+                stepDots.innerHTML=SUBSYSTEM_KEYS.map(()=>'<div class="subsystem-step done"></div>').join('');
+                content.innerHTML=`
+                <div class="guest-ty">
+                    <div class="ty-icon"><i class="bi bi-check-lg"></i></div>
+                    <h2>Diagnóstico Enviado!</h2>
+                    <p class="sub">Obrigado pela sua participação, <strong>${esc(state.guestName||state.token.guestName)}</strong>. Suas respostas foram registradas com sucesso e serão analisadas pela equipe responsável.</p>
+                    <div class="mt-4 p-4 bg-white border rounded-4" style="max-width:420px;">
+                        <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Empresa</span><span class="fw-600 small">${esc(state.token.companyName)}</span></div>
+                        <div class="d-flex justify-content-between mb-2"><span class="text-muted small">Respondente</span><span class="fw-600 small">${esc(state.guestName||state.token.guestName)}</span></div>
+                        <div class="d-flex justify-content-between"><span class="text-muted small">Data / Hora</span><span class="fw-600 small">${new Date().toLocaleString('pt-BR')}</span></div>
+                    </div>
+                </div>`;
+            }
+        }
+
+        function guestSelectAnswer(el,rKey,val){
+            // Remove selection from siblings
+            el.closest('.guest-scale').querySelectorAll('.gs-opt').forEach(o=>o.classList.remove('selected'));
+            el.classList.add('selected');
+            guestState.responses[rKey]=val;
+            // Mark question as answered
+            const qEl=document.getElementById('gq-'+rKey);
+            if(qEl) qEl.classList.add('answered');
+            // Update progress text
+            const key=SUBSYSTEM_KEYS[guestState.currentStep];
+            const sub=SUBSYSTEMS[key];
+            const totalQ=sub.atividades.reduce((s,a)=>s+a.perguntas.length,0);
+            const answered=Object.keys(guestState.responses).filter(k=>k.startsWith(key+'-')).length;
+            document.getElementById('guestProgressText').textContent=`${answered} de ${totalQ} respondidas`;
+        }
+
+        function guestNextStep(){
+            const state=guestState;
+            const n=SUBSYSTEM_KEYS.length;
+
+            if(state.currentStep===-1){
+                // Save guest info
+                const nm=document.getElementById('guestInputName')?.value.trim()||state.token.guestName;
+                const rl=document.getElementById('guestInputRole')?.value.trim()||state.token.guestRole||'';
+                state.guestName=nm; state.guestRole=rl;
+                state.currentStep=0;
+            } else if(state.currentStep>=0 && state.currentStep<n){
+                state.currentStep++;
+                if(state.currentStep===n){
+                    // Submit
+                    submitGuestResponses();
+                    return;
+                }
+            }
+            renderGuestStep();
+        }
+
+        function guestPrevStep(){
+            if(guestState.currentStep<=0){
+                guestState.currentStep=-1;
+            } else {
+                guestState.currentStep--;
+            }
+            renderGuestStep();
+        }
+
+        function submitGuestResponses(){
+            const state=guestState;
+            // Convert guestState.responses {key-ai-pi: val} to {key_ai_pi: val} format
+            const respostas={};
+            for(const [k,v] of Object.entries(state.responses)){
+                respostas[k.replace(/-/g,'_')]=v;
+            }
+
+            const empresa=empresas.find(e=>e.id===state.token.companyId);
+            if(empresa){
+                const resultado=calcularNotas(respostas);
+                const geral=calcularMediaGeral(resultado);
+                const classificacao=getClassificacao(geral.percentual);
+                empresa.respostas=respostas;
+                empresa.resultado=resultado;
+                empresa.geral=geral;
+                empresa.classificacao=classificacao;
+                empresa.finalizado=true;
+                empresa.dataAtualizacao=new Date().toISOString();
+                empresa.guestRespondente={name:state.guestName,role:state.guestRole,submittedAt:new Date().toISOString()};
+                localStorage.setItem('diagnosticos',JSON.stringify(empresas));
+            }
+
+            // Mark token as used
+            const tokens=loadTokens();
+            const tok=tokens.find(t=>t.id===state.token.id);
+            if(tok){
+                tok.usedAt=new Date().toISOString();
+                tok.responses=respostas;
+                saveTokens(tokens);
+            }
+
+            state.currentStep=SUBSYSTEM_KEYS.length; // thank you step
+            renderGuestStep();
+        }
+
+        function checkGuestTokenFromHash(){
+            const hash=window.location.hash;
+            if(hash.startsWith('#guest:')){
+                const tokenId=hash.slice(7);
+                if(tokenId) setTimeout(()=>openGuestMode(tokenId),300);
+            }
+        }
+
+        window.guestSelectAnswer=guestSelectAnswer;
+        window.copiarTexto=copiarTexto;
+        window.revogarToken=revogarToken;
+
+
+        document.addEventListener('DOMContentLoaded',()=>{
   const sel=document.getElementById('strategyCompany');
   const refreshCompanies=()=>{sel.innerHTML=empresas.map(e=>`<option value="${e.id}">${esc(e.nome)}</option>`).join('');strategyCompanyId=sel.value||empresas[0]?.id||null;if(strategyCompanyId){sel.value=strategyCompanyId;renderStrategyAll();}};
+  // Admin section
+  document.getElementById('btnAdmin').addEventListener('click',()=>{
+    mostrarSecao('sectionAdmin');
+    populateTokenEmpresaSelect();
+    renderAdminTokens();
+    renderAdminStats();
+  });
+  document.getElementById('btnGerarToken').addEventListener('click',gerarToken);
+  document.getElementById('btnLimparExpirados')?.addEventListener('click',()=>{
+    if(confirm('Remover todos os tokens expirados?')) limparExpirados();
+  });
+  document.getElementById('tokenFilterStatus').addEventListener('change',renderAdminTokens);
+
+  // Guest mode
+  document.getElementById('guestBtnNext').addEventListener('click',guestNextStep);
+  document.getElementById('guestBtnPrev').addEventListener('click',guestPrevStep);
+  document.getElementById('btnValidateGuestCode').addEventListener('click',()=>{
+    const code=document.getElementById('inputGuestCode').value.trim();
+    if(!code) return;
+    if(openGuestMode(code)){
+      bootstrap.Modal.getInstance(document.getElementById('modalGuestCode')).hide();
+    } else {
+      document.getElementById('inputGuestCode').classList.add('is-invalid');
+    }
+  });
+  document.getElementById('inputGuestCode').addEventListener('input',function(){this.classList.remove('is-invalid');});
+
+  // Add "Acessar com Código" button in home header
+  const headerBtns=document.querySelector('.app-header .d-flex.gap-2');
+  if(headerBtns){
+    const guestBtn=document.createElement('button');
+    guestBtn.className='btn btn-outline-primary';
+    guestBtn.innerHTML='<i class="bi bi-person-badge"></i> Sou Convidado';
+    guestBtn.addEventListener('click',()=>new bootstrap.Modal(document.getElementById('modalGuestCode')).show());
+    headerBtns.appendChild(guestBtn);
+  }
+
+  // Check URL hash for guest token on load
+  checkGuestTokenFromHash();
+
+  // Exec section (existing)
   document.getElementById('btnExecucao').addEventListener('click',()=>{mostrarSecao('sectionExecucao');refreshCompanies();});
   sel.addEventListener('change',()=>{strategyCompanyId=sel.value;renderStrategyAll();});
   document.querySelectorAll('[data-strategy-view]').forEach(b=>b.addEventListener('click',()=>switchStrategyView(b.dataset.strategyView)));
