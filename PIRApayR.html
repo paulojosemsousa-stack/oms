@@ -221,7 +221,7 @@
   <div class="app">
     <aside>
       <div class="brand">
-        <img class="brand-logo" src="assets/pirapay-logo.png" alt="PiraPay">
+        <img class="brand-logo" src="pirapay-logo.png" alt="PiraPay" onerror="this.onerror=null;this.src='assets/pirapay-logo.png';">
         <div>
           <h1>Resultados</h1>
           <small>Projecao financeira</small>
@@ -1641,7 +1641,7 @@
         const generated = new Date().toLocaleString("pt-BR");
         const r5 = rows[rows.length - 1];
         const accum = rows.reduce((s, r) => s + r.netIncome, 0);
-        const logo = new URL("assets/pirapay-logo.png", location.href).href;
+        const logo = new URL("pirapay-logo.png", location.href).href;
         const fidcRows = rows.map(r => {
           const thirdParty = r.creditPortfolio * model.providers.fidcThirdParty;
           const ownCapital = r.creditPortfolio - thirdParty;
