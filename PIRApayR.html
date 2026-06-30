@@ -699,7 +699,7 @@
         ["accounts.colaboradoresCrescimento", "Crescimento anual colaboradores", "percent"],
         ["accounts.cancelamento", "Cancelamento anual da base", "percent"],
         ["accounts.percentualCartao", "% contas com cartao", "percent"],
-        ["accounts.segundaVia", "% solicitacao 2a via", "percent"]
+        ["accounts.segundaVia", "% contas solicitam 2a via", "percent"]
       ]],
       ["Volumes transacionais", [
         ["volumes.aporteMotorista", "Aporte medio produtor", "currency"],
@@ -1017,7 +1017,8 @@
         const cobrancas = model.volumes.cobrancasMesAno1 * Math.pow(1 + model.volumes.cobrancasCrescimento, i) * 12;
 
         const feeAnuidade = i + 1 <= model.pricing.isencaoAnuidadeAnos ? 0 : activeAccounts * model.pricing.anuidadeMensal * 12;
-        const secondCardRevenue = cards * model.accounts.segundaVia * model.pricing.segundaVia;
+        const secondCardBase = cards > 0 ? cards : activeAccounts;
+        const secondCardRevenue = secondCardBase * model.accounts.segundaVia * model.pricing.segundaVia;
         const serviceRevenue = feeAnuidade
           + secondCardRevenue
           + paidBills * model.pricing.boletoPago
@@ -1088,6 +1089,7 @@
           pixCollaborator,
           pixTotal,
           pixRevenue: pixProducer * model.pricing.pixProdutorTarifa + pixCollaborator * model.pricing.pixColaboradorTarifa,
+          secondCardBase,
           secondCardRevenue,
           fuelTpv,
           vaTpv,
@@ -1765,7 +1767,7 @@
           <thead><tr><th>Linha</th><th>Driver usado</th><th>Ano 1</th><th>Ano 5</th></tr></thead>
           <tbody>
             <tr><td>Servicos de conta</td><td>Anuidade, segunda via, contas pagas, saque, PIX produtor, cobranca e GreenPass</td><td>${fmtMoney(rows[0].serviceRevenue)}</td><td>${fmtMoney(r5.serviceRevenue)}</td></tr>
-            <tr><td>2a via do cartao</td><td>Cartoes ativos x percentual de solicitacao de 2a via x tarifa de ${fmtMoney(model.pricing.segundaVia, false)}</td><td>${fmtMoney(rows[0].secondCardRevenue)}</td><td>${fmtMoney(r5.secondCardRevenue)}</td></tr>
+            <tr><td>2a via do cartao</td><td>Base elegivel x percentual de solicitacao de 2a via x tarifa de ${fmtMoney(model.pricing.segundaVia, false)}</td><td>${fmtMoney(rows[0].secondCardRevenue)}</td><td>${fmtMoney(r5.secondCardRevenue)}</td></tr>
             <tr><td>PIX produtor CNPJ</td><td>Operacoes PIX de produtores CNPJ multiplicadas pela tarifa escolhida</td><td>${fmtMoney(rows[0].pixRevenue)}</td><td>${fmtMoney(r5.pixRevenue)}</td></tr>
             <tr><td>Float</td><td>Saldo medio em conta x Selic x captura do float</td><td>${fmtMoney(rows[0].floatRevenue)}</td><td>${fmtMoney(r5.floatRevenue)}</td></tr>
             <tr><td>Combustivel</td><td>TPV combustivel x MDR</td><td>${fmtMoney(rows[0].fuelRevenue)}</td><td>${fmtMoney(r5.fuelRevenue)}</td></tr>
