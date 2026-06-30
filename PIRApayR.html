@@ -486,7 +486,7 @@
       "pricing": {
             "anuidadeMensal": 10,
             "isencaoAnuidadeAnos": 1,
-            "segundaVia": 15,
+            "segundaVia": 20,
             "interchange": 0.012,
             "interchangeOnUs": 0,
             "floatCapture": 1,
@@ -715,6 +715,7 @@
       ]],
       ["Receitas e precos", [
         ["pricing.anuidadeMensal", "Anuidade mensal", "currency"],
+        ["pricing.segundaVia", "Receita 2a via do cartao", "currency"],
         ["pricing.interchange", "Interchange", "percent"],
         ["pricing.interchangeOnUs", "Interchange on-us", "percent"],
         ["pricing.floatCapture", "Captura rendimento float", "percent"],
@@ -749,7 +750,9 @@
     function loadModel() {
       try {
         const stored = localStorage.getItem("pirapay_projection_model");
-        return stored ? mergeDeep(structuredClone(defaultModel), JSON.parse(stored)) : structuredClone(defaultModel);
+        const loaded = stored ? mergeDeep(structuredClone(defaultModel), JSON.parse(stored)) : structuredClone(defaultModel);
+        if (loaded.pricing && loaded.pricing.segundaVia === 15) loaded.pricing.segundaVia = 20;
+        return loaded;
       } catch (e) {
         return structuredClone(defaultModel);
       }
@@ -1014,8 +1017,9 @@
         const cobrancas = model.volumes.cobrancasMesAno1 * Math.pow(1 + model.volumes.cobrancasCrescimento, i) * 12;
 
         const feeAnuidade = i + 1 <= model.pricing.isencaoAnuidadeAnos ? 0 : activeAccounts * model.pricing.anuidadeMensal * 12;
+        const secondCardRevenue = cards * model.accounts.segundaVia * model.pricing.segundaVia;
         const serviceRevenue = feeAnuidade
-          + cards * model.accounts.segundaVia * model.pricing.segundaVia
+          + secondCardRevenue
           + paidBills * model.pricing.boletoPago
           + externalWithdraws * model.pricing.saqueExterno
           + pixProducer * model.pricing.pixProdutorTarifa
@@ -1084,6 +1088,7 @@
           pixCollaborator,
           pixTotal,
           pixRevenue: pixProducer * model.pricing.pixProdutorTarifa + pixCollaborator * model.pricing.pixColaboradorTarifa,
+          secondCardRevenue,
           fuelTpv,
           vaTpv,
           marketTpv,
@@ -1372,6 +1377,7 @@
       `;
       renderMix("revenueMix", [
         ["Servicos conta", r5.serviceRevenue, "#0054A6"],
+        ["2a via cartao", r5.secondCardRevenue, "#0F766E"],
         ["Interchange", r5.interchange + r5.interchangeOnUs, "#FF7A00"],
         ["Float", r5.floatRevenue, "#168A4B"],
         ["Combustivel", r5.fuelRevenue, "#D6A84A"],
@@ -1393,6 +1399,7 @@
       const lines = [
         ["Receitas operacionais", "revenue", true],
         ["Rendas servicos conta", "serviceRevenue"],
+        ["Receita 2a via do cartao", "secondCardRevenue"],
         ["Receita PIX produtor CNPJ", "pixRevenue"],
         ["Rendas interchange", "interchange"],
         ["Rendas interchange on-us", "interchangeOnUs"],
@@ -1723,6 +1730,7 @@
         ${reportRows([
           ["Receitas operacionais", "revenue", 1, "total revenue"],
           ["Rendas servicos conta", "serviceRevenue", 1, "revenue"],
+          ["Receita 2a via do cartao", "secondCardRevenue", 1, "revenue"],
           ["Receita PIX produtor CNPJ", "pixRevenue", 1, "revenue"],
           ["Float", "floatRevenue", 1, "revenue"],
           ["Combustivel", "fuelRevenue", 1, "revenue"],
@@ -1757,6 +1765,7 @@
           <thead><tr><th>Linha</th><th>Driver usado</th><th>Ano 1</th><th>Ano 5</th></tr></thead>
           <tbody>
             <tr><td>Servicos de conta</td><td>Anuidade, segunda via, contas pagas, saque, PIX produtor, cobranca e GreenPass</td><td>${fmtMoney(rows[0].serviceRevenue)}</td><td>${fmtMoney(r5.serviceRevenue)}</td></tr>
+            <tr><td>2a via do cartao</td><td>Cartoes ativos x percentual de solicitacao de 2a via x tarifa de ${fmtMoney(model.pricing.segundaVia, false)}</td><td>${fmtMoney(rows[0].secondCardRevenue)}</td><td>${fmtMoney(r5.secondCardRevenue)}</td></tr>
             <tr><td>PIX produtor CNPJ</td><td>Operacoes PIX de produtores CNPJ multiplicadas pela tarifa escolhida</td><td>${fmtMoney(rows[0].pixRevenue)}</td><td>${fmtMoney(r5.pixRevenue)}</td></tr>
             <tr><td>Float</td><td>Saldo medio em conta x Selic x captura do float</td><td>${fmtMoney(rows[0].floatRevenue)}</td><td>${fmtMoney(r5.floatRevenue)}</td></tr>
             <tr><td>Combustivel</td><td>TPV combustivel x MDR</td><td>${fmtMoney(rows[0].fuelRevenue)}</td><td>${fmtMoney(r5.fuelRevenue)}</td></tr>
