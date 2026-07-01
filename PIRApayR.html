@@ -125,6 +125,10 @@
     .premise-card h4 { margin: 0 0 6px; color: var(--blue); font-size: 12px; }
     .premise-card p { margin: 0; color: #344054; font-size: 12px; line-height: 1.4; }
     .premise-card strong { color: var(--ink); }
+    .macro-rate-block { margin-top: 10px; }
+    .macro-rate-block h4 { margin: 0 0 8px; color: var(--blue); font-size: 13px; }
+    .macro-rate-table th, .macro-rate-table td { text-align: center; }
+    .macro-rate-table th:first-child, .macro-rate-table td:first-child { text-align: left; font-weight: 900; }
     .section-title {
       display: flex; justify-content: space-between; align-items: end; gap: 12px;
       margin: 20px 0 10px;
@@ -1034,8 +1038,6 @@
         const activeFamilies = familyBase * model.accounts.ativosFamiliares[i] * Math.min(1.1, f);
         const activeAccounts = activeDrivers + activeFamilies;
         const cards = activeAccounts * model.accounts.percentualCartao;
-        const cardsIssued = (newDrivers + newFamilies) * model.accounts.percentualCartao;
-        const providerCost = providerAdjustedCosts(activeAccounts, cardsIssued);
 
         const aporteDrivers = activeDrivers * model.volumes.aporteMotorista * 12 * model.volumes.freqAporte;
         const aporteFamilies = activeFamilies * model.volumes.aporteFamilia * 12 * model.volumes.freqAporte;
@@ -1056,15 +1058,18 @@
 
         const feeAnuidade = i + 1 <= model.pricing.isencaoAnuidadeAnos ? 0 : activeAccounts * model.pricing.anuidadeMensal * 12;
         const secondCardBase = cards > 0 ? cards : activeAccounts;
+        const secondCardsIssued = secondCardBase * model.accounts.segundaVia;
+        const cardsIssued = (newDrivers + newFamilies) * model.accounts.percentualCartao;
+        const totalCardsIssued = cardsIssued + secondCardsIssued;
+        const providerCost = providerAdjustedCosts(activeAccounts, totalCardsIssued);
         const secondCardRevenue = secondCardBase * model.accounts.segundaVia * model.pricing.segundaVia;
-        const serviceRevenue = feeAnuidade
-          + secondCardRevenue
+        const pixRevenue = pixProducer * model.pricing.pixProdutorTarifa + pixCollaborator * model.pricing.pixColaboradorTarifa;
+        const accountServiceRevenue = feeAnuidade
           + paidBills * model.pricing.boletoPago
           + externalWithdraws * model.pricing.saqueExterno
-          + pixProducer * model.pricing.pixProdutorTarifa
-          + pixCollaborator * model.pricing.pixColaboradorTarifa
           + cobrancas * model.pricing.cobrancaEmissao
           + activeAccounts * model.pricing.greenpassAdesao * model.pricing.greenpassPreco * 12;
+        const serviceRevenue = accountServiceRevenue + secondCardRevenue + pixRevenue;
         const interchange = cardTpv * model.pricing.interchange;
         const interchangeOnUs = cardTpv * model.pricing.interchangeOnUs;
         const cdiRate = (model.macro.cdi && model.macro.cdi[i] !== undefined) ? model.macro.cdi[i] : model.macro.selic[i];
@@ -1089,9 +1094,11 @@
         const setup = i === 0 ? providerCost.setupBaas + providerCost.setupFront + providerCost.embossSetup : 0;
         const processingCost = activeAccounts * (providerCost.processamentoContaAtiva + providerCost.binMensalCartao) * 12 * ipcaFactor;
         const accountOpeningCost = (newDrivers + newFamilies) * providerCost.aberturaConta * ipcaFactor;
-        const cardIssueVariable = cardsIssued * (providerCost.embossCard + providerCost.courierCard) * ipcaFactor;
-        const cardIssueMinimum = (providerCost.embossMinimumAnnual + providerCost.courierMinimumAnnual) * ipcaFactor;
-        const cardIssueCost = Math.max(cardIssueVariable, cardIssueMinimum);
+        const cardEmbossVariable = totalCardsIssued * providerCost.embossCard * ipcaFactor;
+        const cardCourierVariable = totalCardsIssued * providerCost.courierCard * ipcaFactor;
+        const cardEmbossCost = Math.max(cardEmbossVariable, providerCost.embossMinimumAnnual * ipcaFactor);
+        const cardCourierCost = Math.max(cardCourierVariable, providerCost.courierMinimumAnnual * ipcaFactor);
+        const cardIssueCost = cardEmbossCost + cardCourierCost;
         const txCost = (cardTx * (providerCost.autorizacao + providerCost.antifraude + providerCost.sms)
           + paidBills * providerCost.billPaymentCost
           + externalTransfers * providerCost.transferExternalCost
@@ -1100,13 +1107,14 @@
           + externalWithdraws * providerCost.withdrawalCost
           + recharges * providerCost.rechargeCost
           + chargebacks * providerCost.chargeback) * ipcaFactor;
-        const providerFixed = (providerCost.frontMensal * 12 + model.costs.sacCompartilhadoMensal * 12 + model.costs.sacDedicadoMensal * 12 + providerCost.courierDedicatedPaAnnual) * ipcaFactor;
+        const courierPaCost = providerCost.courierDedicatedPaAnnual * ipcaFactor;
+        const providerFixed = (providerCost.frontMensal * 12 + model.costs.sacCompartilhadoMensal * 12 + model.costs.sacDedicadoMensal * 12) * ipcaFactor;
         const marketing = (i === 0 ? model.costs.marketingAno1 : model.costs.marketingRecorrente) * ipcaFactor;
         const rh = (i === 0 ? model.costs.rhAno1 : model.costs.rhRecorrente) * ipcaFactor;
         const admin = (i === 0 ? model.costs.despesasAdminAno1 : model.costs.despesasAdminRecorrente) * ipcaFactor;
         const fuelCost = fuelTpv * model.pirapay.fuelCashbackCost * ipcaFactor;
         const rewardsCost = (fuelTpv + vaTpv + marketTpv) * model.pirapay.rewardsCost * ipcaFactor;
-        const operatingCosts = setup + processingCost + accountOpeningCost + cardIssueCost + txCost + providerFixed + marketing + rh + admin + fuelCost + rewardsCost + creditCosts;
+        const operatingCosts = setup + processingCost + accountOpeningCost + cardIssueCost + courierPaCost + txCost + providerFixed + marketing + rh + admin + fuelCost + rewardsCost + creditCosts;
         const ebt = revenue - operatingCosts;
         const serviceTaxes = (serviceRevenue + fuelRevenue + vaRevenue + marketRevenue) * (model.macro.pis + model.macro.cofins + model.macro.iss);
         const incomeTaxes = Math.max(0, ebt - serviceTaxes) * (model.macro.irpj + model.macro.csll);
@@ -1126,6 +1134,9 @@
           activeAccounts,
           ipcaFactor,
           cards,
+          cardsIssued,
+          secondCardsIssued,
+          totalCardsIssued,
           cashIn,
           avgBalance,
           cdiRate,
@@ -1134,12 +1145,13 @@
           pixProducer,
           pixCollaborator,
           pixTotal,
-          pixRevenue: pixProducer * model.pricing.pixProdutorTarifa + pixCollaborator * model.pricing.pixColaboradorTarifa,
+          pixRevenue,
           secondCardBase,
           secondCardRevenue,
           fuelTpv,
           vaTpv,
           marketTpv,
+          accountServiceRevenue,
           serviceRevenue,
           interchange,
           interchangeOnUs,
@@ -1152,7 +1164,10 @@
           setup,
           processingCost,
           accountOpeningCost,
+          cardEmbossCost,
+          cardCourierCost,
           cardIssueCost,
+          courierPaCost,
           txCost,
           providerFixed,
           marketing,
@@ -1363,7 +1378,10 @@
                 <table>
                   <tbody>
                     <tr><td>Processamento/conta</td><td><strong>${fmtMoney(r1.processingCost)}</strong></td></tr>
-                    <tr><td>Emissao e entrega cartoes</td><td><strong>${fmtMoney(r1.cardIssueCost)}</strong></td></tr>
+                    <tr><td>Cartoes novos + 2as vias</td><td><strong>${Math.round(r1.totalCardsIssued).toLocaleString("pt-BR")} cartoes</strong></td></tr>
+                    <tr><td>Emissao cartoes/embossing</td><td><strong>${fmtMoney(r1.cardEmbossCost)}</strong></td></tr>
+                    ${Math.abs(r1.cardCourierCost || 0) > 0.5 ? `<tr><td>Entrega cartoes/courier</td><td><strong>${fmtMoney(r1.cardCourierCost)}</strong></td></tr>` : ""}
+                    <tr><td>PA de entrega courier</td><td><strong>${fmtMoney(r1.courierPaCost)}</strong></td></tr>
                     <tr><td>Transacionais e antifraude</td><td><strong>${fmtMoney(r1.txCost)}</strong></td></tr>
                     <tr><td>PIX produtor CNPJ</td><td><strong>${Math.round(r1.pixProducer).toLocaleString("pt-BR")} ops / ${fmtMoney(r1.pixRevenue)}</strong></td></tr>
                     <tr><td>PIX colaborador</td><td><strong>${Math.round(r1.pixCollaborator).toLocaleString("pt-BR")} ops / sem receita</strong></td></tr>
@@ -1427,10 +1445,12 @@
       document.getElementById("executivePremises").innerHTML = `
         <h4 style="margin:0 0 8px;">Premissas principais</h4>
         ${premiseCardsHtml()}
+        ${macroRatesTableHtml()}
       `;
       renderMix("revenueMix", [
-        ["Servicos conta", r5.serviceRevenue, "#0054A6"],
+        ["Servicos conta", r5.accountServiceRevenue, "#0054A6"],
         ["2a via cartao", r5.secondCardRevenue, "#0F766E"],
+        ["PIX produtor", r5.pixRevenue, "#38BDF8"],
         ["Interchange", r5.interchange + r5.interchangeOnUs, "#FF7A00"],
         ["Float", r5.floatRevenue, "#168A4B"],
         ["Combustivel", r5.fuelRevenue, "#D6A84A"],
@@ -1452,14 +1472,14 @@
       const cdi = (model.macro.cdi || model.macro.selic)[0];
       const selic = (model.macro.selic || model.macro.cdi)[0];
       const ipca = model.macro.ipca[0];
-      const curve = years.map((year, i) => `Ano ${year}: Selic ${fmtPct((model.macro.selic || [])[i] || 0)}, CDI ${fmtPct((model.macro.cdi || [])[i] || 0)}, IPCA ${fmtPct((model.macro.ipca || [])[i] || 0)}`).join(" | ");
+      const cardCosts = providerAdjustedCosts(75000, 50000);
       return `
         <div class="premise-grid">
-          <div class="premise-card"><h4>1. Cenario e provedores</h4><p>Cenario <strong>${model.scenario}</strong>. Core <strong>${model.providers.accountCore || model.providers.baas}</strong>, servicos <strong>${model.providers.services}</strong>, front <strong>${model.providers.front}</strong>, emboss <strong>${model.providers.emboss}</strong>.</p></div>
+          <div class="premise-card"><h4>1. Cenario e provedores</h4><p>Cenario <strong>${model.scenario}</strong>. Core <strong>${model.providers.accountCore || model.providers.baas}</strong>, servicos <strong>${model.providers.services}</strong>, front <strong>${model.providers.front}</strong>, emboss <strong>${model.providers.emboss}</strong>, courier <strong>${model.providers.courier}</strong>.</p></div>
           <div class="premise-card"><h4>2. Base da operacao</h4><p>Ano 1 com <strong>${model.accounts.motoristasNovasAno1.toLocaleString("pt-BR")}</strong> produtores e <strong>${model.accounts.colaboradoresNovasAno1.toLocaleString("pt-BR")}</strong> colaboradores. Crescimentos: ${fmtPct(model.accounts.motoristasCrescimento)} e ${fmtPct(model.accounts.colaboradoresCrescimento)}.</p></div>
           <div class="premise-card"><h4>3. Aportes e uso</h4><p>Produtor <strong>${fmtMoney(model.volumes.aporteMotorista, false)}</strong>; colaborador <strong>${fmtMoney(model.volumes.aporteFamilia, false)}</strong>. Compras no cartao: <strong>${fmtPct(model.volumes.comprasPercentualAporte)}</strong> do aporte.</p></div>
-          <div class="premise-card"><h4>4. Cartao e tarifas</h4><p><strong>${fmtPct(model.accounts.percentualCartao)}</strong> das contas com cartao. <strong>${fmtPct(model.accounts.segundaVia)}</strong> solicitam 2a via a <strong>${fmtMoney(model.pricing.segundaVia, false)}</strong>. Interchange <strong>${fmtPct(model.pricing.interchange)}</strong>.</p></div>
-          <div class="premise-card"><h4>5. Macro e float</h4><p>Referencia Ano 1: Selic <strong>${fmtPct(selic)}</strong>; CDI calculado <strong>${fmtPct(cdi)}</strong>; IPCA <strong>${fmtPct(ipca)}</strong>. Curva: ${curve}. Float: saldo medio ${fmtPct(model.volumes.saldoMedioPercentual)}, ${model.volumes.floatDiasMedios} dias, captura ${fmtPct(model.pricing.floatCapture)}.</p></div>
+          <div class="premise-card"><h4>4. Cartao e courier</h4><p><strong>${fmtPct(model.accounts.percentualCartao)}</strong> das contas com cartao. 2a via <strong>${fmtMoney(model.pricing.segundaVia, false)}</strong> e gera custo de emissao/entrega. Courier <strong>${model.providers.courier}</strong>: custo por entrega <strong>${fmtMoney(cardCosts.courierCard, false)}</strong>, minimo anualizado <strong>${fmtMoney(cardCosts.courierMinimumAnnual, false)}</strong>, PA de entrega anualizado <strong>${fmtMoney(cardCosts.courierDedicatedPaAnnual, false)}</strong>.</p></div>
+          <div class="premise-card"><h4>5. Macro e float</h4><p>Referencia Ano 1: Selic <strong>${fmtPct(selic)}</strong>; CDI calculado <strong>${fmtPct(cdi)}</strong>; IPCA <strong>${fmtPct(ipca)}</strong>. Float: saldo medio ${fmtPct(model.volumes.saldoMedioPercentual)}, ${model.volumes.floatDiasMedios} dias, captura ${fmtPct(model.pricing.floatCapture)}.</p></div>
           <div class="premise-card"><h4>6. Credito/FIDC</h4><p><strong>${fmtPct(model.credit.adoptionActive)}</strong> dos ativos tomam credito; ticket <strong>${fmtMoney(model.credit.avgTicket, false)}</strong>; prazo <strong>${model.credit.durationMonths} meses</strong>; spread <strong>${fmtPct(model.credit.spreadAnnual)}</strong>; terceiros FIDC <strong>${fmtPct(model.providers.fidcThirdParty)}</strong>.</p></div>
           <div class="premise-card"><h4>7. Combustivel, VA e marketplace</h4><p>Combustivel: TPV <strong>${fmtMoney(model.pirapay.fuelTpvAno1)}</strong> e MDR <strong>${fmtPct(model.pirapay.fuelMdr)}</strong>. VA: ticket <strong>${fmtMoney(model.pirapay.vaTicketMensal, false)}</strong>. Marketplace MDR <strong>${fmtPct(model.pirapay.marketplaceMdr)}</strong>.</p></div>
           <div class="premise-card"><h4>8. Custos e implantacao</h4><p>Custos recorrentes corrigidos por IPCA. Setup BaaS, front e embossing alocado somente no <strong>Ano 1</strong>. Marketing Ano 1: <strong>${fmtMoney(model.costs.marketingAno1)}</strong>.</p></div>
@@ -1467,10 +1487,49 @@
       `;
     }
 
+    function reportPremiseCardsHtml() {
+      const cardCosts = providerAdjustedCosts(75000, 50000);
+      return `
+        <div class="premise-grid">
+          <div class="premise-card"><h4>1. Provedores</h4><p>Cenario <strong>${model.scenario}</strong>. Core <strong>${model.providers.accountCore || model.providers.baas}</strong>; servicos <strong>${model.providers.services}</strong>; front <strong>${model.providers.front}</strong>; emboss <strong>${model.providers.emboss}</strong>; courier <strong>${model.providers.courier}</strong>.</p></div>
+          <div class="premise-card"><h4>2. Base</h4><p>Ano 1: <strong>${model.accounts.motoristasNovasAno1.toLocaleString("pt-BR")}</strong> produtores e <strong>${model.accounts.colaboradoresNovasAno1.toLocaleString("pt-BR")}</strong> colaboradores. Crescimento: ${fmtPct(model.accounts.motoristasCrescimento)} e ${fmtPct(model.accounts.colaboradoresCrescimento)}.</p></div>
+          <div class="premise-card"><h4>3. Cartao e courier</h4><p>2a via gera receita e tambem novo custo de cartao. Embossing <strong>${fmtMoney(cardCosts.embossCard, false)}</strong>/cartao. Courier <strong>${model.providers.courier}</strong>: custo por entrega <strong>${fmtMoney(cardCosts.courierCard, false)}</strong>, minimo anualizado <strong>${fmtMoney(cardCosts.courierMinimumAnnual, false)}</strong> e PA de entrega anualizado <strong>${fmtMoney(cardCosts.courierDedicatedPaAnnual, false)}</strong>.</p></div>
+          <div class="premise-card"><h4>4. Implantacao</h4><p>Setup alocado apenas no <strong>Ano 1</strong>. Custos recorrentes corrigidos por IPCA. Float por CDI proporcional aos dias de saldo. Monetizacao: PIX, 2a via, combustivel, VA/VR, marketplace e credito/FIDC.</p></div>
+        </div>
+      `;
+    }
+
+    function macroRatesTableHtml() {
+      const rateRows = [
+        ["Selic projetada", model.macro.selic || []],
+        ["CDI usado no float", model.macro.cdi || []],
+        ["IPCA para correcao de custos", model.macro.ipca || []]
+      ];
+      return `
+        <div class="macro-rate-block">
+          <h4>Curva macroeconomica da simulacao</h4>
+          <table class="macro-rate-table">
+            <thead>
+              <tr><th>Taxa</th>${years.map(year => `<th>Ano ${year}</th>`).join("")}</tr>
+            </thead>
+            <tbody>
+              ${rateRows.map(([label, values]) => `
+                <tr>
+                  <td>${esc(label)}</td>
+                  ${years.map((_, i) => `<td>${fmtPct(values[i] || 0)}</td>`).join("")}
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+          <p class="small">Quando atualizado pelo Bacen/Focus, o modelo busca Selic e IPCA. O CDI e recalculado automaticamente como Selic - 0,10 p.p. e segue editavel nas premissas.</p>
+        </div>
+      `;
+    }
+
     function renderDre() {
       const lines = [
         ["Receitas operacionais", "revenue", true],
-        ["Rendas servicos conta", "serviceRevenue"],
+        ["Rendas servicos conta", "accountServiceRevenue"],
         ["Receita 2a via do cartao", "secondCardRevenue"],
         ["Receita PIX produtor CNPJ", "pixRevenue"],
         ["Rendas interchange", "interchange"],
@@ -1483,12 +1542,17 @@
         ["Despesas operacionais", "operatingCosts", true, -1],
         ["Setup/implantacao", "setup", false, -1],
         ["Processamento/conta", "processingCost", false, -1],
-        ["Emissao e entrega cartoes", "cardIssueCost", false, -1],
+        ["Abertura/KYC de contas", "accountOpeningCost", false, -1],
+        ["Emissao de cartoes (embossing)", "cardEmbossCost", false, -1],
+        ["Entrega de cartoes (courier)", "cardCourierCost", false, -1],
+        ["PA de entrega courier", "courierPaCost", false, -1],
         ["Transacionais e antifraude", "txCost", false, -1],
         ["Front, SAC e fixos provedor", "providerFixed", false, -1],
         ["Marketing", "marketing", false, -1],
         ["RH", "rh", false, -1],
         ["Administrativas", "admin", false, -1],
+        ["Cashback combustivel", "fuelCost", false, -1],
+        ["Pontos/rewards", "rewardsCost", false, -1],
         ["Custos credito", "creditCosts", false, -1],
         ["Tributos sobre servicos", "serviceTaxes", false, -1],
         ["IRPJ e CSLL", "incomeTaxes", false, -1],
@@ -1498,19 +1562,22 @@
       const r5 = results.rows[4];
       renderMix("costMix", [
         ["Processamento", r5.processingCost, "#0054A6"],
+        ["KYC/abertura", r5.accountOpeningCost, "#94A3B8"],
         ["Setup", r5.setup, "#475467"],
         ["Cartoes", r5.cardIssueCost, "#FF7A00"],
+        ["PA courier", r5.courierPaCost, "#0EA5E9"],
         ["Transacionais", r5.txCost, "#168A4B"],
         ["Fixos provedor", r5.providerFixed, "#7C3AED"],
         ["Marketing", r5.marketing, "#D6A84A"],
         ["RH/Admin", r5.rh + r5.admin, "#D92D20"],
+        ["Cashback/rewards", r5.fuelCost + r5.rewardsCost, "#F97316"],
         ["Credito", r5.creditCosts, "#0F766E"]
       ], r5.operatingCosts);
     }
 
     function tableHtml(lines) {
       return `<thead><tr><th>Conta</th>${results.rows.map(r => `<th>${r.periodLabel}</th>`).join("")}</tr></thead><tbody>` +
-        lines.map(([label, key, total, sign]) => {
+        lines.filter(([label, key, total]) => total || results.rows.some(r => Math.abs(Number(r[key] || 0)) > 0.5)).map(([label, key, total, sign]) => {
           const cls = total ? " class='total'" : "";
           return `<tr${cls}><td>${label}</td>${results.rows.map(r => {
             const v = r[key] * (sign || 1) / 1000;
@@ -1669,7 +1736,7 @@
     }
 
     function reportRows(items, years) {
-      return items.map(([label, key, sign = 1, tone = ""]) => `
+      return items.filter(([label, key, sign = 1, tone = ""]) => tone.includes("total") || years.some(r => Math.abs(Number(r[key] || 0)) > 0.5)).map(([label, key, sign = 1, tone = ""]) => `
         <tr class="${tone}">
           <td>${esc(label)}</td>
           ${years.map(r => `<td>${fmtMil((r[key] * sign) / 1000)}</td>`).join("")}
@@ -1714,6 +1781,7 @@
         const r5 = rows[rows.length - 1];
         const accum = rows.reduce((s, r) => s + r.netIncome, 0);
         const logo = new URL("pirapay-logo.png", location.href).href;
+        const hasCardDeliveryCost = rows.some(r => Math.abs(Number(r.cardCourierCost || 0)) > 0.5);
         const fidcRows = rows.map(r => {
           const thirdParty = r.creditPortfolio * model.providers.fidcThirdParty;
           const ownCapital = r.creditPortfolio - thirdParty;
@@ -1732,7 +1800,7 @@
     @page { size: A4 landscape; margin: 12mm; }
     * { box-sizing: border-box; }
     body { margin: 0; color: #141827; font-family: Arial, Helvetica, sans-serif; background: #fff; }
-    .page { min-height: 184mm; padding: 3mm 1mm; page-break-after: always; }
+    .page { min-height: 184mm; padding: 2mm 0; page-break-after: always; overflow: hidden; }
     .page:last-child { page-break-after: auto; }
     .head { display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 2px solid #0054A6; padding-bottom: 8px; margin-bottom: 10px; }
     .logo { width: 118px; height: auto; }
@@ -1745,10 +1813,10 @@
 	    .kpi strong { display: block; color: #0054A6; font-size: 16px; margin-bottom: 3px; }
 	    .kpi span { color: #667085; font-size: 9px; }
 	    .cover { display: flex; flex-direction: column; justify-content: space-between; }
-	    .cover-hero { border-bottom: 4px solid #0054A6; padding-bottom: 18px; margin-bottom: 18px; }
-	    .cover-logo { width: 150px; height: auto; margin-bottom: 18px; }
-	    .cover-title { font-size: 34px; line-height: 1.05; color: #0054A6; font-weight: 900; margin: 0 0 8px; }
-	    .cover-subtitle { color: #344054; font-size: 13px; max-width: 720px; line-height: 1.45; }
+	    .cover-hero { border-bottom: 4px solid #0054A6; padding-bottom: 12px; margin-bottom: 10px; }
+	    .cover-logo { width: 132px; height: auto; margin-bottom: 10px; }
+	    .cover-title { font-size: 30px; line-height: 1.05; color: #0054A6; font-weight: 900; margin: 0 0 6px; }
+	    .cover-subtitle { color: #344054; font-size: 12px; max-width: 760px; line-height: 1.35; }
 	    .premise-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
 	    .premise-card { border: 1px solid #D8DEE8; background: #F8FAFC; padding: 8px; min-height: 70px; }
 	    .premise-card h4 { color: #0054A6; font-size: 9px; margin: 0 0 4px; }
@@ -1762,9 +1830,25 @@
     .cost td:not(:first-child), .negative { color: #D92D20; }
     .chart-svg { width: 100%; height: 210px; display: block; margin: 8px 0; border: 1px solid #E4E7EC; padding: 8px; }
     .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .note { border: 1px solid #D8DEE8; background: #F8FAFC; padding: 8px; margin-top: 8px; font-size: 10px; }
-    .foot { position: fixed; left: 12mm; right: 12mm; bottom: 6mm; display: flex; justify-content: space-between; color: #667085; font-size: 8px; }
-    @media screen { body { background: #E5E7EB; } .page { width: 297mm; margin: 14px auto; background: white; padding: 12mm; box-shadow: 0 16px 50px rgba(16,24,40,.18); } .foot { display:none; } }
+    .note { border: 1px solid #D8DEE8; background: #F8FAFC; padding: 7px; margin-top: 7px; font-size: 9.5px; }
+    .macro-rate-block { margin-top: 10px; }
+    .macro-rate-block h4 { color: #0054A6; font-size: 11px; margin: 0 0 6px; }
+    .macro-rate-table { font-size: 9px; margin-top: 4px; }
+    .macro-rate-table th, .macro-rate-table td { text-align: center; }
+    .macro-rate-table th:first-child, .macro-rate-table td:first-child { text-align: left; font-weight: 800; }
+    .market-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 10px 0; }
+    .market-card { border: 1px solid #D8DEE8; background: #F8FAFC; padding: 10px; min-height: 82px; }
+    .market-card strong { display: block; color: #0054A6; font-size: 14px; margin-bottom: 5px; }
+    .market-card span { color: #344054; font-size: 9.5px; line-height: 1.4; }
+    .article-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 12px; margin-top: 10px; }
+    .article-card { border: 1px solid #D8DEE8; background: #F8FAFC; padding: 10px; }
+    .article-card h3 { color: #0054A6; font-size: 12px; margin: 0 0 6px; }
+    .article-card p { font-size: 9.6px; line-height: 1.45; margin: 5px 0; }
+    .article-list { margin: 6px 0 0; padding-left: 16px; font-size: 9.4px; line-height: 1.45; }
+    .article-list li { margin-bottom: 5px; }
+    .source { color: #667085; font-size: 8.5px; margin-top: 8px; }
+    .foot { display: none; }
+    @media screen { body { background: #E5E7EB; } .page { width: 297mm; margin: 14px auto; background: white; padding: 12mm; box-shadow: 0 16px 50px rgba(16,24,40,.18); } }
   </style>
 </head>
 <body>
@@ -1785,7 +1869,8 @@
         <div class="kpi"><strong>${Math.round(r5.activeAccounts).toLocaleString("pt-BR")}</strong><span>Contas ativas Ano 5</span></div>
       </div>
       <h2>Premissas-base da simulacao</h2>
-      ${premiseCardsHtml()}
+      ${reportPremiseCardsHtml()}
+      ${macroRatesTableHtml()}
       <div class="note">Metodologia macro: a Selic projetada vem do Bacen/Focus quando atualizada. O CDI da simulacao e calculado como Selic - 0,10 ponto percentual e pode ser editado manualmente nas premissas.</div>
     </div>
     <div class="note">Gerado em ${esc(generated)}. Cenario ${esc(model.scenario)}. Custos recorrentes corrigidos por IPCA e receita de float calculada por CDI proporcional aos dias medios de permanencia do saldo.</div>
@@ -1813,8 +1898,39 @@
     ])}
     <h2>Leitura executiva</h2>
     <p>O PIRApay e projetado como plataforma financeira para produtores CNPJ e colaboradores, combinando conta, cartao, PIX, float, combustivel, VA/VR, marketplace e credito estruturado via FIDC. No cenario atual, o Ano 5 projeta ${fmtMoney(r5.revenue)} de receita e ${fmtMoney(r5.netIncome)} de lucro liquido.</p>
-    <h2>Premissas-base</h2>
-    ${premiseCardsHtml()}
+    <div class="note">As premissas completas da simulacao ficam consolidadas na capa, incluindo provedores, base operacional, curva Selic/CDI/IPCA, credito/FIDC, combustivel, VA/VR e marketplace.</div>
+  </section>
+  <section class="page">
+    <div class="head"><h1>Reportagem de referencia - BaaS e CaaS ate 2030</h1><img class="logo" src="${logo}" alt="PIRApay"></div>
+    <p>A reportagem do Finsiders Brasil sobre a expectativa de crescimento de Banking as a Service e Credit as a Service ate 2030 reforca a tese central do PIRApay: empresas com ecossistemas fortes tendem a embutir servicos financeiros dentro da sua propria jornada, em vez de depender apenas de bancos tradicionais ou aplicativos genericos.</p>
+    <div class="article-grid">
+      <div class="article-card">
+        <h3>Leitura completa em formato executivo</h3>
+        <p>O movimento de BaaS permite que empresas nao financeiras oferecam conta, cartao, pagamentos, PIX, onboarding, KYC, antifraude e saldo transacional com infraestrutura de parceiros regulados. Isso encurta o tempo de implantacao e torna possivel operar uma marca financeira propria sem construir todos os componentes bancarios do zero.</p>
+        <p>O CaaS amplia essa mesma logica para credito. Em vez de tratar credito como produto isolado, ele passa a ser embutido no fluxo de negocio: antecipacao, capital de giro, credito para compra, financiamento de estoque, recebiveis, servicing e cobranca. Para o PIRApay, essa camada conversa diretamente com FIDC, antecipacao e monetizacao por spread.</p>
+        <p>A leitura estrategica e que o crescimento previsto ate 2030 nao depende apenas de tecnologia. Ele depende da combinacao entre base cativa, dados operacionais, recorrencia de transacoes, parceiros regulados, governanca e capacidade de distribuir produtos financeiros no momento certo da jornada do usuario.</p>
+      </div>
+      <div class="article-card">
+        <h3>Pontos-chave para o PIRApay</h3>
+        <ul class="article-list">
+          <li><strong>Ecossistema:</strong> produtores, colaboradores, postos, marketplace, VA/VR, fornecedores e credito podem operar em uma unica camada financeira.</li>
+          <li><strong>Receita recorrente:</strong> MDR, PIX produtor, float, cartao, combustivel, marketplace e VA/VR reduzem dependencia de uma unica linha de receita.</li>
+          <li><strong>Credito embarcado:</strong> CaaS e FIDC viabilizam antecipacao e capital de giro com separacao entre originacao, funding, risco, servicing e resultado.</li>
+          <li><strong>Anti-lock-in:</strong> a arquitetura precisa permitir trocar ou combinar Dock, Celcoin, Swap e outros provedores sem refazer o SuperApp.</li>
+          <li><strong>Governanca:</strong> quanto mais o modelo escala, maior a importancia de KYC, antifraude, trilha de auditoria, conciliacao, compliance e gestao de terceiros.</li>
+        </ul>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Tema da reportagem</th><th>Traducao para o plano PIRApay</th><th>Indicador a acompanhar</th></tr></thead>
+      <tbody>
+        <tr><td>BaaS crescendo ate 2030</td><td>Conta, cartao, PIX, saldo, onboarding e transacoes como infraestrutura de marca propria.</td><td>Contas ativas, TPV, transacoes por usuario, custo por conta e margem transacional.</td></tr>
+        <tr><td>CaaS ganhando escala</td><td>Credito e antecipacao embutidos no relacionamento com produtores e fornecedores.</td><td>Carteira, spread, inadimplencia esperada, funding, servicing e resultado FIDC.</td></tr>
+        <tr><td>Empresas usando financas embarcadas</td><td>PIRApay como ferramenta de fidelizacao, eficiencia operacional e monetizacao do ecossistema.</td><td>Receita por conta ativa, economia em combustivel, adesao VA/VR e uso marketplace.</td></tr>
+        <tr><td>Mercado mais regulado e competitivo</td><td>Middleware de provedores, governanca e modelos de custo editaveis por fornecedor.</td><td>SLA, custo transacional, incidentes antifraude, conciliacao e troca de provedor.</td></tr>
+      </tbody>
+    </table>
+    <p class="source">Fonte: Finsiders Brasil, "CaaS e BaaS devem dobrar ate 2030, preve mercado" - https://finsidersbrasil.com.br/inovacao/caas-e-baas-devem-dobrar-ate-2030-preve-mercado/</p>
   </section>
   <section class="page">
     <div class="head"><h1>DRE projetada e resultado consolidado</h1><img class="logo" src="${logo}" alt="PIRApay"></div>
@@ -1823,9 +1939,11 @@
       <tbody>
         ${reportRows([
           ["Receitas operacionais", "revenue", 1, "total revenue"],
-          ["Rendas servicos conta", "serviceRevenue", 1, "revenue"],
+          ["Rendas servicos conta", "accountServiceRevenue", 1, "revenue"],
           ["Receita 2a via do cartao", "secondCardRevenue", 1, "revenue"],
           ["Receita PIX produtor CNPJ", "pixRevenue", 1, "revenue"],
+          ["Rendas interchange", "interchange", 1, "revenue"],
+          ["Rendas interchange on-us", "interchangeOnUs", 1, "revenue"],
           ["Float", "floatRevenue", 1, "revenue"],
           ["Combustivel", "fuelRevenue", 1, "revenue"],
           ["VA/VR", "vaRevenue", 1, "revenue"],
@@ -1834,12 +1952,17 @@
           ["Despesas operacionais", "operatingCosts", -1, "total cost"],
           ["Setup/implantacao", "setup", -1, "cost"],
           ["Processamento/conta", "processingCost", -1, "cost"],
-          ["Emissao e entrega cartoes", "cardIssueCost", -1, "cost"],
+          ["Abertura/KYC de contas", "accountOpeningCost", -1, "cost"],
+          ["Emissao de cartoes (embossing)", "cardEmbossCost", -1, "cost"],
+          ["Entrega de cartoes (courier)", "cardCourierCost", -1, "cost"],
+          ["PA de entrega courier", "courierPaCost", -1, "cost"],
           ["Transacionais e antifraude", "txCost", -1, "cost"],
           ["Front, SAC e fixos", "providerFixed", -1, "cost"],
           ["Marketing", "marketing", -1, "cost"],
           ["RH", "rh", -1, "cost"],
           ["Administrativas", "admin", -1, "cost"],
+          ["Cashback combustivel", "fuelCost", -1, "cost"],
+          ["Pontos/rewards", "rewardsCost", -1, "cost"],
           ["Custos credito", "creditCosts", -1, "cost"],
           ["Tributos", "serviceTaxes", -1, "cost"],
           ["IRPJ/CSLL", "incomeTaxes", -1, "cost"],
@@ -1861,9 +1984,10 @@
         <table>
           <thead><tr><th>Linha</th><th>Driver usado</th><th>Ano 1</th><th>Ano 5</th></tr></thead>
           <tbody>
-            <tr><td>Servicos de conta</td><td>Anuidade, segunda via, contas pagas, saque, PIX produtor, cobranca e GreenPass</td><td>${fmtMoney(rows[0].serviceRevenue)}</td><td>${fmtMoney(r5.serviceRevenue)}</td></tr>
-            <tr><td>2a via do cartao</td><td>Base elegivel x percentual de solicitacao de 2a via x tarifa de ${fmtMoney(model.pricing.segundaVia, false)}</td><td>${fmtMoney(rows[0].secondCardRevenue)}</td><td>${fmtMoney(r5.secondCardRevenue)}</td></tr>
+            <tr><td>Servicos de conta</td><td>Anuidade, contas pagas, saque, cobranca e GreenPass, sem duplicar 2a via e PIX</td><td>${fmtMoney(rows[0].accountServiceRevenue)}</td><td>${fmtMoney(r5.accountServiceRevenue)}</td></tr>
+            <tr><td>2a via do cartao</td><td>Base elegivel x percentual de solicitacao de 2a via x tarifa de ${fmtMoney(model.pricing.segundaVia, false)}. No cenario atual, tambem gera custo de embossing e courier.</td><td>${fmtMoney(rows[0].secondCardRevenue)}</td><td>${fmtMoney(r5.secondCardRevenue)}</td></tr>
             <tr><td>PIX produtor CNPJ</td><td>Operacoes PIX de produtores CNPJ multiplicadas pela tarifa escolhida</td><td>${fmtMoney(rows[0].pixRevenue)}</td><td>${fmtMoney(r5.pixRevenue)}</td></tr>
+            <tr><td>Interchange</td><td>TPV cartao x taxa de interchange definida nas premissas</td><td>${fmtMoney(rows[0].interchange + rows[0].interchangeOnUs)}</td><td>${fmtMoney(r5.interchange + r5.interchangeOnUs)}</td></tr>
             <tr><td>Float</td><td>Saldo medio mensal x CDI proporcional a ${model.volumes.floatDiasMedios} dias x 12 meses x captura do float</td><td>${fmtMoney(rows[0].floatRevenue)}</td><td>${fmtMoney(r5.floatRevenue)}</td></tr>
             <tr><td>Combustivel</td><td>TPV combustivel x MDR</td><td>${fmtMoney(rows[0].fuelRevenue)}</td><td>${fmtMoney(r5.fuelRevenue)}</td></tr>
             <tr><td>VA/VR</td><td>Colaboradores x ticket VA/VR x MDR</td><td>${fmtMoney(rows[0].vaRevenue)}</td><td>${fmtMoney(r5.vaRevenue)}</td></tr>
@@ -1879,9 +2003,11 @@
           <tbody>
             <tr><td>Setup/implantacao</td><td>Setup BaaS + setup front + setup embossing, alocado apenas no ano 1</td><td>${fmtMoney(rows[0].setup)}</td><td>${fmtMoney(r5.setup)}</td></tr>
             <tr><td>Processamento/conta</td><td>Contas ativas x custo mensal de conta/cartao do provedor</td><td>${fmtMoney(rows[0].processingCost)}</td><td>${fmtMoney(r5.processingCost)}</td></tr>
-            <tr><td>Cartoes</td><td>Cartoes emitidos x embossing/courier, respeitando minimos</td><td>${fmtMoney(rows[0].cardIssueCost)}</td><td>${fmtMoney(r5.cardIssueCost)}</td></tr>
+            <tr><td>Emissao de cartoes</td><td>Cartoes novos + 2as vias x custo de embossing, respeitando minimo anual da embossadora. Total Ano 1: ${Math.round(rows[0].totalCardsIssued).toLocaleString("pt-BR")}</td><td>${fmtMoney(rows[0].cardEmbossCost)}</td><td>${fmtMoney(r5.cardEmbossCost)}</td></tr>
+            ${hasCardDeliveryCost ? `<tr><td>Entrega de cartoes</td><td>Cartoes novos + 2as vias x custo de courier, respeitando minimo anual/logistico do fornecedor. Total Ano 1: ${Math.round(rows[0].totalCardsIssued).toLocaleString("pt-BR")}</td><td>${fmtMoney(rows[0].cardCourierCost)}</td><td>${fmtMoney(r5.cardCourierCost)}</td></tr>` : `<tr><td>Entrega de cartoes</td><td>Sem custo variavel porque nao ha cartoes novos ou 2as vias emitidas. O custo fixo de PA continua separado abaixo.</td><td>-</td><td>-</td></tr>`}
+            <tr><td>PA de entrega courier</td><td>PA dedicado do fornecedor de entrega, separado dos fixos de front/SAC para evidenciar a courier</td><td>${fmtMoney(rows[0].courierPaCost)}</td><td>${fmtMoney(r5.courierPaCost)}</td></tr>
             <tr><td>Transacionais</td><td>Autorizacao, antifraude, SMS, PIX, saques, contas pagas e chargeback</td><td>${fmtMoney(rows[0].txCost)}</td><td>${fmtMoney(r5.txCost)}</td></tr>
-            <tr><td>Front/SAC/fixos</td><td>Mensalidade front, SAC compartilhado/dedicado e PA courier</td><td>${fmtMoney(rows[0].providerFixed)}</td><td>${fmtMoney(r5.providerFixed)}</td></tr>
+            <tr><td>Front/SAC/fixos</td><td>Mensalidade front e SAC compartilhado/dedicado</td><td>${fmtMoney(rows[0].providerFixed)}</td><td>${fmtMoney(r5.providerFixed)}</td></tr>
             <tr><td>Cashback/rewards</td><td>TPV combustivel, VA/VR e marketplace x custos de incentivo</td><td>${fmtMoney(rows[0].fuelCost + rows[0].rewardsCost)}</td><td>${fmtMoney(r5.fuelCost + r5.rewardsCost)}</td></tr>
             <tr><td>Credito/FIDC</td><td>Funding, perda esperada e servicing</td><td>${fmtMoney(rows[0].creditCosts)}</td><td>${fmtMoney(r5.creditCosts)}</td></tr>
           </tbody>
@@ -1916,6 +2042,10 @@
         win.document.open();
         win.document.write(html);
         win.document.close();
+        try {
+          win.document.title = "PIRApay - Dashboard Executivo";
+          win.history.replaceState(null, "PIRApay - Dashboard Executivo", `${location.pathname}${location.search}#dashboard-executivo-pirapay`);
+        } catch (e) {}
         setTimeout(() => {
           win.focus();
           win.print();
