@@ -623,12 +623,12 @@
     // ── CONFIGURAÇÃO ────────────────────────────────────────────────────
     const APP_CONFIG = {
         // Troque para 'production' após configurar o Supabase
-        mode: 'demo',   // 'demo' | 'production'
+        mode: 'production',   // 'demo' | 'production'
 
         // Preencha com seus dados do Supabase:
         // Dashboard → Settings → API
-        supabaseUrl:     'https://SEU-PROJETO.supabase.co',
-        supabaseAnonKey: 'SUA-ANON-KEY-AQUI',
+        supabaseUrl:     'https://xfkaazleimuqexiqywcl.supabase.co',
+        supabaseAnonKey: 'sb_publishable__XeA2XnUf6y94z8jCxwjFQ_95_v_be3',
     };
 
     // ── CLIENTE SUPABASE (somente se production) ─────────────────────────
@@ -840,7 +840,7 @@
                 </div>
             </div>
 
-            <div class="demo-banner"><i class="bi bi-cone-striped"></i> Ambiente de Demonstração — dados simulados</div>
+            <div class="demo-banner" id="loginDemoBanner"><i class="bi bi-cone-striped"></i> Ambiente de Demonstração — dados simulados</div>
 
             <div class="mb-3">
                 <label class="form-label fw-600" style="font-size:.875rem;">E-mail corporativo</label>
@@ -863,7 +863,7 @@
                         <div><strong>gestor@mspro.com.br</strong> · Gestor</div>
                         <div><strong>consultor@mspro.com.br</strong> · Consultor</div>
                     </div>
-                    <div class="mt-2 text-warning fw-600">Senha de todas: 123456</div>
+                    <div class="mt-2 text-warning fw-600" id="demoPasswordHint">Senha de todas: 123456</div>
                 </div>
                 <label class="form-label fw-600" style="font-size:.8rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;">Selecione o perfil demo</label>
                 <div class="login-demo-roles" id="demoRoleSelector">
@@ -989,7 +989,7 @@
         <!-- MAIN AREA -->
         <div class="main-area" id="mainArea">
             <!-- Demo banner -->
-            <div class="demo-topbanner" id="demoBanner"><i class="bi bi-cone-striped"></i> <strong>MODO DEMO</strong> — dados simulados, sem backend real. Para produção configure <code style="background:rgba(0,0,0,.08);padding:.1rem .3rem;border-radius:4px;">APP_CONFIG.mode = 'production'</code> e as chaves Supabase. <a href="https://supabase.com/dashboard" target="_blank" style="color:#92400e;font-weight:700;margin-left:.5rem;">Abrir Supabase ↗</a></div>
+            <div class="demo-topbanner" id="demoBanner" style="display:none;"><i class="bi bi-database-check"></i> <strong>MODO PRODUCAO</strong> — conectado ao Supabase configurado.</div>
 
             <!-- TOP BAR -->
             <div class="topbar" id="topBar">
@@ -2870,7 +2870,7 @@
                         {id:'bl-c2',perspective:'Clientes e Mercado',level:'Estratégico',title:'Reduzir Avarias em Trânsito',kpi:'Taxa de Avaria',current:1.8,target:0.5,unit:'%',owner:'Qualidade',deadline:'2026-12-31',progress:38},
                         {id:'bl-c3',perspective:'Clientes e Mercado',level:'Tático',title:'Aumentar NPS para 72',kpi:'NPS',current:58,target:72,unit:'pts',owner:'CS',deadline:'2026-12-31',progress:55},
                         {id:'bl-p1',perspective:'Processos Internos',level:'Estratégico',title:'Aumentar Ocupação da Frota para 88%',kpi:'Taxa de Ocupação Veicular',current:74,target:88,unit:'%',owner:'Tráfego',deadline:'2026-12-31',progress:56},
-                        {id:'bl-p2',perspective:'Processos Internos',level:'Estratégico',title:'Zerar Acidentes de Trânsito c/ Vítima',kpi:'Acidentes com Vítima',current:3,target:0,unit='ocorr.',owner:'SST',deadline:'2026-12-31',progress:50},
+                        {id:'bl-p2',perspective:'Processos Internos',level:'Estratégico',title:'Zerar Acidentes de Trânsito c/ Vítima',kpi:'Acidentes com Vítima',current:3,target:0,unit:'ocorr.',owner:'SST',deadline:'2026-12-31',progress:50},
                         {id:'bl-p3',perspective:'Processos Internos',level:'Tático',title:'Implementar Roteirização Inteligente',kpi:'% Rotas Otimizadas',current:35,target:90,unit:'%',owner:'TI',deadline:'2026-09-30',progress:39},
                         {id:'bl-pp1',perspective:'Pessoas e Inovação',level:'Estratégico',title:'Reduzir Rotatividade de Motoristas',kpi:'Turnover Motoristas',current:38,target:20,unit:'%/ano',owner:'RH',deadline:'2026-12-31',progress:35},
                         {id:'bl-pp2',perspective:'Pessoas e Inovação',level:'Tático',title:'Programa Direção Segura e Econômica',kpi:'Motoristas Certificados',current:40,target:100,unit:'%',owner:'SST',deadline:'2026-09-30',progress:40},
@@ -2885,12 +2885,12 @@
                         {id:'ge-f3',perspective:'Financeira',level:'Tático',title:'Reduzir OPEX por MWh',kpi:'OPEX/MWh',current:88,target:72,unit:'R$/MWh',owner:'COO',deadline:'2026-12-31',progress:42},
                         {id:'ge-c1',perspective:'Clientes e Mercado',level:'Estratégico',title:'Atingir SAIDI < 4h/ano',kpi:'SAIDI (horas)',current:6.8,target:4.0,unit:'h/ano',owner:'Operações',deadline:'2026-12-31',progress:41},
                         {id:'ge-c2',perspective:'Clientes e Mercado',level:'Estratégico',title:'Aumentar Satisfação Clientes B2B',kpi:'CSAT B2B',current:3.9,target:4.6,unit:'pts',owner:'CS',deadline:'2026-12-31',progress:60},
-                        {id:'ge-c3',perspective:'Clientes e Mercado',level:'Tático',title:'Expandir para 3 novos estados',kpi:'UFs de Atuação',current:4,target:7,unit='UFs',owner:'CEO',deadline:'2026-12-31',progress:33},
+                        {id:'ge-c3',perspective:'Clientes e Mercado',level:'Tático',title:'Expandir para 3 novos estados',kpi:'UFs de Atuação',current:4,target:7,unit:'UFs',owner:'CEO',deadline:'2026-12-31',progress:33},
                         {id:'ge-p1',perspective:'Processos Internos',level:'Estratégico',title:'Disponibilidade de Plantas ≥ 96%',kpi:'Disponibilidade Operacional',current:93.4,target:96.0,unit:'%',owner:'O&M',deadline:'2026-12-31',progress:69},
                         {id:'ge-p2',perspective:'Processos Internos',level:'Estratégico',title:'Taxa de Frequência de Acidentes < 1',kpi:'LTIFR',current:1.8,target:0.8,unit:'',owner:'SSO',deadline:'2026-12-31',progress:44},
                         {id:'ge-p3',perspective:'Processos Internos',level:'Tático',title:'Implantar Asset Performance Management',kpi:'Ativos Monitorados c/ APM',current:30,target:100,unit:'%',owner:'TI',deadline:'2026-12-31',progress:35},
                         {id:'ge-pp1',perspective:'Pessoas e Inovação',level:'Estratégico',title:'Certificar Engenheiros em Energia Renovável',kpi:'Eng. Certificados',current:28,target:70,unit:'%',owner:'RH',deadline:'2026-12-31',progress:40},
-                        {id:'ge-pp2',perspective:'Pessoas e Inovação',level:'Tático',title:'Consolidar Cultura HSE',kpi:'Comportamentos Seguros Observados',current:65,target:92,unit='%',owner:'SSO',deadline:'2026-12-31',progress:55},
+                        {id:'ge-pp2',perspective:'Pessoas e Inovação',level:'Tático',title:'Consolidar Cultura HSE',kpi:'Comportamentos Seguros Observados',current:65,target:92,unit:'%',owner:'SSO',deadline:'2026-12-31',progress:55},
                         {id:'ge-pp3',perspective:'Pessoas e Inovação',level:'Tático',title:'Plano de Sucessão para Posições Críticas',kpi:'Posições com Sucessor Pronto',current:35,target:80,unit:'%',owner:'CHRO',deadline:'2026-12-31',progress:44},
                     ],
                     actions: []
@@ -2898,7 +2898,7 @@
                 'Delta Tech': {
                     objectives: [
                         {id:'dt-f1',perspective:'Financeira',level:'Estratégico',title:'Atingir MRR de R$ 2M',kpi:'Monthly Recurring Revenue',current:820000,target:2000000,unit:'R$',owner:'CEO',deadline:'2026-12-31',progress:41},
-                        {id:'dt-f2',perspective:'Financeira',level:'Estratégico',title:'Razão LTV/CAC ≥ 4x',kpi:'LTV/CAC Ratio',current:2.8,target:4.0,unit='x',owner:'CFO',deadline:'2026-12-31',progress:52},
+                        {id:'dt-f2',perspective:'Financeira',level:'Estratégico',title:'Razão LTV/CAC ≥ 4x',kpi:'LTV/CAC Ratio',current:2.8,target:4.0,unit:'x',owner:'CFO',deadline:'2026-12-31',progress:52},
                         {id:'dt-f3',perspective:'Financeira',level:'Tático',title:'Controlar Burn Rate mensal',kpi:'Burn Rate',current:380000,target:250000,unit:'R$/mês',owner:'CFO',deadline:'2026-09-30',progress:45},
                         {id:'dt-c1',perspective:'Clientes e Mercado',level:'Estratégico',title:'Atingir 50.000 MAU',kpi:'Monthly Active Users',current:18400,target:50000,unit:'usuários',owner:'Growth',deadline:'2026-12-31',progress:37},
                         {id:'dt-c2',perspective:'Clientes e Mercado',level:'Estratégico',title:'Reduzir Churn para < 3% ao mês',kpi:'Monthly Churn Rate',current:5.8,target:3.0,unit:'%',owner:'CS',deadline:'2026-12-31',progress:42},
@@ -2906,7 +2906,7 @@
                         {id:'dt-p1',perspective:'Processos Internos',level:'Estratégico',title:'Aumentar Velocidade de Release',kpi:'Deploys por Semana',current:2,target:5,unit:'',owner:'CTO',deadline:'2026-09-30',progress:40},
                         {id:'dt-p2',perspective:'Processos Internos',level:'Estratégico',title:'Reduzir Densidade de Defeitos',kpi:'Bugs por Feature',current:4.2,target:1.5,unit:'',owner:'QA',deadline:'2026-12-31',progress:36},
                         {id:'dt-p3',perspective:'Processos Internos',level:'Tático',title:'Atingir p95 de Latência < 200ms',kpi:'Latência p95',current:480,target:200,unit:'ms',owner:'Infra',deadline:'2026-09-30',progress:48},
-                        {id:'dt-pp1',perspective:'Pessoas e Inovação',level:'Estratégico',title:'Construir Cultura de Alta Performance',kpi:'Performance Review Score',current:3.4,target:4.5,unit='pts',owner:'CHRO',deadline:'2026-12-31',progress:42},
+                        {id:'dt-pp1',perspective:'Pessoas e Inovação',level:'Estratégico',title:'Construir Cultura de Alta Performance',kpi:'Performance Review Score',current:3.4,target:4.5,unit:'pts',owner:'CHRO',deadline:'2026-12-31',progress:42},
                         {id:'dt-pp2',perspective:'Pessoas e Inovação',level:'Tático',title:'Aumentar Densidade de Talentos Sênior',kpi:'% Devs Sênior no Time',current:35,target:55,unit:'%',owner:'CTO',deadline:'2026-12-31',progress:45},
                         {id:'dt-pp3',perspective:'Pessoas e Inovação',level:'Tático',title:'Programa de Hackathon e Inovação Interna',kpi:'Projetos de Inovação Lançados',current:1,target:4,unit:'',owner:'CEO',deadline:'2026-12-31',progress:25},
                     ],
@@ -4325,9 +4325,19 @@ function shareActionsWhatsApp(){const d=getCompanyStrategy();let text=`*Plano de
         document.getElementById('loginError')?.remove();
     });
   });
+  if (APP_CONFIG.mode === 'production') {
+    document.getElementById('demoPasswordHint')?.classList.add('d-none');
+    document.getElementById('demoModeBlock')?.classList.add('d-none');
+    document.getElementById('loginDemoBanner')?.classList.add('d-none');
+  }
   // Set default email on load
-  document.getElementById('loginEmail').value = 'admin@mspro.com.br';
-  document.getElementById('loginPassword').value = '123456';
+  if (APP_CONFIG.mode === 'demo') {
+    document.getElementById('loginEmail').value = 'admin@mspro.com.br';
+    document.getElementById('loginPassword').value = '123456';
+  } else {
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+  }
   document.getElementById('btnLogin')?.addEventListener('click', async () => {
     const email    = document.getElementById('loginEmail')?.value.trim();
     const password = document.getElementById('loginPassword')?.value;
@@ -4590,10 +4600,10 @@ function shareActionsWhatsApp(){const d=getCompanyStrategy();let text=`*Plano de
   document.getElementById('auditFilterOp')?.addEventListener('change', renderAuditLog);
 
   // ── ACCESS CHIP in header area ──
-  const accessChipEl = document.createElement('div');
-  accessChipEl.className = 'access-chip ms-2';
-  accessChipEl.id = 'topbarRoleChip';
-  document.getElementById('topBar')?.appendChild(accessChipEl);
+  const createdAccessChipEl = document.createElement('div');
+  createdAccessChipEl.className = 'access-chip ms-2';
+  createdAccessChipEl.id = 'topbarRoleChip';
+  document.getElementById('topBar')?.appendChild(createdAccessChipEl);
 
   // Admin section (legacy support)
   document.getElementById('btnAdmin')?.addEventListener('click',()=>{
