@@ -462,8 +462,8 @@
                   0.037000000000000005,
                   0.0354
             ],
-            "bcbLastUpdate": "30/06/2026, 15:56:09",
-            "bcbSource": "Banco Central - Focus/Expectativas",
+            "bcbLastUpdate": "01/07/2026, 14:05:25",
+            "bcbSource": "Banco Central - Focus/Expectativas; CDI = Selic - 0,10 p.p.",
             "pis": 0.0065,
             "cofins": 0.04,
             "iss": 0.05,
@@ -478,10 +478,10 @@
             ]
       },
       "accounts": {
-            "motoristasNovasAno1": 18000,
-            "motoristasCrescimento": 0.18,
-            "colaboradoresNovasAno1": 6000,
-            "colaboradoresCrescimento": 0.06,
+            "motoristasNovasAno1": 15000,
+            "motoristasCrescimento": 0.1,
+            "colaboradoresNovasAno1": 1000,
+            "colaboradoresCrescimento": 0.02,
             "familiaresPercentual": 0.1,
             "cancelamento": 0.02,
             "ativosMotoristas": [
@@ -503,7 +503,7 @@
       },
       "volumes": {
             "aporteMotorista": 1389,
-            "aporteFamilia": 1333,
+            "aporteFamilia": 4000,
             "freqAporte": 1,
             "mixBoleto": 0,
             "mixTransferencia": 0.01,
@@ -528,7 +528,7 @@
             "anuidadeMensal": 10,
             "isencaoAnuidadeAnos": 1,
             "segundaVia": 20,
-            "interchange": 0.012,
+            "interchange": 0.017,
             "interchangeOnUs": 0,
             "floatCapture": 1,
             "boletoPago": 0.1,
@@ -566,15 +566,16 @@
       },
       "pirapay": {
             "fuelTpvAno1": 300000000,
-            "fuelGrowth": 0.16,
+            "fuelGrowth": 0.1,
+            "tuitionAcquiringPct": 0.1,
             "fuelMdr": 0.006,
-            "fuelCashbackCost": 0.003,
-            "vaColaboradores": 6000,
+            "fuelCashbackCost": 0.002,
+            "vaColaboradores": 1000,
             "vaTicketMensal": 980,
-            "vaMdr": 0.015,
+            "vaMdr": 0.017,
             "marketplaceTpvAno1": 12000000,
             "marketplaceGrowth": 0.28,
-            "marketplaceMdr": 0.035,
+            "marketplaceMdr": 0.04,
             "tokenTpvAno1": 25000000,
             "tokenGrowth": 0.3,
             "tokenMdr": 0.02,
@@ -583,14 +584,14 @@
             "rewardsCost": 0.005
       },
       "credit": {
-            "adoptionActive": 0.12,
+            "adoptionActive": 0.2,
             "avgTicket": 6500,
             "durationMonths": 12,
             "spreadAnnual": 0.24,
-            "poloWorkingCapitalPct": 0.04,
+            "poloWorkingCapitalPct": 0.2,
             "poloWorkingCapitalDurationMonths": 6,
-            "poloWorkingCapitalSpreadAnnual": 0.18,
-            "tuitionAnticipationPct": 0.1,
+            "poloWorkingCapitalSpreadAnnual": 0.22,
+            "tuitionAnticipationPct": 0.2,
             "tuitionAnticipationDurationMonths": 3,
             "tuitionAnticipationSpread": 0.02,
             "tuitionAnticipationServiceFee": 0.005,
@@ -789,8 +790,9 @@
         ["pricing.greenpassPreco", "Receita fidelidade egressos", "currency"]
       ]],
       ["Modulos IPOGpay", [
-        ["pirapay.fuelTpvAno1", "TPV mensalidades ano 1", "currency"],
-        ["pirapay.fuelGrowth", "Crescimento TPV mensalidades", "percent"],
+        ["pirapay.fuelTpvAno1", "Volume total mensalidades ano 1", "currency"],
+        ["pirapay.fuelGrowth", "Crescimento volume mensalidades", "percent"],
+        ["pirapay.tuitionAcquiringPct", "% mensalidades via adquirencia", "percent"],
         ["pirapay.fuelMdr", "MDR adquirencia/gateway", "percent"],
         ["pirapay.vaColaboradores", "Docentes/colaboradores VA/VR", "number"],
         ["pirapay.vaTicketMensal", "Ticket VA/VR mensal", "currency"],
@@ -1117,7 +1119,8 @@
         const floatMonthlyRate = Math.pow(1 + cdiRate, model.volumes.floatDiasMedios / 365) - 1;
         const floatRevenue = avgBalance * floatMonthlyRate * 12 * model.pricing.floatCapture;
 
-        const fuelTpv = model.pirapay.fuelTpvAno1 * Math.pow(1 + model.pirapay.fuelGrowth * f, i);
+        const grossTuitionTpv = model.pirapay.fuelTpvAno1 * Math.pow(1 + model.pirapay.fuelGrowth * f, i);
+        const fuelTpv = grossTuitionTpv * model.pirapay.tuitionAcquiringPct;
         const fuelRevenue = fuelTpv * model.pirapay.fuelMdr;
         const vaTpv = model.pirapay.vaColaboradores * model.pirapay.vaTicketMensal * 12 * Math.pow(1.05, i);
         const vaRevenue = vaTpv * model.pirapay.vaMdr;
@@ -1133,10 +1136,10 @@
         const studentCreditOrigination = creditUsers * model.credit.avgTicket;
         const studentCreditPortfolio = studentCreditOrigination * model.credit.durationMonths / 12;
         const studentCreditRevenue = model.providers.credit === "nao" ? 0 : studentCreditPortfolio * model.credit.spreadAnnual + studentCreditOrigination * model.credit.caasFeeOrigination;
-        const poloWorkingCapitalOrigination = model.providers.credit === "nao" ? 0 : fuelTpv * model.credit.poloWorkingCapitalPct;
+        const poloWorkingCapitalOrigination = model.providers.credit === "nao" ? 0 : grossTuitionTpv * model.credit.poloWorkingCapitalPct;
         const poloWorkingCapitalPortfolio = poloWorkingCapitalOrigination * model.credit.poloWorkingCapitalDurationMonths / 12;
         const poloWorkingCapitalRevenue = model.providers.credit === "nao" ? 0 : poloWorkingCapitalPortfolio * model.credit.poloWorkingCapitalSpreadAnnual + poloWorkingCapitalOrigination * model.credit.caasFeeOrigination;
-        const tuitionAnticipationVolume = model.providers.credit === "nao" ? 0 : fuelTpv * model.credit.tuitionAnticipationPct;
+        const tuitionAnticipationVolume = model.providers.credit === "nao" ? 0 : grossTuitionTpv * model.credit.tuitionAnticipationPct;
         const tuitionAnticipationPortfolio = tuitionAnticipationVolume * model.credit.tuitionAnticipationDurationMonths / 12;
         const tuitionAnticipationRevenue = model.providers.credit === "nao" ? 0 : tuitionAnticipationVolume * (model.credit.tuitionAnticipationSpread + model.credit.tuitionAnticipationServiceFee);
         const creditOrigination = studentCreditOrigination + poloWorkingCapitalOrigination + tuitionAnticipationVolume;
@@ -1203,6 +1206,7 @@
           pixRevenue,
           secondCardBase,
           secondCardRevenue,
+          grossTuitionTpv,
           fuelTpv,
           vaTpv,
           marketTpv,
@@ -1457,6 +1461,8 @@
                     <tr><td>Marketing</td><td><strong>${fmtMoney(r1.marketing)}</strong></td></tr>
                     <tr><td>RH</td><td><strong>${fmtMoney(r1.rh)}</strong></td></tr>
                     <tr><td>Administrativas</td><td><strong>${fmtMoney(r1.admin)}</strong></td></tr>
+                    <tr><td>Mensalidades totais</td><td><strong>${fmtMoney(r1.grossTuitionTpv)}</strong></td></tr>
+                    <tr><td>Mensalidades via adquirencia</td><td><strong>${fmtMoney(r1.fuelTpv)} / ${fmtPct(model.pirapay.tuitionAcquiringPct)}</strong></td></tr>
                     <tr><td>Fidelidade mensalidades</td><td><strong>${fmtMoney(r1.fuelCost)}</strong></td></tr>
                     <tr><td>MDR Token estabelecimentos</td><td><strong>${fmtMoney(r1.tokenMdrRevenue)}</strong></td></tr>
                     <tr><td>Cashback comprador Token</td><td><strong>${fmtMoney(r1.tokenBuyerCashbackCost)}</strong></td></tr>
@@ -1525,7 +1531,7 @@
         ["PIX unidades/polos", r5.pixRevenue, "#38BDF8"],
         ["Interchange", r5.interchange + r5.interchangeOnUs, "#FF7A00"],
         ["Float", r5.floatRevenue, "#168A4B"],
-        ["Mensalidades", r5.fuelRevenue, "#D6A84A"],
+        ["Mensalidades (gateway)", r5.fuelRevenue, "#D6A84A"],
         ["VA/VR docentes", r5.vaRevenue, "#7C3AED"],
         ["Convenios/marketplace", r5.marketRevenue, "#0F766E"],
         ["MDR Token terceiros", r5.tokenMdrRevenue, "#2563EB"],
@@ -1556,7 +1562,7 @@
           <div class="premise-card"><h4>4. Cartao e courier</h4><p><strong>${fmtPct(model.accounts.percentualCartao)}</strong> das contas com cartao. 2a via <strong>${fmtMoney(model.pricing.segundaVia, false)}</strong> e gera custo de emissao/entrega. Courier <strong>${model.providers.courier}</strong>: custo por entrega <strong>${fmtMoney(cardCosts.courierCard, false)}</strong>, minimo anualizado <strong>${fmtMoney(cardCosts.courierMinimumAnnual, false)}</strong>, PA de entrega anualizado <strong>${fmtMoney(cardCosts.courierDedicatedPaAnnual, false)}</strong>.</p></div>
           <div class="premise-card"><h4>5. Macro e float</h4><p>Referencia Ano 1: Selic <strong>${fmtPct(selic)}</strong>; CDI calculado <strong>${fmtPct(cdi)}</strong>; IPCA <strong>${fmtPct(ipca)}</strong>. Float: saldo medio ${fmtPct(model.volumes.saldoMedioPercentual)}, ${model.volumes.floatDiasMedios} dias, captura ${fmtPct(model.pricing.floatCapture)}.</p></div>
           <div class="premise-card"><h4>6. Credito/FIDC</h4><p><strong>${fmtPct(model.credit.adoptionActive)}</strong> dos ativos usam credito estudantil; capital de giro polos usa <strong>${fmtPct(model.credit.poloWorkingCapitalPct)}</strong> do TPV de mensalidades; antecipacao futura polos usa <strong>${fmtPct(model.credit.tuitionAnticipationPct)}</strong>. Terceiros FIDC <strong>${fmtPct(model.providers.fidcThirdParty)}</strong>.</p></div>
-          <div class="premise-card"><h4>7. Mensalidades, VA e convenios</h4><p>Mensalidades: TPV <strong>${fmtMoney(model.pirapay.fuelTpvAno1)}</strong> e MDR <strong>${fmtPct(model.pirapay.fuelMdr)}</strong>. VA/VR: ticket <strong>${fmtMoney(model.pirapay.vaTicketMensal, false)}</strong>. Convenios MDR <strong>${fmtPct(model.pirapay.marketplaceMdr)}</strong>.</p></div>
+          <div class="premise-card"><h4>7. Mensalidades, VA e convenios</h4><p>Mensalidades totais: <strong>${fmtMoney(model.pirapay.fuelTpvAno1)}</strong>; via adquirencia: <strong>${fmtPct(model.pirapay.tuitionAcquiringPct)}</strong>; MDR <strong>${fmtPct(model.pirapay.fuelMdr)}</strong>. VA/VR: ticket <strong>${fmtMoney(model.pirapay.vaTicketMensal, false)}</strong>. Convenios MDR <strong>${fmtPct(model.pirapay.marketplaceMdr)}</strong>.</p></div>
           <div class="premise-card"><h4>8. Token em estabelecimentos</h4><p>TPV Token terceiros <strong>${fmtMoney(model.pirapay.tokenTpvAno1)}</strong>; MDR <strong>${fmtPct(model.pirapay.tokenMdr)}</strong>; devolucao comprador ate <strong>${fmtPct(model.pirapay.tokenBuyerCashback)}</strong> e incentivo por metas ate <strong>${fmtPct(model.pirapay.tokenMerchantIncentive)}</strong>.</p></div>
           <div class="premise-card"><h4>9. Custos e implantacao</h4><p>Custos recorrentes corrigidos por IPCA. Setup BaaS, front e embossing alocado somente no <strong>Ano 1</strong>. Marketing Ano 1: <strong>${fmtMoney(model.costs.marketingAno1)}</strong>.</p></div>
         </div>
@@ -1570,7 +1576,7 @@
           <div class="premise-card"><h4>1. Provedores</h4><p>Cenario <strong>${model.scenario}</strong>. Core <strong>${model.providers.accountCore || model.providers.baas}</strong>; servicos <strong>${model.providers.services}</strong>; front <strong>${model.providers.front}</strong>; emboss <strong>${model.providers.emboss}</strong>; courier <strong>${model.providers.courier}</strong>.</p></div>
           <div class="premise-card"><h4>2. Base</h4><p>Ano 1: <strong>${model.accounts.motoristasNovasAno1.toLocaleString("pt-BR")}</strong> alunos/egressos e <strong>${model.accounts.colaboradoresNovasAno1.toLocaleString("pt-BR")}</strong> docentes/colaboradores. Crescimento: ${fmtPct(model.accounts.motoristasCrescimento)} e ${fmtPct(model.accounts.colaboradoresCrescimento)}.</p></div>
           <div class="premise-card"><h4>3. Cartao e courier</h4><p>2a via gera receita e tambem novo custo de cartao. Embossing <strong>${fmtMoney(cardCosts.embossCard, false)}</strong>/cartao. Courier <strong>${model.providers.courier}</strong>: custo por entrega <strong>${fmtMoney(cardCosts.courierCard, false)}</strong>, minimo anualizado <strong>${fmtMoney(cardCosts.courierMinimumAnnual, false)}</strong> e PA de entrega anualizado <strong>${fmtMoney(cardCosts.courierDedicatedPaAnnual, false)}</strong>.</p></div>
-          <div class="premise-card"><h4>4. Implantacao</h4><p>Setup alocado apenas no <strong>Ano 1</strong>. Custos recorrentes corrigidos por IPCA. Float por CDI proporcional aos dias de saldo. Monetizacao: mensalidades, folha, PIX, 2a via, VA/VR, convenios, credito estudantil e antecipacao/FIDC.</p></div>
+          <div class="premise-card"><h4>4. Implantacao</h4><p>Setup alocado apenas no <strong>Ano 1</strong>. Custos recorrentes corrigidos por IPCA. Float por CDI proporcional aos dias de saldo. Monetizacao: MDR sobre a parcela de mensalidades via adquirencia, folha, PIX, 2a via, VA/VR, convenios, credito estudantil e antecipacao/FIDC.</p></div>
         </div>
       `;
     }
@@ -1611,7 +1617,7 @@
         ["Interchange cartao IPOGpay", "interchange"],
         ["Interchange on-us ecossistema", "interchangeOnUs"],
         ["Float mensalidades e folha", "floatRevenue"],
-        ["Recebimento de mensalidades", "fuelRevenue"],
+        ["Recebimento de mensalidades (gateway)", "fuelRevenue"],
         ["Cartao beneficios VA/VR", "vaRevenue"],
         ["Convenios e marketplace educacional", "marketRevenue"],
         ["MDR Token estabelecimentos terceiros", "tokenMdrRevenue"],
@@ -1703,7 +1709,7 @@
         ["Conta e tarifas", r5.serviceRevenue],
         ["Cartao/interchange", r5.interchange + r5.interchangeOnUs],
         ["Float", r5.floatRevenue],
-        ["Mensalidades", r5.fuelRevenue],
+        ["Mensalidades (gateway)", r5.fuelRevenue],
         ["VA/VR docentes", r5.vaRevenue],
         ["Convenios/marketplace", r5.marketRevenue],
         ["Credito estudantil", r5.studentCreditRevenue],
@@ -2030,7 +2036,7 @@
           ["Interchange cartao IPOGpay", "interchange", 1, "revenue"],
           ["Interchange on-us ecossistema", "interchangeOnUs", 1, "revenue"],
           ["Float mensalidades e folha", "floatRevenue", 1, "revenue"],
-          ["Recebimento de mensalidades", "fuelRevenue", 1, "revenue"],
+          ["Recebimento de mensalidades (gateway)", "fuelRevenue", 1, "revenue"],
           ["Cartao beneficios VA/VR", "vaRevenue", 1, "revenue"],
           ["Convenios e marketplace educacional", "marketRevenue", 1, "revenue"],
           ["MDR Token estabelecimentos terceiros", "tokenMdrRevenue", 1, "revenue"],
@@ -2080,7 +2086,7 @@
             <tr><td>PIX unidades/polos CNPJ</td><td>Operacoes PIX de unidades, polos e parceiros CNPJ multiplicadas pela tarifa escolhida</td><td>${fmtMoney(rows[0].pixRevenue)}</td><td>${fmtMoney(r5.pixRevenue)}</td></tr>
             <tr><td>Interchange</td><td>TPV cartao x taxa de interchange definida nas premissas</td><td>${fmtMoney(rows[0].interchange + rows[0].interchangeOnUs)}</td><td>${fmtMoney(r5.interchange + r5.interchangeOnUs)}</td></tr>
             <tr><td>Float</td><td>Saldo medio mensal x CDI proporcional a ${model.volumes.floatDiasMedios} dias x 12 meses x captura do float</td><td>${fmtMoney(rows[0].floatRevenue)}</td><td>${fmtMoney(r5.floatRevenue)}</td></tr>
-            <tr><td>Mensalidades</td><td>TPV de mensalidades x MDR de adquirencia/gateway</td><td>${fmtMoney(rows[0].fuelRevenue)}</td><td>${fmtMoney(r5.fuelRevenue)}</td></tr>
+            <tr><td>Mensalidades (gateway)</td><td>Volume total de mensalidades x ${fmtPct(model.pirapay.tuitionAcquiringPct)} via adquirencia x MDR de ${fmtPct(model.pirapay.fuelMdr)}. Ano 1 via adquirencia: ${fmtMoney(rows[0].fuelTpv)}</td><td>${fmtMoney(rows[0].fuelRevenue)}</td><td>${fmtMoney(r5.fuelRevenue)}</td></tr>
             <tr><td>VA/VR docentes</td><td>Docentes/colaboradores x ticket VA/VR x MDR</td><td>${fmtMoney(rows[0].vaRevenue)}</td><td>${fmtMoney(r5.vaRevenue)}</td></tr>
             <tr><td>Convenios/marketplace</td><td>TPV de convenios, parceiros e marketplace educacional x MDR</td><td>${fmtMoney(rows[0].marketRevenue)}</td><td>${fmtMoney(r5.marketRevenue)}</td></tr>
             <tr><td>MDR Token estabelecimentos terceiros</td><td>TPV pago por Token dentro do ecossistema IPOG x MDR de ${fmtPct(model.pirapay.tokenMdr)} cobrado de estabelecimentos terceiros</td><td>${fmtMoney(rows[0].tokenMdrRevenue)}</td><td>${fmtMoney(r5.tokenMdrRevenue)}</td></tr>
